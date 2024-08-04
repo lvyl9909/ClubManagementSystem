@@ -1,4 +1,5 @@
-@startuml 123
+@startuml
+!pragma layout smetana
 class Person{
     name
     email
