@@ -8,7 +8,7 @@ class Person{
 class Student{
     student_id
     clubs
-    events
+    rsvps
 }
 
 class FacultyAdministrator{
@@ -63,10 +63,9 @@ Student "1..*" -- "0..*" Club : belong >
 FundingApplication "0..*"--"1" FacultyAdministrator: approval >
 Club "1" -- "0..*" Event : hold >
 Event  -- "1" Venue : locate >
-Student "1" -- "0..*" Rsvp : control >
+Student "1" -- "0..*" Rsvp : responded >
 Event "1" -- "0..*" Rsvp : contain >
 Club "1"--"0..*" FundingApplication : submit >
-Student "0..*"--"0..*" Event: participate >
 FundingApplication  -- "0..*" Event : spend on >
 FacultyAdministrator "1..*" -- "1..*" Club : manage >
 @enduml
