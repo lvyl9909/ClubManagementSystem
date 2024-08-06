@@ -8,7 +8,6 @@ class Person{
 
 class Student{
     student_id
-    clubs
     rsvps
     clubMembership
     ticket
@@ -18,7 +17,6 @@ class ClubMembership{
     student
     club
     isAdmin
-    fundingApplications
 }
 
 
@@ -49,43 +47,42 @@ class Event{
     cost
     club
     rsvps
+    capacity
 }
 
 class FundingApplication{
     description
     amount
+    semester
     status
     club
     event
     date
     reviewer
-    creator
 }
 
 class RSVP{
     student
     event
-    state
+    status
 }
 
 class ticket{
     student
     rsvp
-    state
+    status
 }
 Person <|-- Student
 Person <|-- FacultyAdministrator
-Student  -- "0..*" Club : belong >
-FundingApplication "0..*"--"1" FacultyAdministrator: approval >
-Club "1" -- "0..*" Event : hold >
-Event  -- "1" Venue : locate >
-Student "1" -- "0..*" RSVP : submit >
-Event "1" -- "0..*" RSVP : contain >
-Club "1"--"0..*" FundingApplication : submit >
-FundingApplication  -- "0..*" Event : spend on >
+FundingApplication "0..*"--"1" FacultyAdministrator: approval 
+Club "1" -- "0..*" Event : hold 
+Event  -- "1" Venue : locate 
+Student "1" -- "0..*" RSVP : submit 
+Event "1" -- "0..*" RSVP : contain 
+Club "1"--"0..*" FundingApplication : submit 
+FundingApplication  -- "1..*" Event : spend on 
 RSVP "1"--"1..3" ticket : contain >
 Student "1" -- "0..*" ticket: hold >
-Club "1" -- "1..*" ClubMembership
-Student "1"--"0..*" ClubMembership
-ClubMembership "1" -- "0..*" FundingApplication
+Club "1" -- "1..*" ClubMembership :affiliation
+Student "1"--"0..*" ClubMembership :own
 @enduml
