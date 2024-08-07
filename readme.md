@@ -1,7 +1,6 @@
 We are Team Y!
 
-save database:
-*mysqldump -u root -p testdb > database_dump.sql*
+Team member:
 
-load database:
-*mysql -u your_username -p your_database < database_dump.sql*
+
+Structure:
