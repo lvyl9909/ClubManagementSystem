@@ -13,14 +13,14 @@
 **Our repository structure:**
 
 ```
-docs/
-├── part1/
-├── part2/
-├── part3/
-├── part4/
-├── data-samples/
-├── meeting notes/
-src/
-README.md
+├──docs
+├──├── part1
+├──├── part2
+├──├── part3
+├──├── part4
+├──├── data-samples
+├──├── meeting notes
+├──src
+├──README.md
 ```
 **Changelog:**
