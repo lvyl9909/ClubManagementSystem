@@ -1,4 +1,4 @@
-package org.teamy.backend.database;
+package org.teamy.backend.config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
