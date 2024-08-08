@@ -26,7 +26,7 @@
       <change afterPath="$PROJECT_DIR$/backend/mvnw.cmd" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/HelloServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/database/DatabaseConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/config/DatabaseConfig.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/resources/META-INF/beans.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/resources/META-INF/persistence.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
@@ -118,11 +118,11 @@
 }</component>
   <component name="RunManager" selected="Tomcat 服务器.Tomcat 10.1.26">
     <configuration name="DatabaseConfig" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.teamy.backend.database.DatabaseConfig" />
+      <option name="MAIN_CLASS_NAME" value="org.teamy.backend.config.DatabaseConfig" />
       <module name="backend" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.teamy.backend.database.*" />
+          <option name="PATTERN" value="org.teamy.backend.config.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -265,6 +265,7 @@
       <workItem from="1722951589537" duration="7000" />
       <workItem from="1723007134314" duration="3623000" />
       <workItem from="1723041578633" duration="1170000" />
+      <workItem from="1723092438639" duration="2107000" />
     </task>
     <servers />
   </component>
