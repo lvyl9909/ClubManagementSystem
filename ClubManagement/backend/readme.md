@@ -21,11 +21,11 @@ Ensure you have the following software installed on your system:
 ### Database
 You can find a database_dump.sql file in the backend folder, which is our test database file. You need to run the following command in the directory’s command line to create the corresponding database.
 
-`mysql -u your_username -p your_database < database_dump.sql ` 
+`pg_dump -U username -h hostname -p port -d databasename -F p -f /path/to/your/backup.sql ` 
 
 After modifying the database, you can also run the following command to save the new database script file.
 
-`mysqldump -u your_username -p your_database > database_dump.sql`
+`psql -U username -h hostname -p port -f /path/to/your/backup.sql`
 
 And for now, our test database user and password are hardcoded.
 
