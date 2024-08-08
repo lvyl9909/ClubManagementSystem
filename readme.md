@@ -1,6 +1,10 @@
-We are Team Y!
+# We are Team Y!
 
-Team member:
+**Team Member:**
 
-
-Structure:
+| Name | StudentID | E-mail |
+|----------|----------|----------|
+|   Yilin Lyu        |   1429919       |   yillyu1@student.unimelb.edu.au       |
+|          |          |          |
+|          |          |          |
+|          |          |          |
