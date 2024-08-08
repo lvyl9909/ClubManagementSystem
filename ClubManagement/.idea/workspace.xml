@@ -21,12 +21,18 @@
       <change afterPath="$PROJECT_DIR$/ClubManagement.iml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/.mvn/wrapper/maven-wrapper.jar" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/README.md" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/database_dump.sql" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/mvnw" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/mvnw.cmd" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/HelloServlet.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/config/DatabaseConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/controller/StudentController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/dao/StudentDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/model/Person.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/model/Student.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/service/StudentService.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/resources/META-INF/beans.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/resources/META-INF/persistence.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
@@ -250,6 +256,7 @@
     <attachedChunks>
       <set>
         <option value="jdk-17.0.10-corretto-17.0.10-f644763e9732-24582b8d" />
+        <option value="jdk-21.0.2-openjdk-21.0.2-f644763e9732-a81d5c7c" />
       </set>
     </attachedChunks>
   </component>
@@ -266,6 +273,7 @@
       <workItem from="1723007134314" duration="3623000" />
       <workItem from="1723041578633" duration="1170000" />
       <workItem from="1723092438639" duration="2107000" />
+      <workItem from="1723105986477" duration="371000" />
     </task>
     <servers />
   </component>
