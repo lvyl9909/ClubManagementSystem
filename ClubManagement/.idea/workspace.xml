@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
+      <artifact name="backend:war" />
       <artifact name="backend:war exploded" />
     </artifacts-to-build>
   </component>
@@ -22,12 +23,12 @@
       <change afterPath="$PROJECT_DIR$/backend/.mvn/wrapper/maven-wrapper.jar" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/database_dump.sql" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/mvnw" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/mvnw.cmd" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/postgre_backup.sql" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/HelloServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/config/DatabaseConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/config/TestResource.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/controller/StudentController.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/dao/StudentDao.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/model/Person.java" afterDir="false" />
@@ -72,6 +73,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="LogFilters">
     <option name="FILTER_ERRORS" value="false" />
     <option name="FILTER_WARNINGS" value="false" />
@@ -94,34 +98,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;Jest.renders learn react link.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.backend [clean,install].executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Tomcat 服务器.Tomcat 10.1.26.executor&quot;: &quot;Run&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;corretto-17&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs.jest.jest_package&quot;: &quot;/Users/chenyun/Desktop/SDA/Y/ClubManagement/frontend/node_modules/react-scripts&quot;,
-    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.start.executor&quot;: &quot;Run&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;,
-    &quot;应用程序.DatabaseConfig.executor&quot;: &quot;Run&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Jest.renders learn react link.executor": "Run",
+    "Maven.backend [clean,install].executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Tomcat 服务器.Tomcat 10.1.26.executor": "Run",
+    "jdk.selected.JAVA_MODULE": "corretto-17",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs.jest.jest_package": "/Users/chenyun/Desktop/SDA/Y/ClubManagement/frontend/node_modules/react-scripts",
+    "nodejs_interpreter_path": "node",
+    "nodejs_package_manager_path": "npm",
+    "npm.start.executor": "Run",
+    "vue.rearranger.settings.migration": "true",
+    "应用程序.DatabaseConfig.executor": "Run"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql",
+      "postgresql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Tomcat 服务器.Tomcat 10.1.26">
     <configuration name="DatabaseConfig" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.teamy.backend.config.DatabaseConfig" />
@@ -153,6 +158,7 @@
     </configuration>
     <configuration name="Tomcat 10.1.26" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.26" ALTERNATIVE_JRE_ENABLED="false">
       <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080/ClubManagement" />
+      <option name="COMMON_VM_ARGUMENTS" value="-Djdbc.uri=jdbc:postgresql://dpg-cqqa5sjv2p9s73b4fi2g-a.singapore-postgres.render.com/swen90007_teamy -Djdbc.username=swen90007_teamy_owner -Djdbc.password=MmDETsMioPzOVdhSJoB4T3wwrxD1ElGH" />
       <deployment>
         <artifact name="backend:war exploded">
           <settings>
@@ -274,6 +280,7 @@
       <workItem from="1723041578633" duration="1170000" />
       <workItem from="1723092438639" duration="2107000" />
       <workItem from="1723105986477" duration="371000" />
+      <workItem from="1723114416023" duration="7228000" />
     </task>
     <servers />
   </component>
@@ -282,5 +289,20 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/backend/src/main/java/org/teamy/backend/config/TestResource.java</url>
+          <line>19</line>
+          <properties class="org.teamy.backend.config.TestResource" method="doGet">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
