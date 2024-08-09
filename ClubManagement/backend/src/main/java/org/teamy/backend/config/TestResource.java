@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.*;
+import com.google.gson.Gson;
+
 
 @WebServlet(name = "test", urlPatterns = "/test")
 public class TestResource extends HttpServlet {
