@@ -1,0 +1,20 @@
+# Maven target directory
+target/
+
+# Maven Wrapper files
+.mvn/wrapper/
+
+# Log files
+*.log
+
+# Compiled class files
+*.class
+
+# Packages
+*.jar
+*.war
+*.ear
+
+# Ignore IDE files
+.idea/
+.vscode/
