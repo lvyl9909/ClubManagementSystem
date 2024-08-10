@@ -2,6 +2,7 @@ package org.teamy.backend.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Event {
@@ -13,6 +14,16 @@ public class Event {
     private Integer capacity;
     private List<RSVP> rsvps;
     private Club club;
+    private List<CapacityObserver> observers = new ArrayList<>();
+    private Waitlist waitlist;
+
+    public Waitlist getWaitlist() {
+        return waitlist;
+    }
+
+    public void setWaitlist(Waitlist waitlist) {
+        this.waitlist = waitlist;
+    }
 
     public Event(String title, String description, LocalDateTime dateTime, Venue venue, BigDecimal cost, Integer capacity, List<RSVP> rsvps, Club club) {
         this.title = title;
@@ -87,5 +98,20 @@ public class Event {
 
     public void setClub(Club club) {
         this.club = club;
+    }
+
+    public void registerObserver(CapacityObserver observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObservers() {
+        for (CapacityObserver observer : observers) {
+            observer.update(this);
+        }
+    }
+
+    public void updateCapacity(int newCapacity) {
+        this.capacity = newCapacity;
+        notifyObservers(); // Notify all observers when capacity changes
     }
 }

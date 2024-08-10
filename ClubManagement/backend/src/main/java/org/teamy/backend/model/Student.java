@@ -47,4 +47,8 @@ public class Student extends Person{
     public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
     }
+    public void addTicket(Ticket tickets) {
+        this.tickets.add(tickets);
+    }
+
 }
