@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnectionManager {
-    private static DatabaseConnectionManager instance;
     private Connection connection;
     private static final String PROPERTY_JDBC_URI = "jdbc.uri";
     private static final String PROPERTY_JDBC_USERNAME = "jdbc.username";
@@ -25,18 +24,6 @@ public class DatabaseConnectionManager {
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException("Error initializing the database connection.", e);
         }
-    }
-
-    // Lazy initialization of the Singleton instance
-    public static DatabaseConnectionManager getInstance() {
-        if (instance == null) {
-            synchronized (DatabaseConnectionManager.class) {
-                if (instance == null) {
-                    instance = new DatabaseConnectionManager();
-                }
-            }
-        }
-        return instance;
     }
 
     // Method to get the connection object
