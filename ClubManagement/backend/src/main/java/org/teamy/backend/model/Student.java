@@ -16,6 +16,11 @@ public class Student extends Person{
         this.tickets = tickets;
     }
 
+    public Student(String name, String email, Long phoneNumber, String studentId) {
+        super(name, email, phoneNumber);
+        this.studentId = studentId;
+    }
+
     public String getStudentId() {
         return studentId;
     }
