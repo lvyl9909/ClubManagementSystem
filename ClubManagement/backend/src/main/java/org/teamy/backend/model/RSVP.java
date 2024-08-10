@@ -65,11 +65,16 @@ public class RSVP implements CapacityObserver{
 //    public void setTickets(List<Ticket> tickets) {
 //        this.tickets = tickets;
 //    }
-
+    public void submit() {
+        CapacityCheckHandler capacityHandler = new CapacityCheckHandler();
+        TicketGenerationHandler ticketHandler = new TicketGenerationHandler();
+        capacityHandler.setNextHandler(ticketHandler);
+        capacityHandler.handle(this); // Start chain of responsibility
+    }
     @Override
     public void update(Event event) {
         if (status.equals(RSVPStatus.Waitlisted) && event.getCapacity() > 0) {
-            //submit(); // Re-submit RSVP if event capacity increases
+            submit(); // Re-submit RSVP if event capacity increases
         }
     }
 }
