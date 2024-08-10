@@ -1,4 +1,7 @@
 package org.teamy.backend.controller;
 
-public class StudentController {
+import jakarta.servlet.http.HttpServlet;
+
+public class StudentController  extends HttpServlet {
+    
 }
