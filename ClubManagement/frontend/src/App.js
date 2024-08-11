@@ -14,7 +14,7 @@ function App() {
     setData(null);
     try {
       const res = await fetch(
-          `${API_BASE_URL}/test`,
+          `${API_BASE_URL}/students`,
       );
       if (res.status > 299) {
         setData(`woops! bad response status ${res.status} from API`);
