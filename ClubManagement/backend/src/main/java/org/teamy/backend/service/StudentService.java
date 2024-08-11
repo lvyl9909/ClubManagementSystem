@@ -20,5 +20,20 @@ public class StudentService {
         return studentDataMapper.updateStudent(student);
     }
 
+    public Student getStudentByStudentId(String studentId) throws Exception {
+        // 在这里可以添加业务逻辑，比如检查studentId是否为空
+        if (studentId == null || studentId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Student ID cannot be null or empty");
+        }
+
+        Student student = studentDataMapper.findStudentByStudentId(studentId);
+
+        if (student == null) {
+            throw new Exception("Student with ID " + studentId + " not found");
+        }
+
+        return student;
+    }
+
 
 }

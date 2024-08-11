@@ -17,6 +17,11 @@ public class Club {
         this.fundingApplications = fundingApplications;
     }
 
+    public Club(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
     public String getName() {
         return name;
     }

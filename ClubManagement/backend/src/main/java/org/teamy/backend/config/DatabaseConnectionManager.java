@@ -11,7 +11,7 @@ public class DatabaseConnectionManager {
     private static final String PROPERTY_JDBC_PASSWORD = "jdbc.password";
 
     // Private constructor to prevent instantiation
-    private DatabaseConnectionManager() {
+    public DatabaseConnectionManager() {
         try {
             // Load the driver
             Class.forName("org.postgresql.Driver");
