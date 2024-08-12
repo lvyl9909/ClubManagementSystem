@@ -9,11 +9,11 @@ public class Event {
     private String title;
     private String description;
     private LocalDateTime dateTime;
-    private Venue venue;
+    private String venueName;
     private BigDecimal cost;
     private Integer capacity;
     private List<RSVP> rsvps;
-    private Club club;
+    private Integer clubId;
     private List<CapacityObserver> observers = new ArrayList<>();
     private Waitlist waitlist;
 
@@ -25,15 +25,23 @@ public class Event {
         this.waitlist = waitlist;
     }
 
-    public Event(String title, String description, LocalDateTime dateTime, Venue venue, BigDecimal cost, Integer capacity, List<RSVP> rsvps, Club club) {
+    public Event(String title, String description, LocalDateTime dateTime, String venueName, BigDecimal cost, Integer capacity, List<RSVP> rsvps, Integer clubId) {
         this.title = title;
         this.description = description;
         this.dateTime = dateTime;
-        this.venue = venue;
+        this.venueName = venueName;
         this.cost = cost;
         this.capacity = capacity;
         this.rsvps = rsvps;
-        this.club = club;
+        this.clubId = clubId;
+    }
+
+    public Event(String title, String description, String venueName, BigDecimal cost,Integer clubId) {
+        this.title = title;
+        this.description = description;
+        this.venueName = venueName;
+        this.cost = cost;
+        this.clubId=clubId;
     }
 
     public String getTitle() {
@@ -60,12 +68,12 @@ public class Event {
         this.dateTime = dateTime;
     }
 
-    public Venue getVenue() {
-        return venue;
+    public String getVenueName() {
+        return venueName;
     }
 
-    public void setVenue(Venue venue) {
-        this.venue = venue;
+    public void setVenueName(String venueName) {
+        this.venueName = venueName;
     }
 
     public BigDecimal getCost() {
@@ -92,12 +100,12 @@ public class Event {
         this.rsvps = rsvps;
     }
 
-    public Club getClub() {
-        return club;
+    public Integer getClub() {
+        return clubId;
     }
 
-    public void setClub(Club club) {
-        this.club = club;
+    public void setClub(Integer clubId) {
+        this.clubId = clubId;
     }
 
     public void registerObserver(CapacityObserver observer) {
