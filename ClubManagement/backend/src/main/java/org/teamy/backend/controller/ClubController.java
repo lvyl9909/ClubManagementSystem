@@ -38,6 +38,7 @@ public class ClubController extends HttpServlet {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
         }

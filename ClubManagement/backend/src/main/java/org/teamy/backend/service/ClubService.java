@@ -16,10 +16,9 @@ public class ClubService {
         }
 
         Club club = clubDataMapper.findStudentById(id);
-        if (club == null) {
-            throw new Exception("Club with ID " + id + " not found");
-        }
-
+//        if (club == null) {
+//            throw new Exception("Club with ID " + id + " not found");
+//        }
         return club;
     }
 
