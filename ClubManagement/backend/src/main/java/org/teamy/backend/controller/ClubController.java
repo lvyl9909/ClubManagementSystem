@@ -10,18 +10,24 @@ import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.Club;
 import org.teamy.backend.service.ClubService;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import com.google.gson.Gson;
+
 
 @WebServlet("/clubs/*")
 public class ClubController extends HttpServlet {
     private ClubService clubService;
+    private Gson gson = new Gson();  // Gson 实例
+
     @Override
     public void init() throws ServletException {
         // 假设你有一个方法来获取 ClubService 的实例
         // 比如通过依赖注入、服务定位器模式或手动实例化
         DatabaseConnectionManager databaseConnectionManager = new DatabaseConnectionManager();
         clubService = new ClubService(new ClubDataMapper(databaseConnectionManager.getConnection()));  // 假设 ClubMapperImpl 是具体实现
+        System.out.println("success init");
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -47,6 +53,7 @@ public class ClubController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("processing");
         String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
 
         if (pathInfo.equals("/save")) {
@@ -74,23 +81,28 @@ public class ClubController extends HttpServlet {
             resp.getWriter().write(e.getMessage());
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("An error occurred while saving the club.");
+            resp.getWriter().write("An error occurred while saving the club. "+e.getMessage());
         }
     }
 
-    private Club parseClubFromRequest(HttpServletRequest req) {
-        // 假设请求体为JSON格式，可以使用第三方库如Jackson来解析JSON
-        // 这里是一个简化的示例，实际代码应该包括完整的解析和错误处理逻辑
-        String name = req.getParameter("name");
-        String description = req.getParameter("description");
-
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Club name cannot be empty");
+    private Club parseClubFromRequest(HttpServletRequest req) throws IOException {
+        // 使用BufferedReader读取请求体
+        BufferedReader reader = req.getReader();
+        StringBuilder jsonBuffer = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            jsonBuffer.append(line);
+            System.out.println(line);
         }
 
-        Club club = new Club();
-        club.setName(name);
-        club.setDescription(description);
+        // 使用Gson将JSON字符串解析为Java对象
+        Club club = gson.fromJson(jsonBuffer.toString(), Club.class);
+        System.out.println(club.toString());
+
+        // 校验数据
+        if (club.getName() == null || club.getName().isEmpty()) {
+            throw new IllegalArgumentException("Club name cannot be empty");
+        }
 
         return club;
     }
