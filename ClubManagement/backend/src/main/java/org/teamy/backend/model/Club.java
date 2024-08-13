@@ -22,6 +22,9 @@ public class Club {
         this.description = description;
     }
 
+    public Club() {
+    }
+
     public String getName() {
         return name;
     }

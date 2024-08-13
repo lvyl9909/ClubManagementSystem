@@ -39,9 +39,60 @@ public class ClubController extends HttpServlet {
                 throw new RuntimeException(e);
             }
 
-        } else {
+        }
+        else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
+
+        if (pathInfo.equals("/save")) {
+            saveClub(req, resp);
+        }
+    }
+
+    private void saveClub(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            // 从请求中解析俱乐部数据，假设请求体为JSON格式
+            Club club = parseClubFromRequest(req);
+
+            // 调用Service层保存俱乐部
+            boolean isSaved = clubService.saveClub(club);
+
+            if (isSaved) {
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+                resp.getWriter().write("Club saved successfully.");
+            } else {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("Failed to save the club.");
+            }
+        } catch (IllegalArgumentException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(e.getMessage());
+        } catch (Exception e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("An error occurred while saving the club.");
+        }
+    }
+
+    private Club parseClubFromRequest(HttpServletRequest req) {
+        // 假设请求体为JSON格式，可以使用第三方库如Jackson来解析JSON
+        // 这里是一个简化的示例，实际代码应该包括完整的解析和错误处理逻辑
+        String name = req.getParameter("name");
+        String description = req.getParameter("description");
+
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Club name cannot be empty");
+        }
+
+        Club club = new Club();
+        club.setName(name);
+        club.setDescription(description);
+
+        return club;
     }
 
     private void viewClub(HttpServletRequest req, HttpServletResponse resp, Integer ClubId) throws Exception {
