@@ -33,22 +33,23 @@ public class ClubController extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
+        String idParam = req.getParameter("id"); // 从查询字符串中获取 "id" 参数
 
-        if (pathInfo == null || pathInfo.equals("/")) {
-            listClubs(req, resp);
-        } else if (pathInfo.matches("/\\d+")) {
-            Integer studentId = Integer.valueOf(pathInfo.substring(1)); // 去掉前面的斜杠获取ID
+        if (idParam == "-1") {
+            listClubs(req, resp); // 如果没有 id 参数，则列出所有俱乐部
+        } else {
             try {
-                viewClub(req, resp, studentId);
+                Integer clubId = Integer.valueOf(idParam); // 将 id 参数转换为整数
+                viewClub(req, resp, clubId); // 调用 viewClub 方法
+            } catch (NumberFormatException e) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format"); // 返回400错误，说明ID格式无效
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
         }
-        else {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
-        }
+//        else {
+//            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
+//        }
     }
 
     @Override
