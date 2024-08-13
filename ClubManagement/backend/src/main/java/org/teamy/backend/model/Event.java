@@ -1,14 +1,18 @@
 package org.teamy.backend.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Event {
     private String title;
     private String description;
-    private LocalDateTime dateTime;
+    private String date;
+    private String time;
     private String venueName;
     private BigDecimal cost;
     private Integer capacity;
@@ -25,18 +29,30 @@ public class Event {
         this.waitlist = waitlist;
     }
 
-    public Event(String title, String description, LocalDateTime dateTime, String venueName, BigDecimal cost, Integer capacity, List<RSVP> rsvps, Integer clubId) {
+    public Event(String title, String description, String date, String time, String venueName, BigDecimal cost, Integer capacity,Integer clubId) {
         this.title = title;
         this.description = description;
-        this.dateTime = dateTime;
+        this.date = date;
+        this.time = time;
         this.venueName = venueName;
         this.cost = cost;
         this.capacity = capacity;
-        this.rsvps = rsvps;
+    }
+
+    public Event(String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId) {
+        this.title = title;
+        this.description = description;
+        this.date = date.toString();
+        this.time = time.toString();
+        this.venueName = venueName;
+        this.cost = cost;
         this.clubId = clubId;
     }
 
-    public Event(String title, String description, String venueName, BigDecimal cost,Integer clubId) {
+    public Event() {
+    }
+
+    public Event(String title, String description, String venueName, BigDecimal cost, Integer clubId) {
         this.title = title;
         this.description = description;
         this.venueName = venueName;
@@ -60,12 +76,27 @@ public class Event {
         this.description = description;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public String getDate() {
+        return date;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setDate(String date) {
+        this.date = date;
+    }
+    public Date getSqlDate() {
+        return Date.valueOf(LocalDate.parse(date));  // 在这里手动转换为 java.sql.Date
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public Time getSqlTime() {
+        return Time.valueOf(LocalTime.parse(time));  // 手动转换为 java.sql.Time
     }
 
     public String getVenueName() {
