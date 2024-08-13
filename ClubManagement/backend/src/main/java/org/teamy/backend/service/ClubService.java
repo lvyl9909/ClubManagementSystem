@@ -4,6 +4,9 @@ import org.teamy.backend.DataMapper.ClubDataMapper;
 import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Student;
 
+import java.util.Collections;
+import java.util.List;
+
 public class ClubService {
     private final ClubDataMapper clubDataMapper;
 
@@ -34,6 +37,16 @@ public class ClubService {
         }
 
         return club;
+    }
+    public List<Club> getAllClub() {
+        try {
+            return clubDataMapper.getAllClub();
+        } catch (Exception e) {
+            // 在这里处理异常，例如记录日志或抛出自定义异常
+            System.err.println("Error occurred while fetching clubs: " + e.getMessage());
+            e.printStackTrace();
+            return Collections.emptyList(); // 返回一个空列表以防止上层代码崩溃
+        }
     }
 
     public boolean saveClub(Club club) throws Exception {

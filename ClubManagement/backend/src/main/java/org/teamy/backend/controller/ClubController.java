@@ -13,6 +13,8 @@ import org.teamy.backend.service.ClubService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+
 import com.google.gson.Gson;
 
 
@@ -34,10 +36,8 @@ public class ClubController extends HttpServlet {
         String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
 
         if (pathInfo == null || pathInfo.equals("/")) {
-            // /students -> 显示学生列表
             listClubs(req, resp);
         } else if (pathInfo.matches("/\\d+")) {
-            // /students/{studentId} -> 显示特定学生详情
             Integer studentId = Integer.valueOf(pathInfo.substring(1)); // 去掉前面的斜杠获取ID
             try {
                 viewClub(req, resp, studentId);
@@ -118,7 +118,17 @@ public class ClubController extends HttpServlet {
         }
     }
 
-    private void listClubs(HttpServletRequest req, HttpServletResponse resp) {
+    private void listClubs(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        List<Club> clubs = clubService.getAllClub();
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        PrintWriter out = resp.getWriter();
+
+        // 使用Gson将列表转换为JSON并返回
+        Gson gson = new Gson();
+        String json = gson.toJson(clubs);
+        out.print(json);
+        out.flush();
     }
 
 }

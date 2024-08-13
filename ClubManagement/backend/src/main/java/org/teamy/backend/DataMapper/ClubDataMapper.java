@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClubDataMapper {
     private Connection connection;
@@ -44,5 +46,22 @@ public class ClubDataMapper {
             e.printStackTrace();
             throw new Exception("Error saving club: " + e.getMessage());
         }
+    }
+
+    public List<Club> getAllClub() throws Exception {
+        List<Club> clubs = new ArrayList<>();
+
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM clubs ");
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Club club = new Club(
+                    rs.getString("name"),
+                    rs.getString("description")
+            );
+            clubs.add(club);
+        }
+
+        return clubs;
     }
 }
