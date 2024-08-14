@@ -2,6 +2,7 @@ import React from "react";
 import {Layout, Menu} from "antd";
 import MenuConfig from "../../config";
 import * as Icon from "@ant-design/icons"
+import { useNavigate } from 'react-router-dom'
 const { Header, Sider, Content } = Layout;
 
 const iconToElement = (name) => React.createElement(Icon[name]);
@@ -22,17 +23,22 @@ const items = MenuConfig.map((icon) => {
     return child
 })
 const SideBar =() => {
+    const navigate = useNavigate()
+    const selectMenu = (e) => {
+        navigate(e.key)
+    }
     return(
         <Sider trigger={null} collapsible>
             <h3 className="app-name">Club Management</h3>
             <Menu
-                theme="dark"
                 mode="inline"
-                defaultSelectedKeys={['1']}
-                items={items}
+                theme="dark"
                 style={{
-                    height: '100%'
+                    height: '100%',
+                    borderRight: 0,
                 }}
+                items={items}
+                onClick={selectMenu}
             />
         </Sider>
     )
