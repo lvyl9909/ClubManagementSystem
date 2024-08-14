@@ -74,17 +74,17 @@ public class ClubController extends HttpServlet {
 
             if (isSaved) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
-                resp.getWriter().write("Club saved successfully.");
+                //resp.getWriter().write("Club saved successfully.");
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write("Failed to save the club.");
+                //resp.getWriter().write("Failed to save the club.");
             }
         } catch (IllegalArgumentException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write(e.getMessage());
+            //resp.getWriter().write(e.getMessage());
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("An error occurred while saving the club. "+e.getMessage());
+            //resp.getWriter().write("An error occurred while saving the club. "+e.getMessage());
         }
     }
 

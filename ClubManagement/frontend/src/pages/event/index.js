@@ -1,15 +1,33 @@
 import React,{ useState, useEffect }  from "react";
 import {useParams} from "react-router";
-import {Table, Tag, Space, Button, Col, Row, Input, Form, Modal, InputNumber, TimePicker, DatePicker} from 'antd';
+import {
+    Table,
+    Tag,
+    Space,
+    Button,
+    Col,
+    Row,
+    Input,
+    Form,
+    Modal,
+    InputNumber,
+    TimePicker,
+    DatePicker,
+    Select
+} from 'antd';
 import {Link} from "react-router-dom";
 const { Column } = Table;
+const { Option } = Select;
+
 
 
 
 function Event() {
+    //const { clubId } = useParams();
     const path = process.env.REACT_APP_API_BASE_URL
     //const { id } = useParams();
     const [events, setEvents] = useState([]);
+    const [clubs, setClubs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -19,8 +37,7 @@ function Event() {
         const fetchEvent = async () => {
             try {
                 const response = await fetch(`${path}/events/?id=-1`);
-                console.log(response.ok,'response')
-                if (response.ok===true) {
+                if (response.ok) {
                     const data = await response.json(); // 解析 JSON 数据
                     setEvents(data);
                     console.log(data, 'data------'); // 输出解析后的数据
@@ -38,6 +55,26 @@ function Event() {
         fetchEvent();
     }, []);
 
+    useEffect(() => {
+        const fetchClubs = async () => {
+            try {
+                const response = await fetch(`${path}/clubs/?id=-1`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setClubs(data);
+                } else {
+                    setError('Failed to load club information');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                setError('An error occurred while fetching the club information');
+            }
+        };
+
+        fetchClubs();
+    }, []);
+
+
     const showModal = () => {
         setIsModalVisible(true);
     };
@@ -52,10 +89,10 @@ function Event() {
                 title: values.title,
                 description: values.description,
                 date: values.date.format('YYYY-MM-DD'),
-                time: values.time.format('HH:mm'),
+                time: values.time.format('HH:mm:ss'),
                 venueName: values.venueName,
                 cost: values.cost,
-                //clubId: clubId,
+                clubId: 1
             };
             const response = await fetch(`${path}/events/save`, {
                 method: 'POST',
@@ -66,10 +103,12 @@ function Event() {
             });
 
             if (response.ok) {
+                const createdEvent = await response.json();
+                setEvents([...events, createdEvent]);  // Add the new event to the list
                 setIsModalVisible(false);
                 form.resetFields();
-
             } else {
+                //console.log(clubId)
                 console.error('Failed to create event');
             }
         } catch (error) {
@@ -81,7 +120,7 @@ function Event() {
         <>
             <Row justify="end" style={{ marginBottom: 16 }}>
                 <Col>
-                    <Button onClick={showModal}>
+                    <Button  onClick={showModal}>
                         Create Event
                     </Button>
                 </Col>
@@ -92,7 +131,7 @@ function Event() {
                 <Column title="Date" dataIndex="date" key="date" />
                 <Column title="Time" dataIndex="time" key="time" />
                 <Column title="Venue" dataIndex="venueName" key="venueName" />
-                <Column title="Cost" dataIndex="cost" key="cost" />
+                {/*<Column title="Cost" dataIndex="cost" key="cost" />*/}
             </Table>
             <Modal
                 title="Create a New Event"
@@ -131,7 +170,7 @@ function Event() {
                         label="Time"
                         rules={[{ required: true, message: 'Please select the event time!' }]}
                     >
-                        <TimePicker format="HH:mm" />
+                        <TimePicker format="HH:mm:ss" />
                     </Form.Item>
                     <Form.Item
                         name="venueName"
@@ -147,6 +186,32 @@ function Event() {
                     >
                         <InputNumber min={0} step={0.01} placeholder="Enter the event cost" />
                     </Form.Item>
+                    {/*<Form.Item*/}
+                    {/*    name="clubId"*/}
+                    {/*    label="Select Club"*/}
+                    {/*    rules={[{ required: true, message: 'Please select a club!' }]}*/}
+                    {/*>*/}
+                    {/*    <Select*/}
+                    {/*        placeholder="Select a club"*/}
+                    {/*        // No need for search or filtering here, just display the club names*/}
+                    {/*    >*/}
+                    {/*        {clubs.map(club => (*/}
+                    {/*            <Option key={club.id} value={club.name}>*/}
+                    {/*                {club.name}  /!* Display the club name *!/*/}
+                    {/*            </Option>*/}
+                    {/*        ))}*/}
+                    {/*    </Select>*/}
+                    {/*</Form.Item>*/}
+                    <Form.Item
+                        name="clubId"
+                        label="Select Club"
+                        initialValue={1}  // Default selection to "Tech Enthusiasts"
+                        rules={[{ required: true, message: 'Please select a club!' }]}
+                    >
+                        <Select placeholder="Select a club">
+                            <Option value={1}>Tech Enthusiasts</Option>
+                        </Select>
+                    </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit">
                             Submit
@@ -157,5 +222,4 @@ function Event() {
         </>
     );
 }
-
-export default Event
+export default Event;

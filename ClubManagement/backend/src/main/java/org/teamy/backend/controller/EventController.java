@@ -79,10 +79,11 @@ public class EventController extends HttpServlet {
 
             if (isSaved) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
-                resp.getWriter().write("Event saved successfully.");
+                resp.getWriter().write(gson.toJson(event));
+                //resp.getWriter().write("Event saved successfully.");
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write("Failed to save the event.");
+
             }
         } catch (IllegalArgumentException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
