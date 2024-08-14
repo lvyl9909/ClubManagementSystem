@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Objects;
 
 import com.google.gson.Gson;
 
@@ -34,12 +35,12 @@ public class ClubController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String idParam = req.getParameter("id"); // 从查询字符串中获取 "id" 参数
-        resp.setHeader("Access-Control-Allow-Origin", "*");
-        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//        resp.setHeader("Access-Control-Allow-Origin", "*");
+//        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
 
-        if (idParam == "-1") {
+        if (Objects.equals(idParam, "-1")) {
             listClubs(req, resp); // 如果没有 id 参数，则列出所有俱乐部
         } else {
             try {

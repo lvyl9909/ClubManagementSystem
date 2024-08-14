@@ -19,12 +19,9 @@ function Club() {
                 const response = await fetch(`${path}/clubs/?id=-1`);
                 console.log(response.ok,'response')
                 if (response.ok===true) {
-                    const data =response;
-                    //console.log(data,'data------')
+                    const data = await response.json(); // 解析 JSON 数据
                     setClubs(data);
-                    console.log(data.text())
-                    // const data = await response.json();
-                    // setClubs(data);
+                    console.log(data, 'data------'); // 输出解析后的数据
                 } else {
                     setError('Failed to load club information');
                 }
