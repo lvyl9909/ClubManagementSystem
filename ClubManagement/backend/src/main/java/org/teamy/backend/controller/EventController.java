@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Objects;
 
 @WebServlet("/events/*")
 public class EventController extends HttpServlet {
@@ -33,26 +34,33 @@ public class EventController extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String idParam = req.getParameter("id"); // 从查询字符串中获取 "id" 参数
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
 
-        if (pathInfo == null || pathInfo.equals("/")) {
-            // /students -> 显示学生列表
-            listEvents(req, resp);
-        } else if (pathInfo.matches("/\\d+")) {
-            // /students/{studentId} -> 显示特定学生详情
-            Integer eventId = Integer.valueOf(pathInfo.substring(1)); // 去掉前面的斜杠获取ID
+        if (Objects.equals(idParam, "-1")) {
+            listEvents(req, resp); // 如果没有 id 参数，则列出所有俱乐部
+        } else {
             try {
-                viewEvent(req, resp, eventId);
+                Integer clubId = Integer.valueOf(idParam); // 将 id 参数转换为整数
+                viewEvent(req, resp, clubId); // 调用 viewClub 方法
+            } catch (NumberFormatException e) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format"); // 返回400错误，说明ID格式无效
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
-        } else {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
         }
+//        else {
+//            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
+//        }
     }
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         System.out.println("processing");
         String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
 
