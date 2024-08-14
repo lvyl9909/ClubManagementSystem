@@ -33,6 +33,11 @@ public class WebSecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 //        configuration.setAllowedMethods(Arrays.asList("POST"));
         // 设置允许的凭证
+        // 设置允许的请求头
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+
+        // 设置允许的凭证
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
