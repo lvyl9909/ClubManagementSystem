@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Objects;
 
 @WebServlet("/events/*")
 public class EventController extends HttpServlet {
@@ -33,10 +34,13 @@ public class EventController extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
         String idParam = req.getParameter("id"); // 从查询字符串中获取 "id" 参数
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
 
-        if (idParam == "-1") {
+        if (Objects.equals(idParam, "-1")) {
             listEvents(req, resp); // 如果没有 id 参数，则列出所有俱乐部
         } else {
             try {
@@ -48,9 +52,15 @@ public class EventController extends HttpServlet {
                 throw new RuntimeException(e);
             }
         }
+//        else {
+//            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
+//        }
     }
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         System.out.println("processing");
         String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
 
@@ -69,10 +79,11 @@ public class EventController extends HttpServlet {
 
             if (isSaved) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
-                resp.getWriter().write("Event saved successfully.");
+                resp.getWriter().write(gson.toJson(event));
+                //resp.getWriter().write("Event saved successfully.");
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write("Failed to save the event.");
+
             }
         } catch (IllegalArgumentException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);

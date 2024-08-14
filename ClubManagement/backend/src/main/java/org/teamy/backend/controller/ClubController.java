@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Objects;
 
 import com.google.gson.Gson;
 
@@ -34,8 +35,9 @@ public class ClubController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String idParam = req.getParameter("id"); // 从查询字符串中获取 "id" 参数
+        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
 
-        if (idParam == "-1") {
+        if (Objects.equals(idParam, "-1")) {
             listClubs(req, resp); // 如果没有 id 参数，则列出所有俱乐部
         } else {
             try {
@@ -72,17 +74,17 @@ public class ClubController extends HttpServlet {
 
             if (isSaved) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
-                resp.getWriter().write("Club saved successfully.");
+                //resp.getWriter().write("Club saved successfully.");
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write("Failed to save the club.");
+                //resp.getWriter().write("Failed to save the club.");
             }
         } catch (IllegalArgumentException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write(e.getMessage());
+            //resp.getWriter().write(e.getMessage());
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("An error occurred while saving the club. "+e.getMessage());
+            //resp.getWriter().write("An error occurred while saving the club. "+e.getMessage());
         }
     }
 

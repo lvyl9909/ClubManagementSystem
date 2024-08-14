@@ -29,7 +29,7 @@ public class Event {
         this.waitlist = waitlist;
     }
 
-    public Event(String title, String description, String date, String time, String venueName, BigDecimal cost, Integer capacity,Integer clubId) {
+    public Event(String title, String description, String date, String time, String venueName, BigDecimal cost, Integer capacity, Integer clubId) {
         this.title = title;
         this.description = description;
         this.date = date;
@@ -57,7 +57,7 @@ public class Event {
         this.description = description;
         this.venueName = venueName;
         this.cost = cost;
-        this.clubId=clubId;
+        this.clubId = clubId;
     }
 
     public String getTitle() {
@@ -83,6 +83,7 @@ public class Event {
     public void setDate(String date) {
         this.date = date;
     }
+
     public Date getSqlDate() {
         return Date.valueOf(LocalDate.parse(date));  // 在这里手动转换为 java.sql.Date
     }

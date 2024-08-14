@@ -30,10 +30,12 @@ public class WebSecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(System.getProperty(PROPERTY_CORS_ORIGINS_UI)));
         // 设置允许所有来源
 //        configuration.setAllowedOrigins(Arrays.asList("*"));
-
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 //        configuration.setAllowedMethods(Arrays.asList("POST"));
+        // 设置允许的凭证
+        // 设置允许的请求头
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+
         // 设置允许的凭证
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
