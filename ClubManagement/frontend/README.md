@@ -6,7 +6,6 @@ This project is the front-end part of the Club Management application. It is bui
 
 Ensure you have the following installed on your system:
 
-- [Node.js](https://nodejs.org/) (version 18.18.2 or later)
 - [npm](https://www.npmjs.com/) (version 10.2.1)
 
 ## Setup
