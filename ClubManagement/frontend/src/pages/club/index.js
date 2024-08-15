@@ -120,8 +120,11 @@ function Club() {
                         <Input.TextArea placeholder="Enter the club description" />
                     </Form.Item>
                     <Form.Item>
-                        <Button htmlType="submit">
+                        <Button htmlType="submit" style={{backgroundColor: "blue", color:"white"}}>
                             Submit
+                        </Button>
+                        <Button style={{margin: 20}} onClick={handleCancel}>
+                            Cancel
                         </Button>
                     </Form.Item>
                 </Form>
