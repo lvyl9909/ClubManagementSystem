@@ -52,17 +52,17 @@ To deploy the application using Tomcat 10.1.26:
 
 ### Set Up Environment Variables
 
-To configure the application, you'll need to set up the required environment variables. Follow these steps:
+To run the project correctly, please follow these steps to add the necessary configurations in the virtual machine options:
 
-1. Create a `.env` file in the root directory of the project.
-2. Add the following content to the `.env` file:
+Open the project configuration file.
+In the virtual machine options section, add the following content:
 
    ```bash
    DATABASE_URL=postgresql://swen90007_teamy_owner:MmDETsMioPzOVdhSJoB4T3wwrxD1ElGH@dpg-cqqa5sjv2p9s73b4fi2g-a.singapore-postgres.render.com:5432/swen90007_teamy
    JDK_HOME=/path/to/your/jdk17
    MAVEN_HOME=/path/to/your/maven
    TOMCAT_HOME=/path/to/your/tomcat-10.1.26
-
+   ```
 
 ### Starting the Back-End
 
