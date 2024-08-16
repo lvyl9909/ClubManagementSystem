@@ -65,3 +65,9 @@
 
 ## Contact
 For any questions or issues, please contact:
+
+## Accessing Our Application
+
+You can access our application through the following link:
+
+[ClubManagement](https://clubmanagement-frontend.onrender.com)
