@@ -42,20 +42,20 @@ public class ClubService {
         try {
             return clubDataMapper.getAllClub();
         } catch (Exception e) {
-            // 在这里处理异常，例如记录日志或抛出自定义异常
+            // // Exceptions are handled here, such as logging or throwing custom exceptions
             System.err.println("Error occurred while fetching clubs: " + e.getMessage());
             e.printStackTrace();
-            return Collections.emptyList(); // 返回一个空列表以防止上层代码崩溃
+            return Collections.emptyList(); // Returns an empty list to prevent the upper code from crashing
         }
     }
 
     public boolean saveClub(Club club) throws Exception {
-        // 可以在这里添加额外的业务逻辑，比如数据验证
+        // You can add additional business logic here, such as data validation
         if (club ==null||club.getName() == null || club.getName().isEmpty()) {
             throw new IllegalArgumentException("Club cannot be empty");
         }
 
-        // 调用DAO层的方法
+        // Recall the methods in DAO layer
         return clubDataMapper.saveClub(club);
     }
 }

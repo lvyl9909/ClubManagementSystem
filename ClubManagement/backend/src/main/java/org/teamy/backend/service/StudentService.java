@@ -11,17 +11,17 @@ public class StudentService {
     }
 
     public boolean updateStudent(Student student) throws Exception {
-        // 可以在这里添加额外的业务逻辑，比如数据验证
+        // You can add additional business logic here, such as data validation
         if (student.getName() == null || student.getName().isEmpty()) {
             throw new IllegalArgumentException("Student name cannot be empty");
         }
 
-        // 调用DAO层的方法
+        // Recall methods in DAO layer
         return studentDataMapper.updateStudent(student);
     }
 
     public Student getStudentByStudentId(String studentId) throws Exception {
-        // 在这里可以添加业务逻辑，比如检查studentId是否为空
+        // Here you can add business logic, such as checking whether the studentId is empty
         if (studentId == null || studentId.trim().isEmpty()) {
             throw new IllegalArgumentException("Student ID cannot be null or empty");
         }
