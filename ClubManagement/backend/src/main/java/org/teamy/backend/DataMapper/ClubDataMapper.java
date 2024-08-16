@@ -41,7 +41,7 @@ public class ClubDataMapper {
             stmt.setString(1, club.getName());
             stmt.setString(2, club.getDescription());
             int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;  // 如果插入成功，返回true
+            return rowsAffected > 0;  // If insert successful, return true
         } catch (SQLException e) {
             e.printStackTrace();
             throw new Exception("Error saving club: " + e.getMessage());

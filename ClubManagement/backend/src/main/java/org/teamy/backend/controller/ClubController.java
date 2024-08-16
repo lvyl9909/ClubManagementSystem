@@ -22,42 +22,42 @@ import com.google.gson.Gson;
 @WebServlet("/clubs/*")
 public class ClubController extends HttpServlet {
     private ClubService clubService;
-    private Gson gson = new Gson();  // Gson 实例
+    private Gson gson = new Gson();  // Gson instance
 
     @Override
     public void init() throws ServletException {
-        // 假设你有一个方法来获取 ClubService 的实例
-        // 比如通过依赖注入、服务定位器模式或手动实例化
+        // Suppose you have a way to get an instance of ClubService
+        // Such as through dependency injection, service locator pattern, or manual instantiation
         DatabaseConnectionManager databaseConnectionManager = new DatabaseConnectionManager();
-        clubService = new ClubService(new ClubDataMapper(databaseConnectionManager.getConnection()));  // 假设 ClubMapperImpl 是具体实现
+        clubService = new ClubService(new ClubDataMapper(databaseConnectionManager.getConnection()));  // assume ClubMapperImpl is the specific implementation
         System.out.println("success init");
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String idParam = req.getParameter("id"); // 从查询字符串中获取 "id" 参数
-        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
+        String idParam = req.getParameter("id"); // Gets the "id" argument from the query string
+        String pathInfo = req.getPathInfo(); // Gets the path portion of the URL
 
         if (Objects.equals(idParam, "-1")) {
-            listClubs(req, resp); // 如果没有 id 参数，则列出所有俱乐部
+            listClubs(req, resp); // If there is no id parameter, all clubs are listed
         } else {
             try {
-                Integer clubId = Integer.valueOf(idParam); // 将 id 参数转换为整数
-                viewClub(req, resp, clubId); // 调用 viewClub 方法
+                Integer clubId = Integer.valueOf(idParam); // Converts the id argument to an integer
+                viewClub(req, resp, clubId); // call viewClub method
             } catch (NumberFormatException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format"); // 返回400错误，说明ID格式无效
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format"); // ID invalid, return 404
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
 //        else {
-//            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
+//            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // return 404
 //        }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("processing");
-        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
+        String pathInfo = req.getPathInfo(); // get URL path info
 
         if (pathInfo.equals("/save")) {
             saveClub(req, resp);
@@ -66,10 +66,10 @@ public class ClubController extends HttpServlet {
 
     private void saveClub(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            // 从请求中解析俱乐部数据，假设请求体为JSON格式
+            // Parse the club data from the request, assuming that the request body is in JSON format
             Club club = parseClubFromRequest(req);
 
-            // 调用Service层保存俱乐部
+            // Call the Service layer to save the club
             boolean isSaved = clubService.saveClub(club);
 
             if (isSaved) {
@@ -98,11 +98,11 @@ public class ClubController extends HttpServlet {
             System.out.println(line);
         }
 
-        // 使用Gson将JSON字符串解析为Java对象
+        // Use Gson to parse JSON strings into Java objects
         Club club = gson.fromJson(jsonBuffer.toString(), Club.class);
         System.out.println(club.toString());
 
-        // 校验数据
+        // correct data
         if (club.getName() == null || club.getName().isEmpty()) {
             throw new IllegalArgumentException("Club name cannot be empty");
         }
@@ -127,7 +127,7 @@ public class ClubController extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         PrintWriter out = resp.getWriter();
 
-        // 使用Gson将列表转换为JSON并返回
+        // Use Gson to convert the list to JSON and return it
         Gson gson = new Gson();
         String json = gson.toJson(clubs);
         out.print(json);

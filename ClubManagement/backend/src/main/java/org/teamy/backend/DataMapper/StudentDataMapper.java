@@ -62,25 +62,25 @@ public class StudentDataMapper {
     }
 
     public boolean updateStudent(Student student) throws Exception {
-        // SQL 更新语句
+        // SQL update
         String sql = "UPDATE students SET name = ?, email = ?, phone_number = ? WHERE studentid = ?";
 
-        // 预编译SQL语句
+        // Precompiled SQL statements
         PreparedStatement stmt = connection.prepareStatement(sql);
 
-        // 设置更新的参数
+        // Set update argument
         stmt.setString(1, student.getName());
         stmt.setString(2, student.getEmail());
         stmt.setLong(3, student.getPhoneNumber());
         stmt.setString(4, student.getStudentId());
 
-        // 执行更新操作
+        // Execution update
         int rowsAffected = stmt.executeUpdate();
 
-        // 关闭资源
+        // Close resource
         stmt.close();
 
-        // 如果受影响的行数大于0，表示更新成功
+        // If the number of affected rows is greater than 0, the update is successful
         return rowsAffected > 0;
     }
 }
