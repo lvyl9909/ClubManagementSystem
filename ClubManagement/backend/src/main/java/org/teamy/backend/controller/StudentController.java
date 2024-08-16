@@ -13,17 +13,17 @@ public class StudentController  extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
+        String pathInfo = req.getPathInfo(); // Request the path info in URL
 
         if (pathInfo == null || pathInfo.equals("/")) {
-            // /students -> 显示学生列表
+            // /students -> show student list
             listStudents(req, resp);
         } else if (pathInfo.matches("/\\d+")) {
-            // /students/{studentId} -> 显示特定学生详情
-            String studentId = pathInfo.substring(1); // 去掉前面的斜杠获取ID
+            // /students/{studentId} -> show specific student with id
+            String studentId = pathInfo.substring(1); // Remove the preceding slash to get the ID
             viewStudent(req, resp, studentId);
         } else {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // Return 404
         }
     }
 

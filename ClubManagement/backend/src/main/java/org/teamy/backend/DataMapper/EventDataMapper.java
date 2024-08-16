@@ -47,7 +47,7 @@ public class EventDataMapper {
             stmt.setBigDecimal(6,event.getCost());
             stmt.setInt(7,event.getClub());
             int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;  // 如果插入成功，返回true
+            return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new Exception("Error saving club: " + e.getMessage());

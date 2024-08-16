@@ -23,37 +23,37 @@ import java.util.Objects;
 @WebServlet("/events/*")
 public class EventController extends HttpServlet {
     EventService eventService;
-    private Gson gson = new Gson();  // Gson 实例
+    private Gson gson = new Gson();  // Gson instance
 
     @Override
     public void init() throws ServletException {
-        // 假设你有一个方法来获取 ClubService 的实例
-        // 比如通过依赖注入、服务定位器模式或手动实例化
+        // Suppose you have a way to get an instance of ClubService
+        // Such as through dependency injection, service locator pattern, or manual instantiation
         DatabaseConnectionManager databaseConnectionManager = new DatabaseConnectionManager();
         eventService = new EventService(new EventDataMapper(databaseConnectionManager.getConnection()));  // 假设 ClubMapperImpl 是具体实现
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String idParam = req.getParameter("id"); // 从查询字符串中获取 "id" 参数
+        String idParam = req.getParameter("id"); // Gets the "id" argument from the query string
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
+        String pathInfo = req.getPathInfo(); // Gets the path info of the URL
 
         if (Objects.equals(idParam, "-1")) {
-            listEvents(req, resp); // 如果没有 id 参数，则列出所有俱乐部
+            listEvents(req, resp); // If no id argument，list all clubs
         } else {
             try {
-                Integer clubId = Integer.valueOf(idParam); // 将 id 参数转换为整数
-                viewEvent(req, resp, clubId); // 调用 viewClub 方法
+                Integer clubId = Integer.valueOf(idParam); // Convert id argument into Integer
+                viewEvent(req, resp, clubId); // Call viewClub method
             } catch (NumberFormatException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format"); // 返回400错误，说明ID格式无效
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format"); // return 400, ID invalid
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
 //        else {
-//            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // 返回404错误
+//            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // return 404
 //        }
     }
     @Override
@@ -62,7 +62,7 @@ public class EventController extends HttpServlet {
         resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         System.out.println("processing");
-        String pathInfo = req.getPathInfo(); // 获取URL中的路径部分
+        String pathInfo = req.getPathInfo(); // Gets the path info of the URL
 
         if (pathInfo.equals("/save")) {
             saveEvent(req, resp);
@@ -71,10 +71,10 @@ public class EventController extends HttpServlet {
 
     private void saveEvent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            // 从请求中解析event数据，假设请求体为JSON格式
+            // Parse the event data from the request, assuming that the request body is in JSON format
             Event event = parseEventFromRequest(req);
 
-            // 调用Service层保存event
+            // Call the Service layer to save the event
             boolean isSaved = eventService.saveEvent(event);
 
             if (isSaved) {
@@ -95,7 +95,7 @@ public class EventController extends HttpServlet {
     }
 
     private Event parseEventFromRequest(HttpServletRequest req) throws IOException {
-        // 使用BufferedReader读取请求体
+        //  Use BufferedReader to read request
         BufferedReader reader = req.getReader();
         StringBuilder jsonBuffer = new StringBuilder();
         String line;
@@ -104,11 +104,11 @@ public class EventController extends HttpServlet {
             System.out.println(line);
         }
 
-        // 使用Gson将JSON字符串解析为Java对象
+        // Use Gson to parse JSON string to Java object
         Event event = gson.fromJson(jsonBuffer.toString(), Event.class);
         System.out.println(event.toString());
 
-        // 校验数据
+        // Correct data
         if (event.getTitle() == null || event.getTitle().isEmpty()) {
             throw new IllegalArgumentException("Event name cannot be empty");
         }
@@ -133,7 +133,7 @@ public class EventController extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         PrintWriter out = resp.getWriter();
 
-        // 使用Gson将列表转换为JSON并返回
+        // Use Gson to convert list to JSON and return
         Gson gson = new Gson();
         String json = gson.toJson(clubs);
         out.print(json);

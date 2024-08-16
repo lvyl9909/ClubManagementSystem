@@ -28,15 +28,15 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(System.getProperty(PROPERTY_CORS_ORIGINS_UI)));
-        // 设置允许所有来源
+        // Set to allow all sources
 //        configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 //        configuration.setAllowedMethods(Arrays.asList("POST"));
-        // 设置允许的凭证
-        // 设置允许的请求头
+        // Set the allowed credentials
+        // Set the allowed headers
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 
-        // 设置允许的凭证
+        // Set the allowed credentials
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
