@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.UUID;
 
 public class PostgresRefreshTokenRepository implements RefreshTokenRepository{
     private final DatabaseConnectionManager databaseConnectionManager;
@@ -47,7 +48,8 @@ public class PostgresRefreshTokenRepository implements RefreshTokenRepository{
 
         String sql = "INSERT INTO refresh_token (id, token_id, username) VALUES (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, token.getId());
+            UUID uuid = UUID.fromString(token.getId());
+            statement.setObject(1, uuid);
             statement.setString(2, token.getTokenId());
             statement.setString(3, token.getUsername());
             statement.executeUpdate();

@@ -8,8 +8,6 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-import static javax.management.remote.JMXConnectorFactory.connect;
-
 public class DatabaseConnectionManager {
     private static final int MAX_CONNECTIONS = 10;
     private static final Duration ACQUIRE_CONNECTION_TIMEOUT = Duration.ofMillis(100);
