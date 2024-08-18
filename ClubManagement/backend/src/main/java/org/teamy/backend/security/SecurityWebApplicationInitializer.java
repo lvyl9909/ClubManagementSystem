@@ -1,4 +1,4 @@
-package org.teamy.backend.config;
+package org.teamy.backend.security;
 
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
