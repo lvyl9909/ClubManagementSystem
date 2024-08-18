@@ -1,37 +1,48 @@
 package org.teamy.backend.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.security.repository.JwtTokenServiceImpl;
 import org.teamy.backend.security.repository.PostgresRefreshTokenRepository;
+import org.teamy.backend.security.repository.TokenService;
+import com.google.gson.Gson;
+
 
 import java.io.IOException;
 
 @WebServlet("/auth/token")
 public class TokenResource extends HttpServlet {
 
-    private static final String COOKIE_NAME_REFRESH_TOKEN = "RefreshToken";
-    private static final String PATH_AUTH_TOKEN = "/auth/token";
-    private PostgresRefreshTokenRepository postgresRefreshTokenRepository;
-    private JwtTokenServiceImpl jwtTokenService;
+    public static final String PATH_AUTH_TOKEN = "/auth/token";
+    private static final String COOKIE_NAME_REFRESH_TOKEN = "refreshToken";
+    private ObjectMapper mapper;
+    private TokenService jwtTokenService;
+    private UserDetailsService userDetailsService;
+    private PasswordEncoder passwordEncoder;
+    private boolean secureCookies;
+    private String domain;
+    private int cookieTimeToLiveSeconds;
 
-    // 配置参数（可以通过依赖注入或读取配置文件获得）
-    private final boolean secureCookies = true;
-    private final int cookieTimeToLiveSeconds = 7 * 24 * 60 * 60;  // 7天
-    private final String domain = "localhost";  // 替换为实际域名
-    private final Long SECOND_PER_HOUR = 3600L;
-    private final String ISSUER = "TeamY";
 
     @Override
     public void init() throws ServletException {
-        DatabaseConnectionManager databaseConnectionManager = new DatabaseConnectionManager();
-        this.postgresRefreshTokenRepository = new PostgresRefreshTokenRepository(databaseConnectionManager.getConnection());
-        this.jwtTokenService = new JwtTokenServiceImpl(postgresRefreshTokenRepository, 2 *SECOND_PER_HOUR,ISSUER);
+        super.init();
+        jwtTokenService = (TokenService) getServletContext().getAttribute(ContextListener.TOKEN_SERVICE);
+        userDetailsService = (UserDetailsService) getServletContext().getAttribute(ContextListener.USER_DETAILS_SERVICE);
+        passwordEncoder = (PasswordEncoder) getServletContext().getAttribute(ContextListener.PASSWORD_ENCODER);
+        mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
+        domain = (String) getServletContext().getAttribute(ContextListener.DOMAIN);
+        secureCookies = (boolean) getServletContext().getAttribute(ContextListener.SECURE_COOKIES);
+        cookieTimeToLiveSeconds = (int) getServletContext().getAttribute(ContextListener.COOKIE_TIME_TO_LIVE_SECONDS);
     }
 
     @Override

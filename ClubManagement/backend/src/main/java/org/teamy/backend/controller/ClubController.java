@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.DataMapper.ClubDataMapper;
+import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.Club;
 import org.teamy.backend.service.ClubService;
@@ -26,10 +27,7 @@ public class ClubController extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        // Suppose you have a way to get an instance of ClubService
-        // Such as through dependency injection, service locator pattern, or manual instantiation
-        DatabaseConnectionManager databaseConnectionManager = new DatabaseConnectionManager();
-        clubService = new ClubService(new ClubDataMapper(databaseConnectionManager.getConnection()));  // assume ClubMapperImpl is the specific implementation
+        clubService = (ClubService) getServletContext().getAttribute(ContextListener.CLUB_SERVICE);
         System.out.println("success init");
     }
     @Override

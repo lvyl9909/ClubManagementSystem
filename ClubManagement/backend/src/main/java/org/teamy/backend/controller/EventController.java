@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.DataMapper.ClubDataMapper;
 import org.teamy.backend.DataMapper.EventDataMapper;
+import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
@@ -27,10 +28,8 @@ public class EventController extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        // Suppose you have a way to get an instance of ClubService
-        // Such as through dependency injection, service locator pattern, or manual instantiation
-        DatabaseConnectionManager databaseConnectionManager = new DatabaseConnectionManager();
-        eventService = new EventService(new EventDataMapper(databaseConnectionManager.getConnection()));  // 假设 ClubMapperImpl 是具体实现
+        eventService = (EventService) getServletContext().getAttribute(ContextListener.EVENT_SERVICE);
+        // 假设 ClubMapperImpl 是具体实现
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

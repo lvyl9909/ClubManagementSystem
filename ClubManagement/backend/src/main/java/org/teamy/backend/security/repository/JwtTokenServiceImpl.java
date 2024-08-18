@@ -25,13 +25,13 @@ public class JwtTokenServiceImpl implements TokenService{
     private final RefreshTokenRepository repository;
     private final long timeToLiveSeconds;
     private final String issuer;
-    private static final String secret = "jwt.secret";
+    private final String secret;
     private SecretKey key;
 
-    public JwtTokenServiceImpl(RefreshTokenRepository repository, long timeToLiveSeconds, String issuer) {
-        this.key = getKey();
-        this.repository = repository;
+    public JwtTokenServiceImpl(String key,Integer timeToLiveSeconds, String issuer,RefreshTokenRepository repository) {
+        this.secret = key;
         this.timeToLiveSeconds = timeToLiveSeconds;
+        this.repository = repository;
         this.issuer = issuer;
     }
 

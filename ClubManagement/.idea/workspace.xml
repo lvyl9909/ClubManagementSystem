@@ -145,7 +145,7 @@
     </configuration>
     <configuration name="Tomcat 10.1.26" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.26" ALTERNATIVE_JRE_ENABLED="false">
       <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080/ClubManagement" />
-      <option name="COMMON_VM_ARGUMENTS" value="-Djdbc.uri=jdbc:postgresql://dpg-cqqa5sjv2p9s73b4fi2g-a.singapore-postgres.render.com/swen90007_teamy -Djdbc.username=swen90007_teamy_owner -Djdbc.password=MmDETsMioPzOVdhSJoB4T3wwrxD1ElGH -Dcors.origins.ui=http://localhost:3000" />
+      <option name="COMMON_VM_ARGUMENTS" value="-Djdbc.uri=jdbc:postgresql://dpg-cqqa5sjv2p9s73b4fi2g-a.singapore-postgres.render.com/swen90007_teamy -Djdbc.username=swen90007_teamy_owner -Djdbc.password=MmDETsMioPzOVdhSJoB4T3wwrxD1ElGH -Dcors.origins.ui=http://localhost:3000 -Djwt.secret=a199e09ca9eefd221bb05a37a7bf9fe24b80e6b238a3e76dfaadac32358c03fd -Djwt.timeToLive.seconds=60 -Djwt.issuer=TeamY -Dcookies.timeToLive.seconds=360000 -Dcookies.domain=localhost -Dcookies.secure=false -Dadmin.username=admin -Dadmin.password=admin" />
       <option name="UPDATING_POLICY" value="hot-swap-classes" />
       <deployment>
         <artifact name="backend:war exploded">
