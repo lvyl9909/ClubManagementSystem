@@ -75,6 +75,7 @@
     &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
     &quot;Docker.backend/api/Dockerfile build.executor&quot;: &quot;Run&quot;,
     &quot;Jest.renders learn react link.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend [clean,install,-DforkCount=0...].executor&quot;: &quot;Debug&quot;,
     &quot;Maven.backend [clean,install].executor&quot;: &quot;Run&quot;,
     &quot;Node.js.App.js.executor&quot;: &quot;Run&quot;,
     &quot;Node.js.index.js.executor&quot;: &quot;Run&quot;,
@@ -305,7 +306,8 @@
       <workItem from="1723342501727" duration="14076000" />
       <workItem from="1723438425261" duration="4502000" />
       <workItem from="1723459275526" duration="26683000" />
-      <workItem from="1724375826921" duration="1017000" />
+      <workItem from="1724375826921" duration="3011000" />
+      <workItem from="1724379579577" duration="852000" />
     </task>
     <servers />
   </component>

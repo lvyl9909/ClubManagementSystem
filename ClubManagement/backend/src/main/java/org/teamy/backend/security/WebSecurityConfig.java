@@ -38,7 +38,7 @@ import java.util.Collections;
 @EnableWebSecurity
 public class WebSecurityConfig implements ServletContextAware {
     private static final String PROPERTY_CORS_ORIGINS_UI = "cors.origins.ui";
-    private static final RequestMatcher PROTECTED_URLS = new AntPathRequestMatcher("/clubs/");
+    private static final RequestMatcher PROTECTED_URLS = new AntPathRequestMatcher("/");
     private static final String PROPERTY_ADMIN_USERNAME = "admin.username";
     private static final String PROPERTY_ADMIN_PASSWORD = "admin.password";
 
