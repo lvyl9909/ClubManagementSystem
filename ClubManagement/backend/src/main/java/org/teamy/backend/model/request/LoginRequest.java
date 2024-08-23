@@ -1,4 +1,4 @@
-package org.teamy.backend.model;
+package org.teamy.backend.model.request;
 
 public class LoginRequest {
     private String username;

@@ -1,7 +1,8 @@
-package org.teamy.backend.model;
+package org.teamy.backend.model.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import org.teamy.backend.model.ResponseEntity;
 
 import java.io.IOException;
 

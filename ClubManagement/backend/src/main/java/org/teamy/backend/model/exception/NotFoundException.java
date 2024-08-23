@@ -1,4 +1,4 @@
-package org.teamy.backend.model;
+package org.teamy.backend.model.exception;
 
 public class NotFoundException extends RuntimeException {
 

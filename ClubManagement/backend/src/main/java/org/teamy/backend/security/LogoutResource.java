@@ -3,12 +3,14 @@ package org.teamy.backend.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.model.*;
+import org.teamy.backend.model.exception.ErrorHandler;
+import org.teamy.backend.model.request.LogoutRequest;
+import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.security.repository.TokenService;
 
 import java.io.IOException;
