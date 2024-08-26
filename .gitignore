@@ -1,0 +1,85 @@
+# Java and Spring Boot related
+/target/
+/bin/
+/*.war
+/*.ear
+/*.jar
+
+# Maven
+/.mvn/
+/pom.xml.tag
+/pom.xml.releaseBackup
+/pom.xml.versionsBackup
+/pom.xml.next
+/pom.xml.lock
+**/target/
+**/log/
+release.properties
+
+# Gradle
+.gradle/
+/build/
+/out/
+/*.gradle
+gradle-app.setting
+
+# IDEs and Editors
+/.idea/
+/.idea/
+/*.iml
+*.iml
+*.ipr
+*.iws
+/.project
+/.classpath
+/.settings/
+/.vscode/
+/*.suo
+*.csproj
+*.pidb
+*.user
+*.userosscache
+*.sln
+*.suo
+*.swp
+*.DS_Store
+*.directory
+.idea_modules/
+*.launch
+.gradle
+.buildpath
+/.metadata
+/bin/
+tmp/
+
+# Logs
+/logs/
+/*.log
+**/*.log
+
+# Spring Security
+.spring_security_login.token
+.session
+**/spring_security_context.xml
+
+# React related
+/node_modules/
+/npm-debug.log*
+/yarn-error.log*
+/yarn-debug.log*
+/build/
+/dist/
+/.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Temp Files
+*.swp
+*.swo
+*.tmp
+
+# System Files
+.DS_Store
+Thumbs.db
+*.~lock.*
