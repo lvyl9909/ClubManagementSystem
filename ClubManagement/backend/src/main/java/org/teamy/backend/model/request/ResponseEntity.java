@@ -1,4 +1,4 @@
-package org.teamy.backend.model;
+package org.teamy.backend.model.request;
 
 import jakarta.servlet.http.HttpServletResponse;
 

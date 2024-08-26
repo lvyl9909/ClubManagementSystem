@@ -3,8 +3,7 @@ package org.teamy.backend.model.exception;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.teamy.backend.model.ResponseEntity;
-import org.teamy.backend.model.ValidationException;
+import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.model.request.RequestHandler;
 
 public class ErrorHandler implements RequestHandler {

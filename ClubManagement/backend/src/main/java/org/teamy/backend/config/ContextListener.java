@@ -21,6 +21,7 @@ public class ContextListener implements ServletContextListener {
     public static final String CLUB_SERVICE = "clubService";
     public static final String STUDENT_SERVICE = "studentService";
     public static final String EVENT_SERVICE = "eventService";
+    public static final String DATABASE_SERVICE = "databaseService";
     public static final String MAPPER = "mapper";
     public static final String TOKEN_SERVICE = "tokenService";
     public static final String USER_DETAILS_SERVICE = "userDetailsService";
@@ -45,6 +46,8 @@ public class ContextListener implements ServletContextListener {
                 System.getProperty(PROPERTY_JDBC_USERNAME),
                 System.getProperty(PROPERTY_JDBC_PASSWORD));
         databaseConnectionManager.init();
+
+        sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager );
         sce.getServletContext().setAttribute(CLUB_SERVICE, new ClubService(new ClubDataMapper(databaseConnectionManager)));
         sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager)));
         sce.getServletContext().setAttribute(EVENT_SERVICE, new EventService(new EventDataMapper(databaseConnectionManager)));

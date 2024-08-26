@@ -27,7 +27,9 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.teamy.backend.DataMapper.StudentDataMapper;
 import org.teamy.backend.config.ContextListener;
+import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.security.model.Role;
 import org.teamy.backend.security.repository.TokenService;
 
@@ -44,14 +46,12 @@ public class WebSecurityConfig implements ServletContextAware {
 
     private TokenService jwtTokenService;
     private ServletContext servletContext;
+    private DatabaseConnectionManager databaseConnectionManager;
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        var userDetailsService = new InMemoryUserDetailsManager();
-        userDetailsService.createUser(adminUser(passwordEncoder));
-        userDetailsService.createUser(nonAdminUser(passwordEncoder)); // for testing purposes
-        servletContext.setAttribute(ContextListener.USER_DETAILS_SERVICE, userDetailsService);
-        return userDetailsService;
+        StudentDataMapper userRepository = new StudentDataMapper(databaseConnectionManager);
+        return new CustomUserDetailsService(userRepository);
     }
     @Bean
     AuthenticationEntryPoint unauthorizedEntryPoint() {
@@ -139,6 +139,7 @@ public class WebSecurityConfig implements ServletContextAware {
     @Override
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
+        databaseConnectionManager = (DatabaseConnectionManager) servletContext.getAttribute(ContextListener.DATABASE_SERVICE);
         jwtTokenService = (TokenService) servletContext.getAttribute(ContextListener.TOKEN_SERVICE);
     }
 }

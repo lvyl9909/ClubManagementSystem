@@ -12,12 +12,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.teamy.backend.config.ContextListener;
-import org.teamy.backend.model.*;
 import org.teamy.backend.model.exception.ErrorHandler;
 import org.teamy.backend.model.exception.ForbiddenException;
+import org.teamy.backend.model.exception.ValidationException;
 import org.teamy.backend.model.request.LoginRequest;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.model.request.RefreshRequest;
+import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.security.model.Token;
 import org.teamy.backend.security.repository.TokenService;
 

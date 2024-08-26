@@ -1,30 +1,21 @@
 package org.teamy.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.teamy.backend.DataMapper.ClubDataMapper;
-import org.teamy.backend.DataMapper.EventDataMapper;
 import org.teamy.backend.config.ContextListener;
-import org.teamy.backend.config.DatabaseConnectionManager;
-import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
-import org.teamy.backend.model.ResponseEntity;
+import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.model.request.RequestHandler;
-import org.teamy.backend.service.ClubService;
 import org.teamy.backend.service.EventService;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @WebServlet("/events/*")

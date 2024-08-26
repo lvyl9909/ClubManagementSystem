@@ -7,10 +7,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.config.ContextListener;
-import org.teamy.backend.model.*;
 import org.teamy.backend.model.exception.ErrorHandler;
+import org.teamy.backend.model.exception.ValidationException;
 import org.teamy.backend.model.request.LogoutRequest;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
+import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.security.repository.TokenService;
 
 import java.io.IOException;
