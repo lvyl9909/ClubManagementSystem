@@ -3,7 +3,15 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.51">
     <root id="1">
       <DateStyle>mdy</DateStyle>
-      <IntrospectionStateNumber>538</IntrospectionStateNumber>
+      <Grants>1||-9223372036854775808|c|G
+1||10|c|G
+1||10|C|G
+1||10|T|G
+13256||-9223372036854775808|c|G
+13256||10|c|G
+13256||10|C|G
+13256||10|T|G</Grants>
+      <IntrospectionStateNumber>648</IntrospectionStateNumber>
       <ServerVersion>13.14</ServerVersion>
       <StartupTime>1723188630</StartupTime>
       <TimeZones>true ACDT
@@ -1397,7 +1405,7 @@ true posixrules
 12973||10|C|G
 12973||-9223372036854775808|U|G
 12973||10|U|G</Grants>
-      <IntrospectionStateNumber>538</IntrospectionStateNumber>
+      <IntrospectionStateNumber>648</IntrospectionStateNumber>
       <ObjectId>16389</ObjectId>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </database>
@@ -4744,13 +4752,47 @@ true posixrules
     <schema id="256" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>538</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2024-08-11.13:23:38</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>648</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2024-08-17.14:11:58</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>492</StateNumber>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </schema>
-    <sequence id="257" parent="256" name="club_club_id_seq">
+    <object-type id="257" parent="256" name="funding_application_status">
+      <Labels>submitted
+reviewed
+approved
+rejected</Labels>
+      <ObjectId>16642</ObjectId>
+      <StateNumber>593</StateNumber>
+      <SubCategory>enum</SubCategory>
+      <SubKind>enum</SubKind>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </object-type>
+    <object-type id="258" parent="256" name="rsvp_status">
+      <Labels>Pending
+Confirmed
+Cancelled
+Waitlisted
+TicketIssued</Labels>
+      <ObjectId>16572</ObjectId>
+      <StateNumber>586</StateNumber>
+      <SubCategory>enum</SubCategory>
+      <SubKind>enum</SubKind>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </object-type>
+    <object-type id="259" parent="256" name="ticket_status">
+      <Labels>Pending
+Issued
+Redeemed
+Cancelled</Labels>
+      <ObjectId>16605</ObjectId>
+      <StateNumber>588</StateNumber>
+      <SubCategory>enum</SubCategory>
+      <SubKind>enum</SubKind>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </object-type>
+    <sequence id="260" parent="256" name="club_club_id_seq">
       <DasType>integer|0s</DasType>
       <ObjectId>16431</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4758,7 +4800,15 @@ true posixrules
       <StateNumber>521</StateNumber>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </sequence>
-    <sequence id="258" parent="256" name="club_memberships_membership_id_seq">
+    <sequence id="261" parent="256" name="club_memberships_id_seq">
+      <DasType>bigint|0s</DasType>
+      <ObjectId>16566</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>581</StateNumber>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </sequence>
+    <sequence id="262" parent="256" name="club_memberships_membership_id_seq">
       <DasType>integer|0s</DasType>
       <ObjectId>16489</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4766,7 +4816,15 @@ true posixrules
       <StateNumber>531</StateNumber>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </sequence>
-    <sequence id="259" parent="256" name="event_event_id_seq">
+    <sequence id="263" parent="256" name="clubs_id_seq">
+      <DasType>bigint|0s</DasType>
+      <ObjectId>16546</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>561</StateNumber>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </sequence>
+    <sequence id="264" parent="256" name="event_event_id_seq">
       <DasType>integer|0s</DasType>
       <ObjectId>16464</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4774,7 +4832,39 @@ true posixrules
       <StateNumber>526</StateNumber>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </sequence>
-    <sequence id="260" parent="256" name="students_id_seq">
+    <sequence id="265" parent="256" name="faculty_administrators_id_seq">
+      <DasType>integer|0s</DasType>
+      <ObjectId>16631</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>591</StateNumber>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </sequence>
+    <sequence id="266" parent="256" name="funding_application_events_id_seq">
+      <DasType>integer|0s</DasType>
+      <ObjectId>16677</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>597</StateNumber>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </sequence>
+    <sequence id="267" parent="256" name="fundingapplications_application_id_seq">
+      <DasType>integer|0s</DasType>
+      <ObjectId>16651</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>593</StateNumber>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </sequence>
+    <sequence id="268" parent="256" name="rsvps_rsvp_id_seq">
+      <DasType>integer|0s</DasType>
+      <ObjectId>16583</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>587</StateNumber>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </sequence>
+    <sequence id="269" parent="256" name="students_id_seq">
       <DasType>integer|0s</DasType>
       <ObjectId>16416</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4782,74 +4872,132 @@ true posixrules
       <StateNumber>510</StateNumber>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </sequence>
-    <table id="261" parent="256" name="club_memberships">
+    <sequence id="270" parent="256" name="tickets_ticket_id_seq">
+      <DasType>integer|0s</DasType>
+      <ObjectId>16613</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>588</StateNumber>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </sequence>
+    <sequence id="271" parent="256" name="venues_id_seq">
+      <DasType>integer|0s</DasType>
+      <ObjectId>16533</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>553</StateNumber>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </sequence>
+    <table id="272" parent="256" name="club_memberships">
       <ObjectId>16491</ObjectId>
-      <StateNumber>531</StateNumber>
+      <StateNumber>582</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </table>
-    <table id="262" parent="256" name="clubs">
+    <table id="273" parent="256" name="clubs">
       <ObjectId>16433</ObjectId>
       <StateNumber>529</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </table>
-    <table id="263" parent="256" name="events">
+    <table id="274" parent="256" name="events">
       <ObjectId>16466</ObjectId>
-      <StateNumber>530</StateNumber>
+      <StateNumber>594</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </table>
-    <table id="264" parent="256" name="students">
+    <table id="275" parent="256" name="faculty_administrators">
+      <ObjectId>16633</ObjectId>
+      <StateNumber>593</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </table>
+    <table id="276" parent="256" name="funding_application_events">
+      <ObjectId>16679</ObjectId>
+      <StateNumber>597</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </table>
+    <table id="277" parent="256" name="fundingapplications">
+      <ObjectId>16653</ObjectId>
+      <StateNumber>593</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </table>
+    <table id="278" parent="256" name="refresh_token">
+      <ObjectId>16695</ObjectId>
+      <StateNumber>647</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </table>
+    <table id="279" parent="256" name="rsvps">
+      <ObjectId>16585</ObjectId>
+      <StateNumber>587</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </table>
+    <table id="280" parent="256" name="students">
       <ObjectId>16418</ObjectId>
       <StateNumber>531</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </table>
-    <table id="265" parent="256" name="test">
+    <table id="281" parent="256" name="test">
       <ObjectId>16395</ObjectId>
       <StateNumber>498</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>swen90007_teamy_owner</OwnerName>
     </table>
-    <column id="266" parent="261" name="membership_id">
+    <table id="282" parent="256" name="tickets">
+      <ObjectId>16615</ObjectId>
+      <StateNumber>588</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </table>
+    <table id="283" parent="256" name="venues">
+      <ObjectId>16535</ObjectId>
+      <StateNumber>553</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>swen90007_teamy_owner</OwnerName>
+    </table>
+    <column id="284" parent="272" name="membership_id">
       <DasType>integer|0s</DasType>
-      <DefaultExpression>nextval(&apos;club_memberships_membership_id_seq&apos;::regclass)</DefaultExpression>
+      <DefaultExpression>nextval(&apos;club_memberships_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>531</StateNumber>
+      <StateNumber>581</StateNumber>
       <SequenceId>16489</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="267" parent="261" name="student_id">
-      <DasType>integer|0s</DasType>
+    <column id="285" parent="272" name="student_id">
+      <DasType>bigint|0s</DasType>
       <Position>2</Position>
-      <StateNumber>531</StateNumber>
-      <TypeId>23</TypeId>
+      <StateNumber>570</StateNumber>
+      <TypeId>20</TypeId>
     </column>
-    <column id="268" parent="261" name="club_id">
+    <column id="286" parent="272" name="club_id">
       <DasType>integer|0s</DasType>
       <Position>3</Position>
       <StateNumber>531</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="269" parent="261" name="is_admin">
+    <column id="287" parent="272" name="is_admin">
       <DasType>boolean|0s</DasType>
       <DefaultExpression>false</DefaultExpression>
       <Position>4</Position>
       <StateNumber>531</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <foreign-key id="270" parent="261" name="club_memberships_student_id_fkey">
+    <foreign-key id="288" parent="272" name="club_memberships_student_id_fkey">
       <ColNames>student_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>16498</ObjectId>
+      <ObjectId>16554</ObjectId>
       <OnDelete>cascade</OnDelete>
-      <StateNumber>531</StateNumber>
+      <StateNumber>570</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16418</RefTableId>
     </foreign-key>
-    <foreign-key id="271" parent="261" name="club_memberships_club_id_fkey">
+    <foreign-key id="289" parent="272" name="club_memberships_club_id_fkey">
       <ColNames>club_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16503</ObjectId>
@@ -4858,45 +5006,45 @@ true posixrules
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16433</RefTableId>
     </foreign-key>
-    <index id="272" parent="261" name="club_memberships_pkey">
+    <index id="290" parent="272" name="club_memberships_pkey">
       <ColNames>membership_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16496</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>531</StateNumber>
+      <StateNumber>582</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="273" parent="261" name="club_memberships_pkey">
+    <key id="291" parent="272" name="club_memberships_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16497</ObjectId>
       <Primary>1</Primary>
       <StateNumber>531</StateNumber>
       <UnderlyingIndexId>16496</UnderlyingIndexId>
     </key>
-    <column id="274" parent="262" name="club_id">
+    <column id="292" parent="273" name="club_id">
       <DasType>integer|0s</DasType>
-      <DefaultExpression>nextval(&apos;club_club_id_seq&apos;::regclass)</DefaultExpression>
+      <DefaultExpression>nextval(&apos;clubs_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>521</StateNumber>
+      <StateNumber>561</StateNumber>
       <SequenceId>16431</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="275" parent="262" name="name">
+    <column id="293" parent="273" name="name">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>521</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="276" parent="262" name="description">
+    <column id="294" parent="273" name="description">
       <DasType>text|0s</DasType>
       <Position>3</Position>
       <StateNumber>521</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <index id="277" parent="262" name="club_pkey">
+    <index id="295" parent="273" name="club_pkey">
       <ColNames>club_id</ColNames>
       <ObjectId>16440</ObjectId>
       <Primary>1</Primary>
@@ -4904,13 +5052,13 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="278" parent="262" name="club_pkey">
+    <key id="296" parent="273" name="club_pkey">
       <ObjectId>16441</ObjectId>
       <Primary>1</Primary>
       <StateNumber>521</StateNumber>
       <UnderlyingIndexId>16440</UnderlyingIndexId>
     </key>
-    <column id="279" parent="263" name="event_id">
+    <column id="297" parent="274" name="event_id">
       <DasType>integer|0s</DasType>
       <DefaultExpression>nextval(&apos;event_event_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -4919,54 +5067,54 @@ true posixrules
       <SequenceId>16464</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="280" parent="263" name="club_id">
+    <column id="298" parent="274" name="club_id">
       <DasType>integer|0s</DasType>
       <Position>2</Position>
       <StateNumber>526</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="281" parent="263" name="title">
+    <column id="299" parent="274" name="title">
       <DasType>varchar(200)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>526</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="282" parent="263" name="description">
+    <column id="300" parent="274" name="description">
       <DasType>text|0s</DasType>
       <Position>4</Position>
       <StateNumber>526</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="283" parent="263" name="date">
+    <column id="301" parent="274" name="date">
       <DasType>date|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>526</StateNumber>
       <TypeId>1082</TypeId>
     </column>
-    <column id="284" parent="263" name="time">
+    <column id="302" parent="274" name="time">
       <DasType>time|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>526</StateNumber>
       <TypeId>1083</TypeId>
     </column>
-    <column id="285" parent="263" name="venue">
+    <column id="303" parent="274" name="venue">
       <DasType>varchar(200)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>526</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="286" parent="263" name="cost">
+    <column id="304" parent="274" name="cost">
       <DasType>numeric(10,2 digit)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StateNumber>526</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <foreign-key id="287" parent="263" name="event_club_id_fkey">
+    <foreign-key id="305" parent="274" name="event_club_id_fkey">
       <ColNames>club_id</ColNames>
       <ObjectId>16475</ObjectId>
       <OnDelete>cascade</OnDelete>
@@ -4974,7 +5122,7 @@ true posixrules
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16433</RefTableId>
     </foreign-key>
-    <index id="288" parent="263" name="event_pkey">
+    <index id="306" parent="274" name="event_pkey">
       <ColNames>event_id</ColNames>
       <ObjectId>16473</ObjectId>
       <Primary>1</Primary>
@@ -4982,58 +5130,392 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="289" parent="263" name="event_pkey">
+    <key id="307" parent="274" name="event_pkey">
       <ObjectId>16474</ObjectId>
       <Primary>1</Primary>
       <StateNumber>526</StateNumber>
       <UnderlyingIndexId>16473</UnderlyingIndexId>
     </key>
-    <column id="290" parent="264" name="id">
+    <column id="308" parent="275" name="id">
+      <DasType>integer|0s</DasType>
+      <DefaultExpression>nextval(&apos;faculty_administrators_id_seq&apos;::regclass)</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>591</StateNumber>
+      <SequenceId>16631</SequenceId>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="309" parent="275" name="name">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>591</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="310" parent="275" name="email">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>591</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="311" parent="275" name="phone_number">
+      <DasType>bigint|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>591</StateNumber>
+      <TypeId>20</TypeId>
+    </column>
+    <column id="312" parent="275" name="faculty_id">
+      <DasType>varchar(50)|0s</DasType>
+      <Position>5</Position>
+      <StateNumber>591</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="313" parent="275" name="faculty_administrators_pkey">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16637</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>591</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <index id="314" parent="275" name="faculty_administrators_email_key">
+      <ColNames>email</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16639</ObjectId>
+      <StateNumber>591</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+      <CollationNames>default</CollationNames>
+      <CollationIds>100</CollationIds>
+      <CollationParentNames>pg_catalog</CollationParentNames>
+    </index>
+    <key id="315" parent="275" name="faculty_administrators_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16638</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>591</StateNumber>
+      <UnderlyingIndexId>16637</UnderlyingIndexId>
+    </key>
+    <key id="316" parent="275" name="faculty_administrators_email_key">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16640</ObjectId>
+      <StateNumber>591</StateNumber>
+      <UnderlyingIndexId>16639</UnderlyingIndexId>
+    </key>
+    <column id="317" parent="276" name="id">
+      <DasType>integer|0s</DasType>
+      <DefaultExpression>nextval(&apos;funding_application_events_id_seq&apos;::regclass)</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>597</StateNumber>
+      <SequenceId>16677</SequenceId>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="318" parent="276" name="funding_application_id">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>597</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="319" parent="276" name="event_id">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>597</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <foreign-key id="320" parent="276" name="funding_application_events_funding_application_id_fkey">
+      <ColNames>funding_application_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16685</ObjectId>
+      <OnDelete>cascade</OnDelete>
+      <StateNumber>597</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16653</RefTableId>
+    </foreign-key>
+    <foreign-key id="321" parent="276" name="funding_application_events_event_id_fkey">
+      <ColNames>event_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16690</ObjectId>
+      <OnDelete>cascade</OnDelete>
+      <StateNumber>597</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16466</RefTableId>
+    </foreign-key>
+    <index id="322" parent="276" name="funding_application_events_pkey">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16683</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>597</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="323" parent="276" name="funding_application_events_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16684</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>597</StateNumber>
+      <UnderlyingIndexId>16683</UnderlyingIndexId>
+    </key>
+    <column id="324" parent="277" name="application_id">
+      <DasType>integer|0s</DasType>
+      <DefaultExpression>nextval(&apos;fundingapplications_application_id_seq&apos;::regclass)</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>593</StateNumber>
+      <SequenceId>16651</SequenceId>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="325" parent="277" name="description">
+      <DasType>text|0s</DasType>
+      <Position>2</Position>
+      <StateNumber>593</StateNumber>
+      <TypeId>25</TypeId>
+    </column>
+    <column id="326" parent="277" name="amount">
+      <DasType>numeric(10,2 digit)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>593</StateNumber>
+      <TypeId>1700</TypeId>
+    </column>
+    <column id="327" parent="277" name="semester">
+      <DasType>integer|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>593</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="328" parent="277" name="club">
+      <DasType>integer|0s</DasType>
+      <Position>5</Position>
+      <StateNumber>593</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="329" parent="277" name="status">
+      <DasType>funding_application_status|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StateNumber>593</StateNumber>
+      <TypeId>16642</TypeId>
+    </column>
+    <column id="330" parent="277" name="date">
+      <DasType>date|0s</DasType>
+      <Position>7</Position>
+      <StateNumber>593</StateNumber>
+      <TypeId>1082</TypeId>
+    </column>
+    <column id="331" parent="277" name="reviewer">
+      <DasType>integer|0s</DasType>
+      <Position>8</Position>
+      <StateNumber>593</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <foreign-key id="332" parent="277" name="fundingapplications_club_fkey">
+      <ColNames>club</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16662</ObjectId>
+      <OnDelete>set-null</OnDelete>
+      <StateNumber>593</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16433</RefTableId>
+    </foreign-key>
+    <foreign-key id="333" parent="277" name="fundingapplications_reviewer_fkey">
+      <ColNames>reviewer</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16667</ObjectId>
+      <OnDelete>set-null</OnDelete>
+      <StateNumber>593</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16633</RefTableId>
+    </foreign-key>
+    <index id="334" parent="277" name="fundingapplications_pkey">
+      <ColNames>application_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16660</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>593</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="335" parent="277" name="fundingapplications_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16661</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>593</StateNumber>
+      <UnderlyingIndexId>16660</UnderlyingIndexId>
+    </key>
+    <column id="336" parent="278" name="id">
+      <DasType>uuid|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>647</StateNumber>
+      <TypeId>2950</TypeId>
+    </column>
+    <column id="337" parent="278" name="token_id">
+      <DasType>varchar(36)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>647</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="338" parent="278" name="username">
+      <DasType>varchar(255)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>647</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="339" parent="278" name="refresh_token_pkey">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16698</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>647</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <index id="340" parent="278" name="refresh_token_username">
+      <ColNames>username</ColNames>
+      <ObjectId>16700</ObjectId>
+      <StateNumber>647</StateNumber>
+      <AccessMethodId>403</AccessMethodId>
+      <CollationNames>default</CollationNames>
+      <CollationIds>100</CollationIds>
+      <CollationParentNames>pg_catalog</CollationParentNames>
+    </index>
+    <key id="341" parent="278" name="refresh_token_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16699</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>647</StateNumber>
+      <UnderlyingIndexId>16698</UnderlyingIndexId>
+    </key>
+    <column id="342" parent="279" name="rsvp_id">
+      <DasType>integer|0s</DasType>
+      <DefaultExpression>nextval(&apos;rsvps_rsvp_id_seq&apos;::regclass)</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>587</StateNumber>
+      <SequenceId>16583</SequenceId>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="343" parent="279" name="submitter">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>587</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="344" parent="279" name="event">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>587</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="345" parent="279" name="status">
+      <DasType>rsvp_status|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StateNumber>587</StateNumber>
+      <TypeId>16572</TypeId>
+    </column>
+    <column id="346" parent="279" name="number">
+      <DasType>integer|0s</DasType>
+      <Position>5</Position>
+      <StateNumber>587</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="347" parent="279" name="participant">
+      <DasType>integer[]|0s</DasType>
+      <Position>6</Position>
+      <StateNumber>587</StateNumber>
+      <TypeId>1007</TypeId>
+    </column>
+    <foreign-key id="348" parent="279" name="rsvps_submitter_fkey">
+      <ColNames>submitter</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16594</ObjectId>
+      <OnDelete>cascade</OnDelete>
+      <StateNumber>587</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16418</RefTableId>
+    </foreign-key>
+    <foreign-key id="349" parent="279" name="rsvps_event_fkey">
+      <ColNames>event</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16599</ObjectId>
+      <OnDelete>cascade</OnDelete>
+      <StateNumber>587</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16466</RefTableId>
+    </foreign-key>
+    <index id="350" parent="279" name="rsvps_pkey">
+      <ColNames>rsvp_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16592</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>587</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="351" parent="279" name="rsvps_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16593</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>587</StateNumber>
+      <UnderlyingIndexId>16592</UnderlyingIndexId>
+    </key>
+    <column id="352" parent="280" name="id">
       <DasType>integer|0s</DasType>
       <DefaultExpression>nextval(&apos;students_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>510</StateNumber>
+      <StateNumber>545</StateNumber>
       <SequenceId>16416</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="291" parent="264" name="name">
+    <column id="353" parent="280" name="name">
       <DasType>varchar(255)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>510</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="292" parent="264" name="email">
+    <column id="354" parent="280" name="email">
       <DasType>varchar(255)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>510</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="293" parent="264" name="phone_number">
+    <column id="355" parent="280" name="phone_number">
       <DasType>bigint|0s</DasType>
       <Position>4</Position>
       <StateNumber>510</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="294" parent="264" name="studentid">
+    <column id="356" parent="280" name="studentid">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>510</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="295" parent="264" name="students_pkey">
+    <index id="357" parent="280" name="students_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>16425</ObjectId>
+      <ObjectId>16509</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>510</StateNumber>
+      <StateNumber>545</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="296" parent="264" name="students_email_key">
+    <index id="358" parent="280" name="students_email_key">
       <ColNames>email</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16427</ObjectId>
@@ -5044,7 +5526,7 @@ true posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="297" parent="264" name="students_studentid_key">
+    <index id="359" parent="280" name="students_studentid_key">
       <ColNames>studentid</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16429</ObjectId>
@@ -5055,33 +5537,33 @@ true posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="298" parent="264" name="students_pkey">
+    <key id="360" parent="280" name="students_pkey">
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>16426</ObjectId>
+      <ObjectId>16510</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>510</StateNumber>
-      <UnderlyingIndexId>16425</UnderlyingIndexId>
+      <StateNumber>545</StateNumber>
+      <UnderlyingIndexId>16509</UnderlyingIndexId>
     </key>
-    <key id="299" parent="264" name="students_email_key">
+    <key id="361" parent="280" name="students_email_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16428</ObjectId>
       <StateNumber>510</StateNumber>
       <UnderlyingIndexId>16427</UnderlyingIndexId>
     </key>
-    <key id="300" parent="264" name="students_studentid_key">
+    <key id="362" parent="280" name="students_studentid_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16430</ObjectId>
       <StateNumber>510</StateNumber>
       <UnderlyingIndexId>16429</UnderlyingIndexId>
     </key>
-    <column id="301" parent="265" name="name">
+    <column id="363" parent="281" name="name">
       <DasType>&quot;char&quot;[]|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>498</StateNumber>
       <TypeId>1002</TypeId>
     </column>
-    <index id="302" parent="265" name="test_pkey">
+    <index id="364" parent="281" name="test_pkey">
       <ColNames>name</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16401</ObjectId>
@@ -5090,12 +5572,121 @@ true posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="303" parent="265" name="test_pkey">
+    <key id="365" parent="281" name="test_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16402</ObjectId>
       <Primary>1</Primary>
       <StateNumber>498</StateNumber>
       <UnderlyingIndexId>16401</UnderlyingIndexId>
+    </key>
+    <column id="366" parent="282" name="ticket_id">
+      <DasType>integer|0s</DasType>
+      <DefaultExpression>nextval(&apos;tickets_ticket_id_seq&apos;::regclass)</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>588</StateNumber>
+      <SequenceId>16613</SequenceId>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="367" parent="282" name="student">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>588</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="368" parent="282" name="rsvp">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>588</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="369" parent="282" name="status">
+      <DasType>ticket_status|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StateNumber>588</StateNumber>
+      <TypeId>16605</TypeId>
+    </column>
+    <foreign-key id="370" parent="282" name="tickets_student_fkey">
+      <ColNames>student</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16621</ObjectId>
+      <OnDelete>cascade</OnDelete>
+      <StateNumber>588</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16418</RefTableId>
+    </foreign-key>
+    <foreign-key id="371" parent="282" name="tickets_rsvp_fkey">
+      <ColNames>rsvp</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16626</ObjectId>
+      <OnDelete>cascade</OnDelete>
+      <StateNumber>588</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16585</RefTableId>
+    </foreign-key>
+    <index id="372" parent="282" name="tickets_pkey">
+      <ColNames>ticket_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16619</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>588</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="373" parent="282" name="tickets_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16620</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>588</StateNumber>
+      <UnderlyingIndexId>16619</UnderlyingIndexId>
+    </key>
+    <column id="374" parent="283" name="id">
+      <DasType>integer|0s</DasType>
+      <DefaultExpression>nextval(&apos;venues_id_seq&apos;::regclass)</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>553</StateNumber>
+      <SequenceId>16533</SequenceId>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="375" parent="283" name="name">
+      <DasType>varchar(255)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>553</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="376" parent="283" name="location">
+      <DasType>varchar(255)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>553</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="377" parent="283" name="capacity">
+      <DasType>integer|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>553</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <index id="378" parent="283" name="venues_pkey">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16542</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>553</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="379" parent="283" name="venues_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16543</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>553</StateNumber>
+      <UnderlyingIndexId>16542</UnderlyingIndexId>
     </key>
   </database-model>
 </dataSource>

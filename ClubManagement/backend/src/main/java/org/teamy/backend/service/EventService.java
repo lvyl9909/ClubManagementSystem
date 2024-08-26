@@ -19,9 +19,9 @@ public class EventService {
         }
 
         Event event = eventDataMapper.findEventById(id);
-//        if (club == null) {
-//            throw new Exception("Club with name '" + title + "' not found");
-//        }
+        if (event == null) {
+            throw new RuntimeException("event with id '" + id + "' not found");
+        }
         return event;
     }
     public Event getEventByTitle(String title) throws Exception {

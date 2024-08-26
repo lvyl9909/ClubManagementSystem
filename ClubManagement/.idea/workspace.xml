@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="backend:war" />
       <artifact name="backend:war exploded" />
     </artifacts-to-build>
   </component>
@@ -19,8 +18,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Enum" />
         <option value="Interface" />
+        <option value="Enum" />
         <option value="Class" />
       </list>
     </option>
@@ -41,7 +40,7 @@
     </favorite-branches>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$/.." value="main" />
+        <entry key="$PROJECT_DIR$/.." value="emily-search-event" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -71,45 +70,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Docker.backend/api/Dockerfile build.executor": "Run",
-    "Jest.renders learn react link.executor": "Run",
-    "Maven.backend [clean,install].executor": "Run",
-    "Node.js.App.js.executor": "Run",
-    "Node.js.index.js.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Tomcat 服务器.Tomcat 10.1.26.executor": "Run",
-    "jdk.selected.JAVA_MODULE": "corretto-17",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/chenyun/Desktop/SDA/Y/ClubManagement/backend",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs.jest.jest_package": "/Users/chenyun/Desktop/SDA/Y/ClubManagement/frontend/node_modules/react-scripts",
-    "nodejs_interpreter_path": "node",
-    "nodejs_package_manager_path": "npm",
-    "npm.build.executor": "Run",
-    "npm.start.executor": "Run",
-    "project.structure.last.edited": "工件",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "MavenSettings",
-    "ts.external.directory.path": "/Applications/IntelliJ IDEA.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external",
-    "vue.rearranger.settings.migration": "true",
-    "应用程序.DatabaseConfig.executor": "Run"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Docker.backend/api/Dockerfile build.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.renders learn react link.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend [clean,install,-DforkCount=0...].executor&quot;: &quot;Debug&quot;,
+    &quot;Maven.backend [clean,install].executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.App.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.index.js.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Tomcat 服务器.Tomcat 10.1.26.executor&quot;: &quot;Run&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;corretto-17&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/chenyun/Desktop/SDA/Y/ClubManagement/backend&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;/Users/chenyun/Desktop/SDA/Y/ClubManagement/frontend/node_modules/react-scripts&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;工件&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Applications/IntelliJ IDEA.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;,
+    &quot;应用程序.DatabaseConfig.executor&quot;: &quot;Run&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql",
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;,
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="org.teamy.backend.model" />
@@ -145,17 +145,12 @@
     </configuration>
     <configuration name="Tomcat 10.1.26" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.26" ALTERNATIVE_JRE_ENABLED="false">
       <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080/ClubManagement" />
-      <option name="COMMON_VM_ARGUMENTS" value="-Djdbc.uri=jdbc:postgresql://dpg-cqqa5sjv2p9s73b4fi2g-a.singapore-postgres.render.com/swen90007_teamy -Djdbc.username=swen90007_teamy_owner -Djdbc.password=MmDETsMioPzOVdhSJoB4T3wwrxD1ElGH -Dcors.origins.ui=http://localhost:3000" />
-      <option name="UPDATING_POLICY" value="hot-swap-classes" />
+      <option name="COMMON_VM_ARGUMENTS" value="-Djdbc.uri=jdbc:postgresql://dpg-cqqa5sjv2p9s73b4fi2g-a.singapore-postgres.render.com/swen90007_teamy -Djdbc.username=swen90007_teamy_owner -Djdbc.password=MmDETsMioPzOVdhSJoB4T3wwrxD1ElGH -Dcors.origins.ui=http://localhost:3000 -Djwt.secret=a199e09ca9eefd221bb05a37a7bf9fe24b80e6b238a3e76dfaadac32358c03fd -Djwt.timeToLive.seconds=60 -Djwt.issuer=TeamY -Dcookies.timeToLive.seconds=360000 -Dcookies.domain=localhost -Dcookies.secure=false -Dadmin.username=admin -Dadmin.password=admin" />
+      <option name="UPDATING_POLICY" value="update-resources" />
       <deployment>
         <artifact name="backend:war exploded">
           <settings>
             <option name="CONTEXT_PATH" value="/ClubManagement" />
-          </settings>
-        </artifact>
-        <artifact name="backend:war">
-          <settings>
-            <option name="CONTEXT_PATH" value="/backend_war" />
           </settings>
         </artifact>
       </deployment>
@@ -234,7 +229,6 @@
         <option name="Make" enabled="true" />
         <option name="BuildArtifacts" enabled="true">
           <artifact name="backend:war exploded" />
-          <artifact name="backend:war" />
         </option>
       </method>
     </configuration>
@@ -312,6 +306,10 @@
       <workItem from="1723342501727" duration="14076000" />
       <workItem from="1723438425261" duration="4502000" />
       <workItem from="1723459275526" duration="26683000" />
+      <workItem from="1724375826921" duration="3011000" />
+      <workItem from="1724379579577" duration="1058000" />
+      <workItem from="1724558340753" duration="612000" />
+      <workItem from="1724645419445" duration="5153000" />
     </task>
     <servers />
   </component>
@@ -329,7 +327,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/emily-search-event" />
+                        <option value="main" />
                       </list>
                     </value>
                   </entry>

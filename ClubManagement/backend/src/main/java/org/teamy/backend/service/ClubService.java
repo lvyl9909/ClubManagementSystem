@@ -49,13 +49,13 @@ public class ClubService {
         }
     }
 
-    public boolean saveClub(Club club) throws Exception {
+    public void saveClub(Club club) throws Exception {
         // You can add additional business logic here, such as data validation
         if (club ==null||club.getName() == null || club.getName().isEmpty()) {
             throw new IllegalArgumentException("Club cannot be empty");
         }
-
-        // Recall the methods in DAO layer
-        return clubDataMapper.saveClub(club);
+        if (!clubDataMapper.saveClub(club)) {
+            throw new RuntimeException("Failed to save the club.");
+        }
     }
 }

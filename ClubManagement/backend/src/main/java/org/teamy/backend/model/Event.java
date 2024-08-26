@@ -15,9 +15,9 @@ public class Event {
     private String time;
     private String venueName;
     private BigDecimal cost;
+    private Integer clubId;
     private Integer capacity;
     private List<RSVP> rsvps;
-    private Integer clubId;
     private List<CapacityObserver> observers = new ArrayList<>();
     private Waitlist waitlist;
 
@@ -25,28 +25,42 @@ public class Event {
         return waitlist;
     }
 
+    public Integer getClubId() {
+        return clubId;
+    }
+
+    public void setClubId(Integer clubId) {
+        this.clubId = clubId;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", date='" + date + '\'' +
+                ", time='" + time + '\'' +
+                ", venueName='" + venueName + '\'' +
+                ", cost=" + cost +
+                ", capacity=" + capacity +
+                ", rsvps=" + rsvps +
+                ", clubId=" + clubId +
+                '}';
+    }
+
     public void setWaitlist(Waitlist waitlist) {
         this.waitlist = waitlist;
     }
 
-    public Event(String title, String description, String date, String time, String venueName, BigDecimal cost, Integer capacity, Integer clubId) {
-        this.title = title;
-        this.description = description;
-        this.date = date;
-        this.time = time;
-        this.venueName = venueName;
-        this.cost = cost;
-        this.capacity = capacity;
-    }
 
     public Event(String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId) {
+        this.clubId = clubId;
         this.title = title;
         this.description = description;
         this.date = date.toString();
         this.time = time.toString();
         this.venueName = venueName;
         this.cost = cost;
-        this.clubId = clubId;
     }
 
     public Event() {
