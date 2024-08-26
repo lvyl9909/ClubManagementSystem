@@ -90,19 +90,8 @@ public class ClubController extends HttpServlet {
                             Club club = parseClubFromRequest(req);
 
                             // 调用Service层保存Club
-                            boolean isSaved = clubService.saveClub(club);
-
-                            if (isSaved) {
-                                return ResponseEntity.ok(null);
-                            } else {
-                                return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
-                                        Error.builder()
-                                                .status(HttpServletResponse.SC_BAD_REQUEST)
-                                                .message("Failed to save the club.")
-                                                .reason("Failed to save the club.")
-                                                .build()
-                                );
-                            }
+                            clubService.saveClub(club);
+                            return ResponseEntity.create(club);
                         } catch (IllegalArgumentException e) {
                             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                                     Error.builder()
@@ -111,7 +100,16 @@ public class ClubController extends HttpServlet {
                                             .reason(e.getMessage())
                                             .build()
                             );
-                        } catch (Exception e) {
+                        } catch (RuntimeException e){
+                            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                                    Error.builder()
+                                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                                            .message("Failed to save the club.")
+                                            .reason("Failed to save the club.")
+                                            .build()
+                            );
+                        }
+                        catch (Exception e) {
                             return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                     Error.builder()
                                             .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
@@ -133,7 +131,6 @@ public class ClubController extends HttpServlet {
         if (club.getName() == null || club.getName().isEmpty()) {
             throw new IllegalArgumentException("Club name cannot be empty");
         }
-
         return club;
     }
 

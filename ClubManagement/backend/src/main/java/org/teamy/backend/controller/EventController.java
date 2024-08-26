@@ -131,17 +131,6 @@ public class EventController extends HttpServlet {
 
         return event;
     }
-
-//    private void viewEvent(HttpServletRequest req, HttpServletResponse resp, Integer eventId) throws Exception {
-//        PrintWriter out = resp.getWriter();
-//        Event event = eventService.getEventById(eventId);
-//        if (event != null) {
-//            out.write("{\"title\":\"" + event.getTitle() + "\", \"description\":\"" + event.getDescription()+"\", \"club\":\"" + event.getClub() +"\", \"cost\":\"" + event.getCost()+"\", \"venue\":\"" + event.getVenueName()+ "\"}");
-//        } else {
-//            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//            out.write("{\"error\":\"Club not found.\"}");
-//        }
-//    }
     private ResponseEntity viewEvent(Integer eventId) {
         Event event = null;
         try {
@@ -157,19 +146,6 @@ public class EventController extends HttpServlet {
             );
         }
     }
-
-//    private void listEvents(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-//        List<Event> clubs = eventService.getAllEvents();
-//        resp.setContentType("application/json");
-//        resp.setCharacterEncoding("UTF-8");
-//        PrintWriter out = resp.getWriter();
-//
-//        // Use Gson to convert list to JSON and return
-//        Gson gson = new Gson();
-//        String json = gson.toJson(clubs);
-//        out.print(json);
-//        out.flush();
-//    }
     private ResponseEntity listEvents() {
         List<Event> events = eventService.getAllEvents();
         return ResponseEntity.ok(events);
