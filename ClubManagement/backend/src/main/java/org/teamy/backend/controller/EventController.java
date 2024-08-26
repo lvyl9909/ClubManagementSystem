@@ -1,5 +1,6 @@
 package org.teamy.backend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,6 +13,10 @@ import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
+import org.teamy.backend.model.ResponseEntity;
+import org.teamy.backend.model.exception.Error;
+import org.teamy.backend.model.request.MarshallingRequestHandler;
+import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.service.ClubService;
 import org.teamy.backend.service.EventService;
 
@@ -19,124 +24,154 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @WebServlet("/events/*")
 public class EventController extends HttpServlet {
     EventService eventService;
-    private Gson gson = new Gson();  // Gson instance
+    private ObjectMapper mapper;
 
     @Override
     public void init() throws ServletException {
         eventService = (EventService) getServletContext().getAttribute(ContextListener.EVENT_SERVICE);
-        // 假设 ClubMapperImpl 是具体实现
+        mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
+
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String idParam = req.getParameter("id"); // Gets the "id" argument from the query string
-        resp.setHeader("Access-Control-Allow-Origin", "*");
-        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        String pathInfo = req.getPathInfo(); // Gets the path info of the URL
+        String idParam = req.getParameter("id"); // 获取查询字符串中的 "id" 参数
 
-        if (Objects.equals(idParam, "-1")) {
-            listEvents(req, resp); // If no id argument，list all clubs
-        } else {
-            try {
-                Integer clubId = Integer.valueOf(idParam); // Convert id argument into Integer
-                viewEvent(req, resp, clubId); // Call viewClub method
-            } catch (NumberFormatException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format"); // return 400, ID invalid
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        RequestHandler handler = () -> {
+            if (Objects.equals(idParam, "-1")) {
+                return listEvents();
+            } else {
+                try {
+                    Integer eventId = Integer.valueOf(idParam); // 将id参数转换为整数
+                    return viewEvent(eventId);
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                            Error.builder()
+                                    .status(HttpServletResponse.SC_BAD_REQUEST)
+                                    .message("Invalid ID format")
+                                    .reason(e.getMessage())
+                                    .build()
+                    );
+                } catch (Exception e) {
+                    return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            Error.builder()
+                                    .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                                    .message("error")
+                                    .reason(e.getMessage())
+                                    .build()
+                    );
+                }
             }
-        }
-//        else {
-//            resp.sendError(HttpServletResponse.SC_NOT_FOUND); // return 404
-//        }
+        };
+
+        MarshallingRequestHandler.of(mapper, resp, handler).handle();
     }
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setHeader("Access-Control-Allow-Origin", "*");
-        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        System.out.println("processing");
         String pathInfo = req.getPathInfo(); // Gets the path info of the URL
 
         if (pathInfo.equals("/save")) {
-            saveEvent(req, resp);
-        }
-    }
+            MarshallingRequestHandler.of(
+                    mapper, // 使用Jackson的ObjectMapper
+                    resp,
+                    () -> {
+                        try {
+                            // 解析请求体中的Club数据，假设请求体是JSON格式
+                            Event event = parseEventFromRequest(req);
 
-    private void saveEvent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        try {
-            // Parse the event data from the request, assuming that the request body is in JSON format
-            Event event = parseEventFromRequest(req);
+                            // 调用Service层保存Club
+                            boolean isSaved = eventService.saveEvent(event);
 
-            // Call the Service layer to save the event
-            boolean isSaved = eventService.saveEvent(event);
-
-            if (isSaved) {
-                resp.setStatus(HttpServletResponse.SC_CREATED);
-                resp.getWriter().write(gson.toJson(event));
-                //resp.getWriter().write("Event saved successfully.");
-            } else {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
+                            if (isSaved) {
+                                return ResponseEntity.ok(null);
+                            } else {
+                                return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                                        Error.builder()
+                                                .status(HttpServletResponse.SC_BAD_REQUEST)
+                                                .message("Failed to save the event.")
+                                                .reason("Failed to save the event.")
+                                                .build()
+                                );
+                            }
+                        } catch (IllegalArgumentException e) {
+                            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                                    Error.builder()
+                                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                                            .message("Failed to save the event.")
+                                            .reason(e.getMessage())
+                                            .build()
+                            );
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                                    Error.builder()
+                                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                                            .message("An error occurred while saving the event.")
+                                            .reason(e.getMessage())
+                                            .build()
+                            );
+                        }
+                    }
+            ).handle();
             }
-        } catch (IllegalArgumentException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write(e.getMessage());
-        } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("An error occurred while saving the event. "+e.getMessage());
-        }
     }
 
     private Event parseEventFromRequest(HttpServletRequest req) throws IOException {
-        //  Use BufferedReader to read request
-        BufferedReader reader = req.getReader();
-        StringBuilder jsonBuffer = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            jsonBuffer.append(line);
-            System.out.println(line);
-        }
-
-        // Use Gson to parse JSON string to Java object
-        Event event = gson.fromJson(jsonBuffer.toString(), Event.class);
+        Event event = mapper.readValue(req.getInputStream(), Event.class);
         System.out.println(event.toString());
 
-        // Correct data
-        if (event.getTitle() == null || event.getTitle().isEmpty()) {
+        if ( event.getTitle().isEmpty()||event.getTitle() == null ) {
             throw new IllegalArgumentException("Event name cannot be empty");
         }
 
         return event;
     }
 
-    private void viewEvent(HttpServletRequest req, HttpServletResponse resp, Integer eventId) throws Exception {
-        PrintWriter out = resp.getWriter();
-        Event event = eventService.getEventById(eventId);
-        if (event != null) {
-            out.write("{\"title\":\"" + event.getTitle() + "\", \"description\":\"" + event.getDescription()+"\", \"club\":\"" + event.getClub() +"\", \"cost\":\"" + event.getCost()+"\", \"venue\":\"" + event.getVenueName()+ "\"}");
-        } else {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            out.write("{\"error\":\"Club not found.\"}");
+//    private void viewEvent(HttpServletRequest req, HttpServletResponse resp, Integer eventId) throws Exception {
+//        PrintWriter out = resp.getWriter();
+//        Event event = eventService.getEventById(eventId);
+//        if (event != null) {
+//            out.write("{\"title\":\"" + event.getTitle() + "\", \"description\":\"" + event.getDescription()+"\", \"club\":\"" + event.getClub() +"\", \"cost\":\"" + event.getCost()+"\", \"venue\":\"" + event.getVenueName()+ "\"}");
+//        } else {
+//            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+//            out.write("{\"error\":\"Club not found.\"}");
+//        }
+//    }
+    private ResponseEntity viewEvent(Integer eventId) {
+        Event event = null;
+        try {
+            event = eventService.getEventById(eventId);
+            return ResponseEntity.ok(event);
+        } catch (Exception e) {
+            return ResponseEntity.of(HttpServletResponse.SC_NOT_FOUND,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_NOT_FOUND)
+                            .message("Event not found.")
+                            .reason(e.getMessage())
+                            .build()
+            );
         }
     }
 
-    private void listEvents(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        List<Event> clubs = eventService.getAllEvents();
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-        PrintWriter out = resp.getWriter();
-
-        // Use Gson to convert list to JSON and return
-        Gson gson = new Gson();
-        String json = gson.toJson(clubs);
-        out.print(json);
-        out.flush();
+//    private void listEvents(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+//        List<Event> clubs = eventService.getAllEvents();
+//        resp.setContentType("application/json");
+//        resp.setCharacterEncoding("UTF-8");
+//        PrintWriter out = resp.getWriter();
+//
+//        // Use Gson to convert list to JSON and return
+//        Gson gson = new Gson();
+//        String json = gson.toJson(clubs);
+//        out.print(json);
+//        out.flush();
+//    }
+    private ResponseEntity listEvents() {
+        List<Event> events = eventService.getAllEvents();
+        return ResponseEntity.ok(events);
     }
-
 }

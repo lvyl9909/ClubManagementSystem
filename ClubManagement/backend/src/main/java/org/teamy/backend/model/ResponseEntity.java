@@ -27,4 +27,8 @@ public class ResponseEntity {
     public static ResponseEntity ok(Object body) {
         return new ResponseEntity(HttpServletResponse.SC_OK, body);
     }
+    public static ResponseEntity create(Object body) {
+        return new ResponseEntity(HttpServletResponse.SC_CREATED, body);
+    }
+
 }
