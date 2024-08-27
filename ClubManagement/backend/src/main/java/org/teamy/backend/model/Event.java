@@ -18,12 +18,9 @@ public class Event {
     private Integer clubId;
     private Integer capacity;
     private List<RSVP> rsvps;
-    private List<CapacityObserver> observers = new ArrayList<>();
+    private final List<CapacityObserver> observers = new ArrayList<>();
     private Waitlist waitlist;
 
-    public Waitlist getWaitlist() {
-        return waitlist;
-    }
 
     public Integer getClubId() {
         return clubId;
@@ -72,6 +69,19 @@ public class Event {
         this.venueName = venueName;
         this.cost = cost;
         this.clubId = clubId;
+    }
+
+    public Event(String title, String description, String date, String time, String venueName, BigDecimal cost, Integer clubId, Integer capacity) {
+        this.title = title;
+        this.description = description;
+        this.date = date;
+        this.time = time;
+        this.venueName = venueName;
+        this.cost = cost;
+        this.clubId = clubId;
+        this.capacity = capacity;
+        this.waitlist = new Waitlist(this);
+        this.rsvps = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -167,5 +177,8 @@ public class Event {
     public void updateCapacity(int newCapacity) {
         this.capacity = newCapacity;
         notifyObservers(); // Notify all observers when capacity changes
+    }
+    public Waitlist getWaitlist() {
+        return waitlist;
     }
 }

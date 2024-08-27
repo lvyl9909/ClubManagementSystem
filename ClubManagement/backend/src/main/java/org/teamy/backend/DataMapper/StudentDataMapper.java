@@ -1,6 +1,7 @@
 package org.teamy.backend.DataMapper;
 
 import org.teamy.backend.config.DatabaseConnectionManager;
+import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Student;
 
 import java.sql.Connection;
@@ -128,4 +129,5 @@ public class StudentDataMapper {
         // If the number of affected rows is greater than 0, the update is successful
         return rowsAffected > 0;
     }
+
 }
