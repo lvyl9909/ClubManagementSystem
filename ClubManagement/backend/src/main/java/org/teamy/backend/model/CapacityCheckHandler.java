@@ -1,8 +1,9 @@
 package org.teamy.backend.model;
 
+import org.teamy.backend.service.EventService;
+
 public class CapacityCheckHandler implements RSVPHandler {
     private RSVPHandler nextHandler;
-
     @Override
     public void setNextHandler(RSVPHandler handler) {
         this.nextHandler = handler;

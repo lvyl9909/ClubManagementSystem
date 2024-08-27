@@ -2,11 +2,13 @@ package org.teamy.backend.model;
 
 public class Venue {
     private String name;
+    private String description;
     private String location;
     private Integer capacity;
 
-    public Venue(String name, String location, Integer capacity) {
+    public Venue(String name, String description, String location, Integer capacity) {
         this.name = name;
+        this.description = description;
         this.location = location;
         this.capacity = capacity;
     }

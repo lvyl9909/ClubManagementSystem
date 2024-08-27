@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-@WebServlet("/events/*")
+@WebServlet("/student/events/*")
 public class EventController extends HttpServlet {
     EventService eventService;
     private ObjectMapper mapper;

@@ -5,7 +5,7 @@ import java.util.Queue;
 
 public class Waitlist implements CapacityObserver {
 
-    private Queue<RSVP> waitlist = new LinkedList<>();
+    private final Queue<RSVP> waitlist = new LinkedList<>();
     private Event event;
 
     public Waitlist(Event event) {

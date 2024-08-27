@@ -1,6 +1,9 @@
 package org.teamy.backend.model;
 
+import org.teamy.backend.DataMapper.ClubDataMapper;
 import org.teamy.backend.security.model.Role;
+import org.teamy.backend.service.ClubService;
+import org.teamy.backend.service.StudentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,31 +12,32 @@ import java.util.Set;
 public class Student extends Person{
     private String studentId;
     private List<RSVP>rsvps;
-    private List<ClubMembership>clubMemberships;
+    private List<Integer>clubId;
     private List<Ticket>tickets;
+    private List<Club>clubs;
 
-    public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive, Set<Role> roles, String studentId, List<RSVP> rsvps, List<ClubMembership> clubMemberships, List<Ticket> tickets) {
+    private final ClubService clubService;
+
+    public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive, Set<Role> roles, String studentId, List<RSVP> rsvps, List<Integer> clubId, List<Ticket> tickets,ClubService clubService) {
         super(id, username, name, email, phoneNumber, password, isActive, roles);
         this.studentId = studentId;
         this.rsvps = rsvps;
-        this.clubMemberships = clubMemberships;
+        this.clubId = clubId;
         this.tickets = tickets;
-    }
+        this.clubs = new ArrayList<>();
 
-    public Student(String name, String email, Long phoneNumber, String studentId, List<RSVP> rsvps, List<ClubMembership> clubMemberships, List<Ticket> tickets) {
-        super(name, email, phoneNumber);
-        this.studentId = studentId;
-        this.rsvps = rsvps;
-        this.clubMemberships = clubMemberships;
-        this.tickets = tickets;
+        this.clubService=clubService;
     }
 
     public Student(String name, String email, Long phoneNumber, String studentId) {
         super(name, email, phoneNumber);
         this.studentId = studentId;
         this.rsvps = new ArrayList<>();
-        this.clubMemberships = new ArrayList<>();
+        this.clubId = new ArrayList<>();
         this.tickets = new ArrayList<>();
+        this.clubs = new ArrayList<>();
+
+        this.clubService = null;//记得要改
     }
 
     public String getStudentId() {
@@ -52,12 +56,28 @@ public class Student extends Person{
         this.rsvps = rsvps;
     }
 
-    public List<ClubMembership> getClubMemberships() {
-        return clubMemberships;
+    public List<Integer> getClubId() {
+        return clubId;
     }
 
-    public void setClubMemberships(List<ClubMembership> clubMemberships) {
-        this.clubMemberships = clubMemberships;
+    public void setClubId(List<Integer> clubId) {
+        this.clubId = clubId;
+    }
+
+    public List<Club> getClubs() {
+        for (Integer clubId:clubId){
+            try {
+                Club club = clubService.getClubById(clubId);
+                clubs.add(club);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return clubs;
+    }
+
+    public void setClubs(List<Club> clubs) {
+        this.clubs = clubs;
     }
 
     public List<Ticket> getTickets() {

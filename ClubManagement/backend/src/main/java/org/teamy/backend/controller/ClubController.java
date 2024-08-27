@@ -21,7 +21,7 @@ import java.util.Objects;
 import com.google.gson.Gson;
 
 
-@WebServlet("/clubs/*")
+@WebServlet("/student/clubs/*")
 public class ClubController extends HttpServlet {
     private ClubService clubService;
     private ObjectMapper mapper;

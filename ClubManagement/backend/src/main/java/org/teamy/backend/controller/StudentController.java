@@ -8,7 +8,7 @@ import jakarta.servlet.annotation.*;
 
 
 import java.io.IOException;
-@WebServlet("/students/*")
+@WebServlet("/student/students/*")
 public class StudentController  extends HttpServlet {
 
     @Override

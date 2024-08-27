@@ -1,6 +1,8 @@
 package org.teamy.backend.security;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -41,6 +43,9 @@ import java.util.Collections;
 public class WebSecurityConfig implements ServletContextAware {
     private static final String PROPERTY_CORS_ORIGINS_UI = "cors.origins.ui";
     private static final RequestMatcher PROTECTED_URLS = new AntPathRequestMatcher("/");
+    private static final RequestMatcher ADMIN_PROTECTED_URLS = new AntPathRequestMatcher("/admin/**");
+    private static final RequestMatcher STUDENT_PROTECTED_URLS = new AntPathRequestMatcher("/student/**");
+
     private static final String PROPERTY_ADMIN_USERNAME = "admin.username";
     private static final String PROPERTY_ADMIN_PASSWORD = "admin.password";
 
@@ -48,16 +53,19 @@ public class WebSecurityConfig implements ServletContextAware {
     private ServletContext servletContext;
     private DatabaseConnectionManager databaseConnectionManager;
 
+    //定义表单登陆的方法
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         StudentDataMapper userRepository = new StudentDataMapper(databaseConnectionManager);
         return new CustomUserDetailsService(userRepository);
     }
+    //未认证的入口
     @Bean
     AuthenticationEntryPoint unauthorizedEntryPoint() {
         return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
     }
 
+    //配置身份验证管理器，分别定义表单登陆和令牌登陆的入口
     @Bean
     AuthenticationManager authenticationManager(HttpSecurity http, UserDetailsService userDetailsService, TokenAuthenticationProvider authenticationProvider) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -77,8 +85,11 @@ public class WebSecurityConfig implements ServletContextAware {
                 .and()
                 .addFilterBefore(tokenAuthenticationFilter, AnonymousAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(PROTECTED_URLS)
+                        .requestMatchers(ADMIN_PROTECTED_URLS)
                         .hasRole(Role.ADMIN.name())
+                        .requestMatchers(STUDENT_PROTECTED_URLS)
+                        .permitAll()
+//                        .hasRole(Role.USER.name())
                         .anyRequest()
                         .permitAll())
                 .authenticationManager(authenticationManager)
@@ -86,14 +97,21 @@ public class WebSecurityConfig implements ServletContextAware {
                 .csrf().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
+//                .formLogin(form -> form
+//                        .loginPage("/login")
+//                        .permitAll()
+//                        .successHandler(successHandler()) // 将自定义的successHandler添加到formLogin配置中
+//                        .failureUrl("/login?error=true"))
                 .logout().disable()
                 .build();
     }
+
+    //配置身份验证提供者，基于令牌的身份验证
     @Bean
     public TokenAuthenticationProvider tokenAuthenticationProvider(UserDetailsService userDetailsService) {
         return new TokenAuthenticationProvider(userDetailsService);
     }
-
+    //配置CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -106,11 +124,24 @@ public class WebSecurityConfig implements ServletContextAware {
         return source;
     }
 
+    //认证成功之后去哪
     @Bean
     SimpleUrlAuthenticationSuccessHandler successHandler() {
         final SimpleUrlAuthenticationSuccessHandler successHandler = new SimpleUrlAuthenticationSuccessHandler();
-        successHandler.setRedirectStrategy((request, response, url) -> {});
+        successHandler.setRedirectStrategy((request, response, url) -> {
+            // 根据条件设置重定向URL
+//            String redirectUrl = determineTargetUrl(request, response);
+//            response.sendRedirect(redirectUrl);
+        });
         return successHandler;
+    }
+    private String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
+        // 例如，基于用户角色进行重定向
+        if (request.isUserInRole("ADMIN")) {
+            return "/admin/home";
+        } else {
+            return "/user/home";
+        }
     }
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter(AuthenticationManager authenticationManager, SimpleUrlAuthenticationSuccessHandler simpleUrlAuthenticationSuccessHandler) {

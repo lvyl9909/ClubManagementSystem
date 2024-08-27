@@ -1,6 +1,7 @@
 package org.teamy.backend.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,17 @@ public class fundingApplication {
         this.event = event;
         this.date = date;
         this.reviewer = reviewer;
+    }
+
+    public fundingApplication(String description, BigDecimal amount, Integer semester, Club club, fundingApplicationStatus status, Date date) {
+        this.description = description;
+        this.amount = amount;
+        this.semester = semester;
+        this.club = club;
+        this.status = status;
+        this.date = date;
+        this.event = new ArrayList<>();
+        this.reviewer = null;
     }
 
     public String getDescription() {

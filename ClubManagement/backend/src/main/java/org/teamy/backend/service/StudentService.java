@@ -1,6 +1,7 @@
 package org.teamy.backend.service;
 
 import org.teamy.backend.DataMapper.StudentDataMapper;
+import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Student;
 
 public class StudentService {
@@ -32,6 +33,17 @@ public class StudentService {
             throw new Exception("Student with ID " + studentId + " not found");
         }
 
+        return student;
+    }
+    public Student getStudentById(int id) throws Exception {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Club ID must be positive");
+        }
+
+        Student student = studentDataMapper.findStudentById(id);
+//        if (club == null) {
+//            throw new Exception("Club with ID " + id + " not found");
+//        }
         return student;
     }
 
