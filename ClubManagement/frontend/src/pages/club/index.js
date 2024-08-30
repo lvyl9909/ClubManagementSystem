@@ -18,7 +18,7 @@ function Club() {
     useEffect(() => {
         const fetchClub = async () => {
             try {
-                const response = await fetch(`${path}/clubs/?id=-1`);
+                const response = await fetch(`${path}/student/clubs/?id=-1`);
                 console.log(response.ok,'response')
                 if (response.ok===true) {
                     const data = await response.json(); // 解析 JSON 数据
@@ -52,7 +52,7 @@ function Club() {
                 name: values.name,
                 description: values.description,
             };
-            const response = await fetch(`${path}/clubs/save`, {
+            const response = await fetch(`${path}/student/clubs/save`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -36,7 +36,7 @@ function Event() {
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                const response = await fetch(`${path}/events/?id=-1`);
+                const response = await fetch(`${path}/student/events/?id=-1`);
                 if (response.ok) {
                     const data = await response.json(); // 解析 JSON 数据
                     setEvents(data);
@@ -58,7 +58,7 @@ function Event() {
     useEffect(() => {
         const fetchClubs = async () => {
             try {
-                const response = await fetch(`${path}/clubs/?id=-1`);
+                const response = await fetch(`${path}/student/clubs/?id=-1`);
                 if (response.ok) {
                     const data = await response.json();
                     setClubs(data);
@@ -94,7 +94,7 @@ function Event() {
                 cost: values.cost,
                 clubId: 1
             };
-            const response = await fetch(`${path}/events/save`, {
+            const response = await fetch(`${path}/student/events/save`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
