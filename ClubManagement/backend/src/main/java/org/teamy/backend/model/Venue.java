@@ -36,4 +36,12 @@ public class Venue {
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

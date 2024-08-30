@@ -21,7 +21,6 @@ public class Event {
     private final List<CapacityObserver> observers = new ArrayList<>();
     private Waitlist waitlist;
 
-
     public Integer getClubId() {
         return clubId;
     }
