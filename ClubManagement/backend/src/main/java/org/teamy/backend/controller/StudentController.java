@@ -25,10 +25,13 @@ import java.util.Objects;
 @WebServlet("/student/students/*")
 public class StudentController  extends HttpServlet {
     StudentService studentService;
+
+    ClubService clubService;
     private ObjectMapper mapper;
 
     @Override
     public void init() throws ServletException {
+        clubService = (ClubService) getServletContext().getAttribute(ContextListener.CLUB_SERVICE);
         studentService = (StudentService) getServletContext().getAttribute(ContextListener.STUDENT_SERVICE);
         mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
         System.out.println("success init");

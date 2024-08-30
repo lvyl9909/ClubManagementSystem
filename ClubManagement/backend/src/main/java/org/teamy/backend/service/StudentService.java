@@ -4,13 +4,17 @@ import org.teamy.backend.DataMapper.StudentDataMapper;
 import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Student;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StudentService {
     private StudentDataMapper studentDataMapper;
+    private final ClubService clubService;
 
-    public StudentService(StudentDataMapper studentDataMapper) {
+
+    public StudentService(StudentDataMapper studentDataMapper,ClubService clubService) {
         this.studentDataMapper = studentDataMapper;
+        this.clubService = clubService;
     }
 
     public boolean updateStudent(Student student) throws Exception {
@@ -54,12 +58,25 @@ public class StudentService {
             throw new IllegalArgumentException("Club ID must be positive");
         }
 
-        List<Club> clubs= null;
+        Student student;
         try {
-            clubs = studentDataMapper.findClubStudentJoin(id);
+            student = studentDataMapper.findStudentById(id);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        List<Club> clubs = new ArrayList<>();
+        for (Integer clubId : student.getClubId()) {
+            try {
+                Club club = clubService.getClubById(clubId);
+                clubs.add(club);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // 设置到Student对象中（如果需要存储）
+        student.setClubs(clubs);
 
         return clubs;
     }

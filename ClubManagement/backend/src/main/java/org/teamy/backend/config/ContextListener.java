@@ -49,7 +49,7 @@ public class ContextListener implements ServletContextListener {
 
         sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager );
         sce.getServletContext().setAttribute(CLUB_SERVICE, new ClubService(new ClubDataMapper(databaseConnectionManager)));
-        sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager)));
+        sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager),new ClubService(new ClubDataMapper(databaseConnectionManager))));
         sce.getServletContext().setAttribute(EVENT_SERVICE, new EventService(new EventDataMapper(databaseConnectionManager)));
 
         var mapper = Jackson2ObjectMapperBuilder.json()

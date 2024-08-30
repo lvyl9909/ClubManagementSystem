@@ -24,8 +24,16 @@ public class StudentDataMapper {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students WHERE id = ?");
             stmt.setInt(1, Id);
             ResultSet rs = stmt.executeQuery();
+
+            PreparedStatement stmt2 = connection.prepareStatement("SELECT * FROM students_clubs WHERE student_id = ?");
+            stmt2.setInt(1, Id);
+            ResultSet rs2 = stmt2.executeQuery();
             if (rs.next()) {
-                return new Student( rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("student_id"));
+                Student tempStudent =  new Student( rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("studentid"));
+                while (rs2.next()) {
+                    tempStudent.addClubId(rs2.getInt("club_id"));
+                }
+                return tempStudent;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -6,6 +6,7 @@ import org.teamy.backend.service.ClubService;
 import org.teamy.backend.service.StudentService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -16,17 +17,12 @@ public class Student extends Person{
     private List<Ticket>tickets;
     private List<Club>clubs;
 
-    private final ClubService clubService;
-
-    public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive, Set<Role> roles, String studentId, List<RSVP> rsvps, List<Integer> clubId, List<Ticket> tickets,ClubService clubService) {
+    public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive, Set<Role> roles, String studentId, List<RSVP> rsvps, List<Integer> clubId, List<Ticket> tickets) {
         super(id, username, name, email, phoneNumber, password, isActive, roles);
         this.studentId = studentId;
         this.rsvps = rsvps;
         this.clubId = clubId;
         this.tickets = tickets;
-        this.clubs = new ArrayList<>();
-
-        this.clubService=clubService;
     }
 
     public Student(String name, String email, Long phoneNumber, String studentId) {
@@ -35,9 +31,6 @@ public class Student extends Person{
         this.rsvps = new ArrayList<>();
         this.clubId = new ArrayList<>();
         this.tickets = new ArrayList<>();
-        this.clubs = new ArrayList<>();
-
-        this.clubService = null;//记得要改
     }
 
     public String getStudentId() {
@@ -65,19 +58,19 @@ public class Student extends Person{
     }
 
     public List<Club> getClubs() {
-        for (Integer clubId:clubId){
-            try {
-                Club club = clubService.getClubById(clubId);
-                clubs.add(club);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        if (clubs == null) {
+            // clubs尚未初始化时，返回一个空列表或者抛出异常，具体取决于业务需求
+            return Collections.emptyList();
         }
         return clubs;
     }
 
     public void setClubs(List<Club> clubs) {
         this.clubs = clubs;
+    }
+
+    public void addClubId(Integer clubId) {
+        this.clubId.add(clubId);
     }
 
     public List<Ticket> getTickets() {
