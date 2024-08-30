@@ -4,6 +4,8 @@ import org.teamy.backend.DataMapper.StudentDataMapper;
 import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Student;
 
+import java.util.List;
+
 public class StudentService {
     private StudentDataMapper studentDataMapper;
 
@@ -47,5 +49,19 @@ public class StudentService {
         return student;
     }
 
+    public List<Club> getClubStudentJoin(int id)  {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Club ID must be positive");
+        }
+
+        List<Club> clubs= null;
+        try {
+            clubs = studentDataMapper.findClubStudentJoin(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return clubs;
+    }
 
 }

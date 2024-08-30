@@ -84,11 +84,13 @@ public class StudentDataMapper {
         var connection = databaseConnectionManager.nextConnection();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO students (studentid, name, email,phone_number) VALUES (?, ?, ?,?)");
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO students (studentid, name, email,phone_number,passw,isactive) VALUES (?, ?, ?,?,?,?)");
             stmt.setString(1, student.getStudentId());
             stmt.setString(2, student.getName());
             stmt.setString(3, student.getEmail());
             stmt.setLong(4, student.getPhoneNumber());
+            stmt.setString(5, student.getPassword());
+            stmt.setBoolean(6, true);
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -130,4 +132,37 @@ public class StudentDataMapper {
         return rowsAffected > 0;
     }
 
+    public List<Club> findClubStudentJoin(int Id) throws Exception {
+        var connection = databaseConnectionManager.nextConnection();
+
+        List<Club> clubs = null;
+        try {
+            clubs = new ArrayList<>();
+
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students_clubs WHERE student_id = ?");
+            stmt.setInt(1, Id);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Integer clubId = rs.getInt("club_id");
+                stmt = connection.prepareStatement("SELECT * FROM clubs WHERE club_id = ?");
+                stmt.setInt(1,clubId);
+                ResultSet clubRs = stmt.executeQuery();
+
+                if (clubRs.next()) {
+                    Club club = new Club(
+                            clubRs.getString("name"),
+                            clubRs.getString("description")
+                    );
+                    clubs.add(club);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+
+        return clubs;
+    }
 }

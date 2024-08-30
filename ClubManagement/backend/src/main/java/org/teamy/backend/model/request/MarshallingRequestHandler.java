@@ -19,7 +19,7 @@ public class MarshallingRequestHandler implements RequestHandler {
     }
 
     @Override
-    public ResponseEntity handle() {
+    public ResponseEntity handle()  {
         var entity = handler.handle();
         try {
             if (entity.getBody().isPresent()) {
