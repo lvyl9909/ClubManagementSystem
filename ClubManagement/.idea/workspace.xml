@@ -313,6 +313,9 @@
       <workItem from="1724673993854" duration="249000" />
       <workItem from="1724674245701" duration="16734000" />
       <workItem from="1724980177152" duration="9710000" />
+      <workItem from="1725092522160" duration="9694000" />
+      <workItem from="1725108361643" duration="5845000" />
+      <workItem from="1725358381091" duration="4725000" />
     </task>
     <servers />
   </component>
@@ -330,7 +333,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="main" />
+                        <option value="origin/emily-search-event" />
                       </list>
                     </value>
                   </entry>

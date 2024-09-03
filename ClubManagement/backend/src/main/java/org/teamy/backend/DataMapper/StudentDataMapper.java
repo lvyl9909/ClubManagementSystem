@@ -50,7 +50,7 @@ public class StudentDataMapper {
             stmt.setString(1, studentId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Student( rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("student_id"));
+                return new Student( rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("studentid"),rs.getString("passw"));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

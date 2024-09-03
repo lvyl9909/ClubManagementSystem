@@ -10,6 +10,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.teamy.backend.DataMapper.ClubDataMapper;
 import org.teamy.backend.DataMapper.EventDataMapper;
 import org.teamy.backend.DataMapper.StudentDataMapper;
+import org.teamy.backend.security.CustomUserDetailsService;
 import org.teamy.backend.security.repository.JwtTokenServiceImpl;
 import org.teamy.backend.security.repository.PostgresRefreshTokenRepository;
 import org.teamy.backend.service.ClubService;
@@ -49,6 +50,7 @@ public class ContextListener implements ServletContextListener {
 
         sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager );
         sce.getServletContext().setAttribute(CLUB_SERVICE, new ClubService(new ClubDataMapper(databaseConnectionManager)));
+        sce.getServletContext().setAttribute(USER_DETAILS_SERVICE, new CustomUserDetailsService(new StudentDataMapper(databaseConnectionManager)));
         sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager),new ClubService(new ClubDataMapper(databaseConnectionManager))));
         sce.getServletContext().setAttribute(EVENT_SERVICE, new EventService(new EventDataMapper(databaseConnectionManager)));
 

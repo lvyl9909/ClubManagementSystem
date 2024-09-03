@@ -32,6 +32,13 @@ public class Student extends Person{
         this.clubId = new ArrayList<>();
         this.tickets = new ArrayList<>();
     }
+    public Student(String name, String email, Long phoneNumber, String studentId,String password) {
+        super(name, email, phoneNumber,password);
+        this.studentId = studentId;
+        this.rsvps = new ArrayList<>();
+        this.clubId = new ArrayList<>();
+        this.tickets = new ArrayList<>();
+    }
 
     public String getStudentId() {
         return studentId;
@@ -59,7 +66,6 @@ public class Student extends Person{
 
     public List<Club> getClubs() {
         if (clubs == null) {
-            // clubs尚未初始化时，返回一个空列表或者抛出异常，具体取决于业务需求
             return Collections.emptyList();
         }
         return clubs;

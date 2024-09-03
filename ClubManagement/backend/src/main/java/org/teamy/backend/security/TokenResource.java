@@ -61,16 +61,30 @@ public class TokenResource extends HttpServlet {
                 var bodyBuffer = new StringWriter();
                 req.getReader().transferTo(bodyBuffer);
                 var login = mapper.readValue(bodyBuffer.toString(), LoginRequest.class);
+                System.out.println("0");
                 UserDetails userDetails = Optional.ofNullable(userDetailsService.loadUserByUsername(login.getUsername()))
                         .orElseThrow(ForbiddenException::new);
-                if (!passwordEncoder.matches(login.getPassword(), userDetails.getPassword())) {
+                System.out.println("1");
+//bu
+//                if (!passwordEncoder.matches(login.getPassword(), userDetails.getPassword())) {
+//                    throw new ForbiddenException();
+//                }
+                System.out.println(login.getPassword());
+                System.out.println(userDetails.getPassword());
+                if (!login.getPassword().equals(userDetails.getPassword())) {
                     throw new ForbiddenException();
                 }
+                System.out.println("password correct");
                 var token = jwtTokenService.createToken(userDetails);
+                System.out.println("token created");
                 resp.addCookie(refreshCookie(token.getRefreshTokenId(), req.getContextPath()));
+                System.out.println("Cookie added");
                 return tokenResponse(token.getAccessToken());
             } catch (IOException e) {
                 throw new ValidationException(String.format("invalid token body: %s", e.getMessage()));
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+                throw e;
             }
         })).handle();
     }

@@ -52,7 +52,7 @@ public class StudentController  extends HttpServlet {
     }
 
     private ResponseEntity listClubs() {
-        List<Club> clubs = studentService.getClubStudentJoin(1);
+        List<Club> clubs = studentService.getLazyLoadedClubs(studentService.getCurrentStudent());
         return ResponseEntity.ok(clubs);
     }
 

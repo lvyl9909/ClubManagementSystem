@@ -55,7 +55,7 @@ public class WebSecurityConfig implements ServletContextAware {
 
     //定义表单登陆的方法
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+    public UserDetailsService userDetailsService() {
         StudentDataMapper userRepository = new StudentDataMapper(databaseConnectionManager);
         return new CustomUserDetailsService(userRepository);
     }
@@ -85,11 +85,12 @@ public class WebSecurityConfig implements ServletContextAware {
                 .and()
                 .addFilterBefore(tokenAuthenticationFilter, AnonymousAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/auth/token").permitAll()
                         .requestMatchers(ADMIN_PROTECTED_URLS)
                         .hasRole(Role.ADMIN.name())
                         .requestMatchers(STUDENT_PROTECTED_URLS)
-                        .permitAll()
-//                        .hasRole(Role.USER.name())
+//                        .permitAll()
+                        .hasRole(Role.USER.name())
                         .anyRequest()
                         .permitAll())
                 .authenticationManager(authenticationManager)
@@ -97,11 +98,11 @@ public class WebSecurityConfig implements ServletContextAware {
                 .csrf().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
-//                .formLogin(form -> form
-//                        .loginPage("/login")
-//                        .permitAll()
-//                        .successHandler(successHandler()) // 将自定义的successHandler添加到formLogin配置中
-//                        .failureUrl("/login?error=true"))
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll()
+                        .successHandler(successHandler()) // 将自定义的successHandler添加到formLogin配置中
+                        .failureUrl("/login?error=true"))
                 .logout().disable()
                 .build();
     }
@@ -140,7 +141,7 @@ public class WebSecurityConfig implements ServletContextAware {
         if (request.isUserInRole("ADMIN")) {
             return "/admin/home";
         } else {
-            return "/user/home";
+            return "/student/home";
         }
     }
     @Bean
