@@ -42,7 +42,7 @@ public class StudentDataMapper {
         }
         return null;
     }
-    public Student findStudentByStudentId(String studentId) throws Exception {
+    public Student findStudentByStudentId(String studentId) throws SQLException {
         var connection = databaseConnectionManager.nextConnection();
 
         try {
@@ -52,9 +52,9 @@ public class StudentDataMapper {
             if (rs.next()) {
                 return new Student( rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("studentid"),rs.getString("passw"));
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
+        }catch (SQLException e){
+            throw new SQLException(e.getMessage());
+        } finally{
             databaseConnectionManager.releaseConnection(connection);
         }
         return null;

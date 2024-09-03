@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.teamy.backend.config.ContextListener;
+import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.exception.ErrorHandler;
 import org.teamy.backend.model.exception.ForbiddenException;
 import org.teamy.backend.model.exception.ValidationException;
@@ -21,7 +22,7 @@ import org.teamy.backend.model.request.RefreshRequest;
 import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.security.model.Token;
 import org.teamy.backend.security.repository.TokenService;
-
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -80,11 +81,20 @@ public class TokenResource extends HttpServlet {
                 resp.addCookie(refreshCookie(token.getRefreshTokenId(), req.getContextPath()));
                 System.out.println("Cookie added");
                 return tokenResponse(token.getAccessToken());
-            } catch (IOException e) {
-                throw new ValidationException(String.format("invalid token body: %s", e.getMessage()));
-            }catch (Exception e){
-                System.out.println(e.getMessage());
-                throw e;
+            }catch (UsernameNotFoundException e) {
+                return ResponseEntity.of(HttpServletResponse.SC_UNAUTHORIZED, Error.builder()
+                        .status(HttpServletResponse.SC_UNAUTHORIZED)
+                        .message("UsernameNotFound")
+                        .reason(e.getMessage())
+                        .build());
+            } catch (ForbiddenException e) {
+                return ResponseEntity.of(HttpServletResponse.SC_FORBIDDEN,Error.builder()
+                        .status(HttpServletResponse.SC_FORBIDDEN)
+                        .message("Forbidden")
+                        .reason(e.getMessage())
+                        .build());
+            } catch (Exception e) {
+                return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,e.getMessage());
             }
         })).handle();
     }

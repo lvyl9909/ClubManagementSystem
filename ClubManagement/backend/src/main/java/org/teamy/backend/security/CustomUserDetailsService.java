@@ -39,21 +39,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public Person loadUserByUsername(String username) throws UsernameNotFoundException {
-//        Person user = userDatabase.get(username);
-//        if (user == null) {
-//            throw new UsernameNotFoundException("User not found");
-//        }
         Person user=null;
         try {
             user = studentDataMapper.findStudentByStudentId(username);
             if (user == null) {
+                System.out.println("username not found");
                 throw new UsernameNotFoundException("User not found");
             }
             return user;
         } catch (SQLException e) {
             throw new UsernameNotFoundException("Database error", e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 
