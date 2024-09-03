@@ -2,9 +2,10 @@ import {createBrowserRouter,Navigate} from "react-router-dom";
 import Main from "../pages/main";
 import Home from "../pages/home";
 import Club from "../pages/club";
-import event from "../pages/event";
+import Event from "../pages/event";
 import pageOne from "../pages/other/pageone";
 import pageTwo from "../pages/other/pagetwo";
+import Login from "../pages/login";
 const routes = [
     {
         path:'/',
@@ -24,7 +25,7 @@ const routes = [
             },
             {
                 path:'event',
-                Component:event
+                Component:Event
             },
             {
                 path: 'other',
@@ -40,6 +41,10 @@ const routes = [
                 ]
             }
         ]
+    },
+    {
+        path: '/login',
+        Component: Login
     }
 ]
 
