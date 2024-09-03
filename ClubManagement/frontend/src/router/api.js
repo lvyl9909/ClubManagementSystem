@@ -46,7 +46,7 @@ export async function doCall(path, method, data, signal) {
 
     if (res.status === 401 && accessToken) {
         await refreshToken(accessToken);
-        return doCall(path, method, data); // Retry the original request
+        return doCall(path, method, data);
     }
 
     if (res.status > 299) {
@@ -64,7 +64,6 @@ async function refreshToken(accessToken) {
             Accept: 'application/json',
         },
         body: JSON.stringify({ accessToken }),
-        credentials: 'include',
     });
     if (res.status > 299) {
         throw new Error(`expecting success from API for PUT but response was status ${res.status}: ${res.statusText}`);

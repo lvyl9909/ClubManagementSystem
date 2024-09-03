@@ -16,15 +16,20 @@ const Login = () => {
 
     const handleLogin = async (values) => {
         const { username, password } = values;
+        setError('');
+
         try {
-            await login(username, password);
-            if (!authenticationError) {
+            const response = await login(username, password);
+
+            if (response.status === 401) {
+                setError('Invalid username or password. Please try again.');
+            } else if (response.status === 404) {
+                setError('User does not exist. Please check your username.');
+            } else {
                 navigate('/Home');
-            }else{
-                setError(authenticationError);
             }
         } catch (error) {
-            setError('Login failed. Please try again.');
+            setError('An unexpected error occurred. Please try again later.');
         }
     };
 

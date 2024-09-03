@@ -17,8 +17,14 @@ export function AuthProvider({ children }) {
         setAuthenticationError(null);
 
         try {
-            const token = await loginApi(username, password);
+            const res = await loginApi(username, password);
+            if (!res.ok) {
+                setAuthenticationError('Login failed');
+                return res;
+            }
+            const token = await res.json();
             setUser(extractUserFromToken(token.accessToken));
+            return res;
         } catch (error) {
             setAuthenticationError(error.message);
         } finally {
