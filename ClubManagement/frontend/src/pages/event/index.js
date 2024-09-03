@@ -126,6 +126,7 @@ function Event() {
                 </Col>
             </Row>
             <Table dataSource={events} rowKey="id">
+                <Column title="Club Id" dataIndex="clubId" key="clubId" />
                 <Column title="Title" dataIndex="title" key="title" />
                 <Column title="Description" dataIndex="description" key="description" />
                 <Column title="Date" dataIndex="date" key="date" />
