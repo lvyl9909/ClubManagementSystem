@@ -11,7 +11,7 @@ export function AuthProvider({ children }) {
     const [authenticating, setAuthenticating] = useState(false);
     const [authenticationError, setAuthenticationError] = useState(null);
 
-    const extractUserFromToken = (token) => JSON.parse(atob(token.split('.')[1]));
+
     const login = async (username, password) => {
         setAuthenticating(true);
         setAuthenticationError(null);
@@ -21,11 +21,13 @@ export function AuthProvider({ children }) {
             // console.log("API response:", res);
             //const token = await res.json();
             console.log("Raw token:", token);
+            const extractUserFromToken = (token) => JSON.parse(atob(token.split('.')[1]));
             const userDetails = extractUserFromToken(token.accessToken); // Extract user details from token
             console.log("Decoded user details:", userDetails);
             setUser(userDetails);
         } catch (error) {
             setAuthenticationError(error.message);
+            throw error;
         } finally {
             setAuthenticating(false);
         }
