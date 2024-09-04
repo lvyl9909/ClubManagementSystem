@@ -1,6 +1,6 @@
 import React from "react";
 import {Layout, Menu} from "antd";
-import MenuConfig from "../../config";
+import MenuConfig from "../../config/config";
 import * as Icon from "@ant-design/icons"
 import { useNavigate } from 'react-router-dom'
 const { Header, Sider, Content } = Layout;

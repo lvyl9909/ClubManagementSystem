@@ -1,11 +1,11 @@
 import {createBrowserRouter,Navigate} from "react-router-dom";
 import Main from "../pages/main";
-import Home from "../pages/home";
-import Club from "../pages/club";
-import Event from "../pages/event";
+import Home from "../pages/home/home";
+import Club from "../pages/club/club";
+import Event from "../pages/event/event";
 import pageOne from "../pages/other/pageone";
 import pageTwo from "../pages/other/pagetwo";
-import Login from "../pages/login";
+import Login from "../pages/login/login";
 const routes = [
     {
         path:'/',
@@ -13,7 +13,7 @@ const routes = [
         children:[
             {
                 path:'/',
-                element: <Navigate to="home" replace/> // redirect
+                element: <Navigate to="login" replace/> // redirect
             },
             {
                 path:'home',
