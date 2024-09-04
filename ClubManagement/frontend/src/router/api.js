@@ -3,7 +3,10 @@ const path = process.env.REACT_APP_API_BASE_URL
 export async function loginApi(username, password) {
     const res = await doCall(`${path}/auth/token`,'POST', { username, password });
     if (!res.ok) {
-        throw new Error('Login failed');
+        const errorResponse = await res.json();
+        const error = new Error(errorResponse.message || 'Login failed');
+        error.status = res.status;
+        throw error;
     }
     const token = await res.json();
     setTokenInStorage(token);
