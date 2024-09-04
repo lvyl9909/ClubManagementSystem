@@ -3,6 +3,7 @@ import { Col, Row, Card, Table } from 'antd'
 //import { getData } from '../../api'
 import "./home.css"
 import * as Icon from "@ant-design/icons";
+import {useAuth} from '../../router/auth';
 const iconToElement = (name) => React.createElement(Icon[name]);
 const Home = () => {
     const userImg = require("../../assets/images/user.png")

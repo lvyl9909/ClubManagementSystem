@@ -2,7 +2,7 @@ import React,{ useState }  from 'react'
 import { Form, Input, Button, message } from 'antd';
 import "./login.css"
 import { useNavigate, Navigate } from 'react-router-dom'
-import {AuthProvider, useAuth} from '../../router/auth';
+import {useAuth} from '../../router/auth';
 
 
 const Login = () => {
@@ -19,17 +19,13 @@ const Login = () => {
         setError('');
 
         try {
-            const response = await login(username, password);
-
-            if (response.status === 401) {
-                setError('Invalid username or password. Please try again.');
-            } else if (response.status === 404) {
-                setError('User does not exist. Please check your username.');
-            } else {
-                navigate('/Home');
+            await login(username, password);
+            if(authenticationError){
+                return;
             }
+            navigate('/Home');
         } catch (error) {
-            setError('An unexpected error occurred. Please try again later.');
+            setError('Invalid Username or Password! Please try again.');
         }
     };
 

@@ -17,14 +17,13 @@ export function AuthProvider({ children }) {
         setAuthenticationError(null);
 
         try {
-            const res = await loginApi(username, password);
-            if (!res.ok) {
-                setAuthenticationError('Login failed');
-                return res;
-            }
-            const token = await res.json();
-            setUser(extractUserFromToken(token.accessToken));
-            return res;
+            const token = await loginApi(username, password);
+            // console.log("API response:", res);
+            //const token = await res.json();
+            console.log("Raw token:", token);
+            const userDetails = extractUserFromToken(token.accessToken); // Extract user details from token
+            console.log("Decoded user details:", userDetails);
+            setUser(userDetails);
         } catch (error) {
             setAuthenticationError(error.message);
         } finally {
@@ -44,6 +43,15 @@ export function AuthProvider({ children }) {
         authenticating,
         authenticationError,
     }), [user, authenticating, authenticationError]);
+
+    // function extractUserFromToken(token) {
+    //     const decodedToken = JSON.parse(atob(token.split('.')[1]));
+    //     console.log("decodedToken",decodedToken)
+    //     return{
+    //         username:decodedToken.sub,
+    //         name:decodedToken.name
+    //     }
+    // }
 
     return (
         <AuthContext.Provider value={value}>

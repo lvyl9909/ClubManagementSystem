@@ -13,23 +13,25 @@ export async function loginApi(username, password) {
 export async function logoutApi(username) {
     await doCall(`${path}/auth/logout`,'POST',{ username });
     localStorage.removeItem('accessToken');
-    localStorage.removeItem('tokenType');
+    localStorage.removeItem('type');
 }
 
 function setTokenInStorage(token) {
     localStorage.setItem('accessToken', token.accessToken);
-    localStorage.setItem('tokenType', token.tokenType);
+    localStorage.setItem('type', token.type);
 }
 
-export async function doCall(path, method, data, signal) {
+export async function doCall(path, method, data) {
     const headers = {
         'Content-Type': 'application/json',
         Accept: 'application/json',
     };
 
     const accessToken = localStorage.getItem('accessToken');
+    const tokenType = localStorage.getItem('type')
     if (accessToken) {
-        headers.Authorization = `${localStorage.getItem('tokenType')} ${accessToken}`;
+        headers.Authorization = `${tokenType} ${accessToken}`;
+        // console.log("type",localStorage.getItem('type'));
     }
 
     let body;
@@ -57,7 +59,7 @@ export async function doCall(path, method, data, signal) {
 }
 
 async function refreshToken(accessToken) {
-    const res = await fetch('${path}/auth/token', {
+    const res = await fetch(`${path}/auth/token`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
