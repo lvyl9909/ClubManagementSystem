@@ -41,7 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public Person loadUserByUsername(String username) throws UsernameNotFoundException {
         Person user=null;
         try {
-            user = studentDataMapper.findStudentByStudentId(username);
+            user = studentDataMapper.findStudentByUsername(username);
             if (user == null) {
                 System.out.println("username not found");
                 throw new UsernameNotFoundException("User not found");

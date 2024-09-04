@@ -98,11 +98,6 @@ public class WebSecurityConfig implements ServletContextAware {
                 .csrf().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll()
-                        .successHandler(successHandler()) // 将自定义的successHandler添加到formLogin配置中
-                        .failureUrl("/login?error=true"))
                 .logout().disable()
                 .build();
     }
@@ -146,7 +141,7 @@ public class WebSecurityConfig implements ServletContextAware {
     }
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter(AuthenticationManager authenticationManager, SimpleUrlAuthenticationSuccessHandler simpleUrlAuthenticationSuccessHandler) {
-        var filter = new TokenAuthenticationFilter(PROTECTED_URLS, jwtTokenService);
+        var filter = new TokenAuthenticationFilter(STUDENT_PROTECTED_URLS, jwtTokenService);
         filter.setAuthenticationManager(authenticationManager);
         filter.setAuthenticationSuccessHandler(simpleUrlAuthenticationSuccessHandler);
         return filter;

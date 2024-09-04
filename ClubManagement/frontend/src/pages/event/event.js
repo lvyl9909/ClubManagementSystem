@@ -36,7 +36,16 @@ function Event() {
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                const response = await fetch(`${path}/student/events/?id=-1`);
+                const token = localStorage.getItem('accessToken');
+                const type = localStorage.getItem('type');
+
+                const response = await fetch(`${path}/student/events/?id=-1`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json', // 设置内容类型
+                        'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
+                    }
+                });
                 if (response.ok) {
                     const data = await response.json(); // 解析 JSON 数据
                     setEvents(data);
@@ -94,10 +103,13 @@ function Event() {
                 cost: values.cost,
                 clubId: 1
             };
+            const token = localStorage.getItem('accessToken');
+            const type = localStorage.getItem('type');
             const response = await fetch(`${path}/student/events/save`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
                 },
                 body: JSON.stringify(newEvent),
             });

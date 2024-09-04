@@ -34,13 +34,27 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         var matcher = PATTERN_TOKEN.matcher(authorizationHeader);
         if (matcher.find()) {
             var token = matcher.group(1);
-            return getAuthenticationManager().authenticate(jwtTokenService.readToken(token));
+//            return getAuthenticationManager().authenticate(jwtTokenService.readToken(token));
+            var authentication = jwtTokenService.readToken(token);
+            System.out.println("Authentication object before authenticate: " + authentication);
+
+            try {
+                var result = getAuthenticationManager().authenticate(authentication); // 验证对象
+                System.out.println("Authentication successful: " + result);
+                return result;
+            } catch (AuthenticationException e) {
+                System.out.println("Authentication failed: " + e.getMessage());
+                throw e;
+            }
         }
         throw new BadCredentialsException(String.format("invalid %s header value", HEADER_AUTHORIZATION));
     }
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         super.successfulAuthentication(request, response, chain, authResult);
+
+        System.out.println("User authenticated: " + authResult.getName());
+        System.out.println("Authorities: " + authResult.getAuthorities());
         chain.doFilter(request, response);
     }
 }

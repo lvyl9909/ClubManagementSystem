@@ -42,15 +42,15 @@ public class StudentDataMapper {
         }
         return null;
     }
-    public Student findStudentByStudentId(String studentId) throws SQLException {
+    public Student findStudentByUsername(String username) throws SQLException {
         var connection = databaseConnectionManager.nextConnection();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students WHERE studentid = ?");
-            stmt.setString(1, studentId);
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students WHERE username = ?");
+            stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Student( rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("studentid"),rs.getString("passw"));
+                return new Student( rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("studentid"),rs.getString("passw"),rs.getString("username"));
             }
         }catch (SQLException e){
             throw new SQLException(e.getMessage());

@@ -32,8 +32,8 @@ public class Student extends Person{
         this.clubId = new ArrayList<>();
         this.tickets = new ArrayList<>();
     }
-    public Student(String name, String email, Long phoneNumber, String studentId,String password) {
-        super(name, email, phoneNumber,password);
+    public Student(String name, String email, Long phoneNumber, String studentId,String password,String username) {
+        super(name, email, phoneNumber,password,username);
         this.studentId = studentId;
         this.rsvps = new ArrayList<>();
         this.clubId = new ArrayList<>();

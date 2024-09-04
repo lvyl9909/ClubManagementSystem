@@ -51,6 +51,15 @@ public class Person implements UserDetails {
         this.phoneNumber = phoneNumber;
         this.password=password;
     }
+    public Person(String name, String email, Long phoneNumber,String password,String username) {
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.password=password;
+        this.username=username;
+        this.roles.add(Role.USER); // 默认添加 USER 角色
+        this.isActive=true;
+    }
     public Long getId() {
         return id;
     }
