@@ -16,6 +16,7 @@ import {
     Select
 } from 'antd';
 import {Link} from "react-router-dom";
+import {doCall} from "../../router/api";
 const { Column } = Table;
 const { Option } = Select;
 
@@ -36,18 +37,19 @@ function Event() {
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                const token = localStorage.getItem('accessToken');
-                const type = localStorage.getItem('type');
 
-                const response = await fetch(`${path}/student/events/?id=-1`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json', // 设置内容类型
-                        'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
-                    }
-                });
-                if (response.ok) {
-                    const data = await response.json(); // 解析 JSON 数据
+
+                const res = await doCall(`${path}/student/events/?id=-1`,'GET', );
+
+                // const response = await fetch(`${path}/student/events/?id=-1`, {
+                //     method: 'GET',
+                //     headers: {
+                //         'Content-Type': 'application/json', // 设置内容类型
+                //         'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
+                //     }
+                // });
+                if (res.ok) {
+                    const data = await res.json(); // 解析 JSON 数据
                     setEvents(data);
                     console.log(data, 'data------'); // 输出解析后的数据
                 } else {
@@ -103,19 +105,19 @@ function Event() {
                 cost: values.cost,
                 clubId: 1
             };
-            const token = localStorage.getItem('accessToken');
-            const type = localStorage.getItem('type');
-            const response = await fetch(`${path}/student/events/save`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
-                },
-                body: JSON.stringify(newEvent),
-            });
+            const res = await doCall(`${path}/student/events/save`,'POST',{newEvent} );
 
-            if (response.ok) {
-                const createdEvent = await response.json();
+            // const response = await fetch(`${path}/student/events/save`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
+            //     },
+            //     body: JSON.stringify(newEvent),
+            // });
+
+            if (res.ok) {
+                const createdEvent = await res.json();
                 setEvents([...events, createdEvent]);  // Add the new event to the list
                 setIsModalVisible(false);
                 form.resetFields();

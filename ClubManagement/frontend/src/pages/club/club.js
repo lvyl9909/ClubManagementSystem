@@ -2,6 +2,7 @@ import React,{ useState, useEffect }  from "react";
 import {useParams} from "react-router";
 import {Table, Tag, Space, Button, Col, Row, Input, Form, Modal} from 'antd';
 import {Link} from "react-router-dom";
+import {doCall} from "../../router/api";
 const { Column } = Table;
 
 
@@ -20,17 +21,18 @@ function Club() {
             try {
                 const token = localStorage.getItem('accessToken');
                 const type = localStorage.getItem('type');
+                const res = await doCall(`${path}/student/clubs/?id=-1`,'GET', );
 
-                const response = await fetch(`${path}/student/clubs/?id=-1`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json', // 设置内容类型
-                        'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
-                    }
-                });
-                console.log(response.ok,'response')
-                if (response.ok===true) {
-                    const data = await response.json(); // 解析 JSON 数据
+                // const response = await fetch(`${path}/student/clubs/?id=-1`, {
+                //     method: 'GET',
+                //     headers: {
+                //         'Content-Type': 'application/json', // 设置内容类型
+                //         'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
+                //     }
+                // });
+                console.log(res.ok,'response')
+                if (res.ok===true) {
+                    const data = await res.json(); // 解析 JSON 数据
                     setClubs(data);
                     console.log(data, 'data------'); // 输出解析后的数据
                 } else {
@@ -64,17 +66,19 @@ function Club() {
                 name: values.name,
                 description: values.description,
             };
-            const response = await fetch(`${path}/student/clubs/save`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
-                },
-                body: JSON.stringify(newClub),
-            });
+            const res = await doCall(`${path}/student/clubs/save`,'POST', {newClub});
 
-            if (response.ok) {
-                const createdClub = await response.json();
+            // const response = await fetch(`${path}/student/clubs/save`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
+            //     },
+            //     body: JSON.stringify(newClub),
+            // });
+
+            if (res.ok) {
+                const createdClub = await res.json();
                 setClubs([...clubs, createdClub]);  // Add the new club to the list
                 setIsModalVisible(false);
                 form.resetFields();  // Reset the form fields after successful creation

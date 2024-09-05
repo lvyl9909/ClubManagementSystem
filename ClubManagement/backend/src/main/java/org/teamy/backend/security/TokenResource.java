@@ -103,11 +103,28 @@ public class TokenResource extends HttpServlet {
             try {
                 var bodyBuffer = new StringWriter();
                 req.getReader().transferTo(bodyBuffer);
+                System.out.println("0");
+
                 var refreshRequest = mapper.readValue(bodyBuffer.toString(), RefreshRequest.class);
+                System.out.println("1");
+                Cookie[] cookies = req.getCookies();
+                if (cookies == null) {
+                    // 说明请求中没有任何 cookies
+                    System.out.println("No cookies in request");
+                } else {
+                    System.out.println("Cookies count: " + cookies.length);
+                    Arrays.stream(cookies).forEach(cookie ->
+                            System.out.println("Cookie Name: " + cookie.getName() + ", Cookie Value: " + cookie.getValue()));
+                }
 
                 var refreshToken = getRefreshCookie(req);
+                System.out.println(refreshToken);
                 var token = jwtTokenService.refresh(refreshRequest.getAccessToken(), refreshToken);
+                System.out.println("3");
+
                 resp.addCookie(refreshCookie(token.getRefreshTokenId(), req.getContextPath()));
+                System.out.println("4");
+
                 return tokenResponse(token.getAccessToken());
             } catch (IOException e) {
                 throw new ValidationException(String.format("invalid token body: %s", e.getMessage()));
@@ -133,6 +150,7 @@ public class TokenResource extends HttpServlet {
     }
 
     private String getRefreshCookie(HttpServletRequest req) {
+
         return Arrays.stream(Optional.ofNullable(req.getCookies()).orElse(new Cookie[]{}))
                 .filter(c -> c.getName().equals(COOKIE_NAME_REFRESH_TOKEN))
                 .findFirst()

@@ -69,6 +69,7 @@ async function refreshToken(accessToken) {
             Accept: 'application/json',
         },
         body: JSON.stringify({ accessToken }),
+        credentials: 'include',  // 添加这一行以发送 Cookie
     });
     if (res.status > 299) {
         throw new Error(`expecting success from API for PUT but response was status ${res.status}: ${res.statusText}`);

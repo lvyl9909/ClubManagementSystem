@@ -23,7 +23,7 @@ public class PostgresRefreshTokenRepository implements RefreshTokenRepository{
 
         String sql = "SELECT id, token_id, username FROM refresh_token WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, id);
+            statement.setObject(1, UUID.fromString(id));  // 转换为 UUID 类型
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
