@@ -49,10 +49,10 @@ export async function doCall(path, method, data) {
         credentials: 'include',
     });
 
-    if (res.status === 401 && accessToken) {
-        await refreshToken(accessToken);
-        return doCall(path, method, data);
-    }
+    // if (res.status === 401 && accessToken) {
+    //     await refreshToken(accessToken);
+    //     return doCall(path, method, data);
+    // }
 
     if (res.status > 299) {
         throw new Error(`Error: ${res.status} ${res.statusText}`);
@@ -71,7 +71,9 @@ async function refreshToken(accessToken) {
         body: JSON.stringify({ accessToken }),
         credentials: 'include',  // 添加这一行以发送 Cookie
     });
+    console.log(res.status);
     if (res.status > 299) {
+        console.error(`Token refresh failed: ${res.status} ${res.statusText}.`);
         throw new Error(`expecting success from API for PUT but response was status ${res.status}: ${res.statusText}`);
     }
     if (!res.ok) {
