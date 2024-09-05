@@ -1,5 +1,6 @@
 package org.teamy.backend.model;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.teamy.backend.service.EventService;
 import org.teamy.backend.service.StudentService;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RSVP implements CapacityObserver{
+    private Integer id;
     private Integer submitterId;
     private Integer eventId;
     private Event event;
@@ -19,44 +21,22 @@ public class RSVP implements CapacityObserver{
 
     private List<Student> participants ;
 
-    private final EventService eventService;
-    private final StudentService studentService;
-    public RSVP(Integer submitterId, Integer eventId, RSVPStatus status, Integer number, EventService eventService, StudentService studentService) {
+    public RSVP(Integer id, Integer submitterId, Integer eventId, RSVPStatus status, Integer number, List<Integer>participantIds) {
+        this.id=id;
         this.submitterId = submitterId;
         this.eventId = eventId;
         this.status = status;
         this.number = number;
-        this.participantIds = new ArrayList<>(number);
+        this.participantIds = participantIds;
 
-        this.eventService = eventService;
-        this.studentService = studentService;
     }
 
-    public Event getEvent() {
-        if (event == null) {
-            try {
-                event = eventService.getEventById(eventId);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return event;
-    }
+
 
     public void setEvent(Event event) {
         this.event = event;
     }
 
-    public Student getSubmitter() {
-        if (submitter == null) {
-            try {
-                submitter = studentService.getStudentById(submitterId);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return submitter;
-    }
 
     public void setSubmitter(Student submitter) {
         this.submitter = submitter;
@@ -86,30 +66,10 @@ public class RSVP implements CapacityObserver{
         this.participantIds = participantIds;
     }
 
-    public List<Student> getParticipants() {
-        if ( participants.isEmpty()) {
-            for (int i = 0; i < number; i++) {
-                try {
-                    Student participant = studentService.getStudentById(participantIds.get(i));
-                    participants.add(participant);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        return participants;
-    }
+
 
     public void setParticipants(List<Student> participants) {
         this.participants = participants;
-    }
-
-    public EventService getEventService() {
-        return eventService;
-    }
-
-    public StudentService getStudentService() {
-        return studentService;
     }
 
     public RSVPStatus getStatus() {
@@ -135,7 +95,7 @@ public class RSVP implements CapacityObserver{
     }
     @Override
     public void update(Event event) {
-        if (status.equals(RSVPStatus.Waitlisted) && event.getCapacity() > 0) {
+        if (status.equals(RSVPStatus.Waitlist) && event.getCapacity() > 0) {
             submit(); // Re-submit RSVP if event capacity increases
         }
     }

@@ -1,13 +1,17 @@
 package org.teamy.backend.model;
 
 public class Ticket {
+    private Integer id;
+    private Integer studentId;
     private Student student;
+    private Integer rsvpId;
     private RSVP rsvp;
     private TicketStatus status;
 
-    public Ticket(Student student, RSVP rsvp, TicketStatus status) {
-        this.student = student;
-        this.rsvp = rsvp;
+    public Ticket(Integer id,Integer studentId, Integer rsvpId, TicketStatus status) {
+        this.id=id;
+        this.studentId = studentId;
+        this.rsvpId = rsvpId;
         this.status = status;
     }
 

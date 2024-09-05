@@ -7,21 +7,20 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.teamy.backend.DataMapper.ClubDataMapper;
-import org.teamy.backend.DataMapper.EventDataMapper;
-import org.teamy.backend.DataMapper.StudentDataMapper;
+import org.teamy.backend.DataMapper.*;
 import org.teamy.backend.security.CustomUserDetailsService;
 import org.teamy.backend.security.repository.JwtTokenServiceImpl;
 import org.teamy.backend.security.repository.PostgresRefreshTokenRepository;
-import org.teamy.backend.service.ClubService;
-import org.teamy.backend.service.EventService;
-import org.teamy.backend.service.StudentService;
+import org.teamy.backend.service.*;
 
 @WebListener
 public class ContextListener implements ServletContextListener {
     public static final String CLUB_SERVICE = "clubService";
     public static final String STUDENT_SERVICE = "studentService";
     public static final String EVENT_SERVICE = "eventService";
+    public static final String RSVP_SERVICE = "rsvpService";
+    public static final String TICKET_SERVICE = "ticketService";
+
     public static final String DATABASE_SERVICE = "databaseService";
     public static final String MAPPER = "mapper";
     public static final String TOKEN_SERVICE = "tokenService";
@@ -51,8 +50,10 @@ public class ContextListener implements ServletContextListener {
         sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager );
         sce.getServletContext().setAttribute(CLUB_SERVICE, new ClubService(new ClubDataMapper(databaseConnectionManager)));
         sce.getServletContext().setAttribute(USER_DETAILS_SERVICE, new CustomUserDetailsService(new StudentDataMapper(databaseConnectionManager)));
-        sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager),new ClubService(new ClubDataMapper(databaseConnectionManager))));
         sce.getServletContext().setAttribute(EVENT_SERVICE, new EventService(new EventDataMapper(databaseConnectionManager)));
+        sce.getServletContext().setAttribute(RSVP_SERVICE, new RSVPService(new RSVPDataMapper(databaseConnectionManager)));
+        sce.getServletContext().setAttribute(TICKET_SERVICE, new TicketService(new TicketDataMapper(databaseConnectionManager)));
+        sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager),new ClubService(new ClubDataMapper(databaseConnectionManager)),new RSVPService(new RSVPDataMapper(databaseConnectionManager)),new TicketService(new TicketDataMapper(databaseConnectionManager))));
 
         var mapper = Jackson2ObjectMapperBuilder.json()
                 .modules(new JavaTimeModule())

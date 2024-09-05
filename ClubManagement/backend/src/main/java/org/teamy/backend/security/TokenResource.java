@@ -62,7 +62,8 @@ public class TokenResource extends HttpServlet {
                 var bodyBuffer = new StringWriter();
                 req.getReader().transferTo(bodyBuffer);
                 var login = mapper.readValue(bodyBuffer.toString(), LoginRequest.class);
-                System.out.println("0");
+                System.out.println("doPost token start");
+                System.out.println(login.getUsername());
                 UserDetails userDetails = Optional.ofNullable(userDetailsService.loadUserByUsername(login.getUsername()))
                         .orElseThrow(ForbiddenException::new);
                 System.out.println(userDetails.getAuthorities()); // 打印用户的权限
@@ -70,6 +71,8 @@ public class TokenResource extends HttpServlet {
 //                if (!passwordEncoder.matches(login.getPassword(), userDetails.getPassword())) {
 //                    throw new ForbiddenException();
 //                }
+                System.out.println(login.getPassword());
+                System.out.println(userDetails.getPassword());
                 if (!login.getPassword().equals(userDetails.getPassword())) {
                     throw new ForbiddenException();
                 }
@@ -103,10 +106,9 @@ public class TokenResource extends HttpServlet {
             try {
                 var bodyBuffer = new StringWriter();
                 req.getReader().transferTo(bodyBuffer);
-                System.out.println("0");
+                System.out.println("doPut Cookie start");
 
                 var refreshRequest = mapper.readValue(bodyBuffer.toString(), RefreshRequest.class);
-                System.out.println("1");
                 Cookie[] cookies = req.getCookies();
                 if (cookies == null) {
                     // 说明请求中没有任何 cookies

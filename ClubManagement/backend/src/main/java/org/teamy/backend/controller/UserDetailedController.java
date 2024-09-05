@@ -8,7 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.model.Club;
+import org.teamy.backend.model.RSVP;
 import org.teamy.backend.model.Student;
+import org.teamy.backend.model.Ticket;
+import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.model.request.ResponseEntity;
@@ -42,9 +45,18 @@ public class UserDetailedController extends HttpServlet {
                 return listClubs();
             }else if (pathInfo.equals("/info")) {
                 return viewStudent();
+            }else if (pathInfo.equals("/tickets")) {
+                return listTickets();
+            }else if (pathInfo.equals("/rsvp")) {
+                return listRSVP();
             }
-            return null;
-        };
+            return ResponseEntity.of(HttpServletResponse.SC_NOT_FOUND,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_NOT_FOUND)
+                            .message("page not found")
+                            .reason("page not found")
+                            .build()
+            );        };
         MarshallingRequestHandler.of(mapper, resp, handler).handle();
 
     }
@@ -52,6 +64,14 @@ public class UserDetailedController extends HttpServlet {
     private ResponseEntity listClubs() {
         List<Club> clubs = studentService.getLazyLoadedClubs(studentService.getCurrentStudent());
         return ResponseEntity.ok(clubs);
+    }
+    private ResponseEntity listTickets() {
+        List<Ticket> tickets = studentService.getLazyLoadedTickets(studentService.getCurrentStudent());
+        return ResponseEntity.ok(tickets);
+    }
+    private ResponseEntity listRSVP() {
+        List<RSVP> rsvps = studentService.getLazyLoadedRSVP(studentService.getCurrentStudent());
+        return ResponseEntity.ok(rsvps);
     }
     private ResponseEntity viewStudent() {
         Student student = studentService.getCurrentStudent();

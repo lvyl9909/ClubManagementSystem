@@ -5,7 +5,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.teamy.backend.DataMapper.StudentDataMapper;
 import org.teamy.backend.model.Club;
+import org.teamy.backend.model.RSVP;
 import org.teamy.backend.model.Student;
+import org.teamy.backend.model.Ticket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +15,13 @@ import java.util.List;
 public class StudentService {
     private StudentDataMapper studentDataMapper;
     private final ClubService clubService;
-    public StudentService(StudentDataMapper studentDataMapper,ClubService clubService) {
+    private final RSVPService rsvpService;
+    private final TicketService ticketService;
+    public StudentService(StudentDataMapper studentDataMapper, ClubService clubService, RSVPService rsvpService, TicketService ticketService) {
         this.studentDataMapper = studentDataMapper;
         this.clubService = clubService;
+        this.rsvpService = rsvpService;
+        this.ticketService = ticketService;
     }
     public UserDetails getCurrentUserDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -31,30 +37,6 @@ public class StudentService {
         }
         throw new IllegalStateException("Authenticated user is not a Student");
     }
-
-    public boolean updateStudent(Student student) throws Exception {
-        // You can add additional business logic here, such as data validation
-        if (student.getName() == null || student.getName().isEmpty()) {
-            throw new IllegalArgumentException("Student name cannot be empty");
-        }
-        // Recall methods in DAO layer
-        return studentDataMapper.updateStudent(student);
-    }
-
-//    public Student getStudentByStudentId(String studentId) throws Exception {
-//        // Here you can add business logic, such as checking whether the studentId is empty
-//        if (studentId == null || studentId.trim().isEmpty()) {
-//            throw new IllegalArgumentException("Student ID cannot be null or empty");
-//        }
-//
-//        Student student = studentDataMapper.findStudentByStudentId(studentId);
-//
-//        if (student == null) {
-//            throw new Exception("Student with ID " + studentId + " not found");
-//        }
-//
-//        return student;
-//    }
     public Student getStudentById(int id) throws Exception {
         if (id <= 0) {
             throw new IllegalArgumentException("Club ID must be positive");
@@ -78,6 +60,38 @@ public class StudentService {
             student.setClubs(clubs);
         }
         return student.getClubs();
+    }
+
+    public List<Ticket> getLazyLoadedTickets(Student student) {
+        if (student.getTickets() == null || student.getTickets().isEmpty()) {
+            List<Ticket> tickets = new ArrayList<>();
+            for (Integer ticketsId : student.getTicketsId()) {
+                try {
+//                    Ticket ticket = clubService.getClubById(clubId);
+//                    tickets.add();
+                } catch (Exception e) {
+                    throw new RuntimeException("Error loading clubs for student", e);
+                }
+            }
+            student.setTickets(tickets);
+        }
+        return student.getTickets();
+    }
+
+    public List<RSVP> getLazyLoadedRSVP(Student student) {
+        if (student.getRsvps() == null || student.getRsvps().isEmpty()) {
+            List<RSVP> rsvps = new ArrayList<>();
+            for (Integer rsvpId : student.getRsvpsId()) {
+                try {
+//                    Ticket ticket = clubService.getClubById(clubId);
+//                    tickets.add();
+                } catch (Exception e) {
+                    throw new RuntimeException("Error loading clubs for student", e);
+                }
+            }
+            student.setRsvps(rsvps);
+        }
+        return student.getRsvps();
     }
 
 }

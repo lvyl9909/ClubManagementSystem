@@ -16,7 +16,7 @@ public class Waitlist implements CapacityObserver {
     // Add RSVP to waitlist
     public void addToWaitlist(RSVP rsvp) {
         waitlist.offer(rsvp);
-        rsvp.setStatus(RSVPStatus.Waitlisted);
+        rsvp.setStatus(RSVPStatus.Waitlist);
     }
 
     // Remove RSVP from waitlist

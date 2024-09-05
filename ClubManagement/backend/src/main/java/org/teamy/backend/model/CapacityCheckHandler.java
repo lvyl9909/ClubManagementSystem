@@ -11,14 +11,14 @@ public class CapacityCheckHandler implements RSVPHandler {
 
     @Override
     public void handle(RSVP rsvp) {
-        if (rsvp.getEvent().getCapacity() > 0) {
-            rsvp.getEvent().updateCapacity(rsvp.getEvent().getCapacity()-rsvp.getNumber());
-            if (nextHandler != null) {
-                nextHandler.handle(rsvp); // Pass to next handler
-            }
-        } else {
-            rsvp.setStatus(RSVPStatus.Waitlisted);
-            rsvp.getEvent().getWaitlist().addToWaitlist(rsvp); // Add to waitlist if no capacity
-        }
+//        if (rsvp.getEvent().getCapacity() > 0) {
+//            rsvp.getEvent().updateCapacity(rsvp.getEvent().getCapacity()-rsvp.getNumber());
+//            if (nextHandler != null) {
+//                nextHandler.handle(rsvp); // Pass to next handler
+//            }
+//        } else {
+//            rsvp.setStatus(RSVPStatus.Waitlisted);
+//            rsvp.getEvent().getWaitlist().addToWaitlist(rsvp); // Add to waitlist if no capacity
+//        }
     }
 }

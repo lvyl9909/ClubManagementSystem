@@ -11,41 +11,39 @@ import java.util.List;
 import java.util.Set;
 
 public class Student extends Person{
-    private String studentId;
+    private List<Integer>rsvpsId;
     private List<RSVP>rsvps;
     private List<Integer>clubId;
+    private List<Integer>ticketsId;
+
     private List<Ticket>tickets;
     private List<Club>clubs;
 
-    public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive, Set<Role> roles, String studentId, List<RSVP> rsvps, List<Integer> clubId, List<Ticket> tickets) {
+    public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive, Set<Role> roles, List<RSVP> rsvps, List<Integer> clubId, List<Ticket> tickets) {
         super(id, username, name, email, phoneNumber, password, isActive, roles);
-        this.studentId = studentId;
         this.rsvps = rsvps;
         this.clubId = clubId;
         this.tickets = tickets;
     }
 
-    public Student(String name, String email, Long phoneNumber, String studentId) {
+    public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive) {
+        super(id, name,email,  phoneNumber, password, username, isActive);
+        this.rsvpsId = new ArrayList<>();
+        this.clubId = new ArrayList<>();
+        this.ticketsId = new ArrayList<>();
+    }
+
+    public Student(String name, String email, Long phoneNumber) {
         super(name, email, phoneNumber);
-        this.studentId = studentId;
         this.rsvps = new ArrayList<>();
         this.clubId = new ArrayList<>();
         this.tickets = new ArrayList<>();
     }
-    public Student(String name, String email, Long phoneNumber, String studentId,String password,String username) {
+    public Student(String name, String email, Long phoneNumber,String password,String username) {
         super(name, email, phoneNumber,password,username);
-        this.studentId = studentId;
         this.rsvps = new ArrayList<>();
         this.clubId = new ArrayList<>();
         this.tickets = new ArrayList<>();
-    }
-
-    public String getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
     }
 
     public List<RSVP> getRsvps() {
@@ -90,4 +88,19 @@ public class Student extends Person{
         this.tickets.add(tickets);
     }
 
+    public List<Integer> getRsvpsId() {
+        return rsvpsId;
+    }
+
+    public void setRsvpsId(List<Integer> rsvpsId) {
+        this.rsvpsId = rsvpsId;
+    }
+
+    public List<Integer> getTicketsId() {
+        return ticketsId;
+    }
+
+    public void setTicketsId(List<Integer> ticketsId) {
+        this.ticketsId = ticketsId;
+    }
 }
