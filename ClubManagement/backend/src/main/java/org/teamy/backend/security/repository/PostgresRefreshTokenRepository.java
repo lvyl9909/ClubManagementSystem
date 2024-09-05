@@ -81,7 +81,8 @@ public class PostgresRefreshTokenRepository implements RefreshTokenRepository{
 
         String sql = "DELETE FROM refresh_token WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, id);
+            statement.setObject(1,UUID.fromString(id));
+//            statement.setString(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
