@@ -49,10 +49,10 @@ export async function doCall(path, method, data) {
         credentials: 'include',
     });
 
-    // if (res.status === 401 && accessToken) {
-    //     await refreshToken(accessToken);
-    //     return doCall(path, method, data);
-    // }
+    if (res.status === 401 && accessToken) {
+        await refreshToken(accessToken);
+        return doCall(path, method, data);
+    }
 
     if (res.status > 299) {
         throw new Error(`Error: ${res.status} ${res.statusText}`);
