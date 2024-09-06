@@ -2,9 +2,6 @@ package org.teamy.backend.DataMapper;
 
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.RSVP;
-import org.teamy.backend.model.RSVPStatus;
-import org.teamy.backend.model.Ticket;
-import org.teamy.backend.model.TicketStatus;
 
 import java.sql.Array;
 import java.sql.PreparedStatement;
@@ -32,7 +29,7 @@ public class RSVPDataMapper {
 
                 // 将 Integer[] 转换为 List<Integer>
                 List<Integer> participants = Arrays.asList(numbers);
-                return new RSVP( rs.getInt("rsvp_id"), rs.getInt("student_id"),rs.getInt("event"),RSVPStatus.valueOf(rs.getString("status")),rs.getInt("number"),participants);
+                return new RSVP( rs.getInt("rsvp_id"), rs.getInt("student_id"),rs.getInt("event"),rs.getInt("number"),participants);
 
             }
         } catch (SQLException e) {

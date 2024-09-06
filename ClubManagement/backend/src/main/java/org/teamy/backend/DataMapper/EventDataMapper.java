@@ -3,6 +3,7 @@ package org.teamy.backend.DataMapper;
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
+import org.teamy.backend.model.EventStatus;
 import org.teamy.backend.model.Student;
 
 import java.sql.Connection;
@@ -34,6 +35,25 @@ public class EventDataMapper {
         }
         return null;
     }
+    public void deleteEvent(int eventId) throws Exception {
+        var connection = databaseConnectionManager.nextConnection();
+
+        try {
+            // 更新事件状态为 "Cancelled"
+            PreparedStatement stmt = connection.prepareStatement("UPDATE events SET status = ? WHERE event_id = ?");
+            stmt.setString(1, "Cancelled");
+            stmt.setInt(2, eventId);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new RuntimeException("No event found with id: " + eventId);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+    }
 
     public Event findEventByTitle(String title) throws Exception {
         var connection = databaseConnectionManager.nextConnection();
@@ -56,15 +76,16 @@ public class EventDataMapper {
     public boolean saveEvent(Event event) throws Exception {
         var connection = databaseConnectionManager.nextConnection();
 
-        String query = "INSERT INTO events (title, description,date,time,venue,cost,club_id) VALUES (?,?,?,?,?,?,?)";
+        String query = "INSERT INTO events (title, description,date,time,venue,cost,club_id,status) VALUES (?,?,?,?,?,?,?,?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, event.getTitle());
             stmt.setString(2, event.getDescription());
             stmt.setDate(3,event.getSqlDate());
             stmt.setTime(4,event.getSqlTime());
-            stmt.setString(5,event.getVenueName());
+            stmt.setInt(5,event.getVenueId());
             stmt.setBigDecimal(6,event.getCost());
             stmt.setInt(7,event.getClub());
+            stmt.setString(8, EventStatus.Ongoing.name());
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

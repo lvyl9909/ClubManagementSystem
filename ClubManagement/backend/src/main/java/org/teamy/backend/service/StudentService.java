@@ -67,8 +67,8 @@ public class StudentService {
             List<Ticket> tickets = new ArrayList<>();
             for (Integer ticketsId : student.getTicketsId()) {
                 try {
-//                    Ticket ticket = clubService.getClubById(clubId);
-//                    tickets.add();
+                    Ticket ticket = ticketService.getTicketById(ticketsId);
+                    tickets.add(ticket);
                 } catch (Exception e) {
                     throw new RuntimeException("Error loading clubs for student", e);
                 }
@@ -83,8 +83,8 @@ public class StudentService {
             List<RSVP> rsvps = new ArrayList<>();
             for (Integer rsvpId : student.getRsvpsId()) {
                 try {
-//                    Ticket ticket = clubService.getClubById(clubId);
-//                    tickets.add();
+                    RSVP rsvp = rsvpService.getRSVPById(rsvpId);
+                    rsvps.add(rsvp);
                 } catch (Exception e) {
                     throw new RuntimeException("Error loading clubs for student", e);
                 }

@@ -14,13 +14,11 @@ public class Event {
     private String date;
     private String time;
     private String venueName;
+    private Integer venueId;
     private BigDecimal cost;
     private Integer clubId;
     private Integer capacity;
     private List<RSVP> rsvps;
-    private final List<CapacityObserver> observers = new ArrayList<>();
-    private Waitlist waitlist;
-
     public Integer getClubId() {
         return clubId;
     }
@@ -42,10 +40,6 @@ public class Event {
                 ", rsvps=" + rsvps +
                 ", clubId=" + clubId +
                 '}';
-    }
-
-    public void setWaitlist(Waitlist waitlist) {
-        this.waitlist = waitlist;
     }
 
 
@@ -79,7 +73,6 @@ public class Event {
         this.cost = cost;
         this.clubId = clubId;
         this.capacity = capacity;
-        this.waitlist = new Waitlist(this);
         this.rsvps = new ArrayList<>();
     }
 
@@ -131,6 +124,14 @@ public class Event {
         this.venueName = venueName;
     }
 
+    public Integer getVenueId() {
+        return venueId;
+    }
+
+    public void setVenueId(Integer venueId) {
+        this.venueId = venueId;
+    }
+
     public BigDecimal getCost() {
         return cost;
     }
@@ -163,21 +164,4 @@ public class Event {
         this.clubId = clubId;
     }
 
-    public void registerObserver(CapacityObserver observer) {
-        observers.add(observer);
-    }
-
-    public void notifyObservers() {
-        for (CapacityObserver observer : observers) {
-            observer.update(this);
-        }
-    }
-
-    public void updateCapacity(int newCapacity) {
-        this.capacity = newCapacity;
-        notifyObservers(); // Notify all observers when capacity changes
-    }
-    public Waitlist getWaitlist() {
-        return waitlist;
-    }
 }

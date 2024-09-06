@@ -1,12 +1,14 @@
 package org.teamy.backend.model;
 
 public class Venue {
+    private Integer id;
     private String name;
     private String description;
     private String location;
     private Integer capacity;
 
-    public Venue(String name, String description, String location, Integer capacity) {
+    public Venue(Integer id,String name, String description, String location, Integer capacity) {
+        this.id=id;
         this.name = name;
         this.description = description;
         this.location = location;
