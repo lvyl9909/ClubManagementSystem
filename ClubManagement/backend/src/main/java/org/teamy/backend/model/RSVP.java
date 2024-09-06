@@ -28,6 +28,20 @@ public class RSVP {
         this.participantIds = participantIds;
 
     }
+    public RSVP( Integer submitterId, Integer eventId, Integer number, List<Integer>participantIds) {
+        this.submitterId = submitterId;
+        this.eventId = eventId;
+        this.number = number;
+        this.participantIds = participantIds;
+    }
+    public RSVP( Integer submitterId, Integer eventId, Integer number) {
+        this.submitterId = submitterId;
+        this.eventId = eventId;
+        this.number = number;
+        this.participantIds = new ArrayList<>(number);
+    }
+
+
 
 
 
@@ -38,6 +52,26 @@ public class RSVP {
 
     public void setSubmitter(Student submitter) {
         this.submitter = submitter;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public Student getSubmitter() {
+        return submitter;
+    }
+
+    public List<Student> getParticipants() {
+        return participants;
     }
 
     public Integer getSubmitterId() {

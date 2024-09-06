@@ -150,4 +150,31 @@ public class EventDataMapper {
 
         return events;
     }
+    public boolean updateEvent(Event event) throws Exception {
+        var connection = databaseConnectionManager.nextConnection();
+
+        // SQL 更新语句，更新指定的事件
+        String query = "UPDATE events SET title = ?, description = ?, date = ?, time = ?, venue = ?, cost = ?, club_id = ?, status = ? WHERE event_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, event.getTitle());
+            stmt.setString(2, event.getDescription());
+            stmt.setDate(3, event.getSqlDate());
+            stmt.setTime(4, event.getSqlTime());
+            stmt.setInt(5, event.getVenueId());
+            stmt.setBigDecimal(6, event.getCost());
+            stmt.setInt(7, event.getClub());
+            stmt.setString(8, event.getStatus().name());  // 假设状态是枚举类型
+            stmt.setInt(9, event.getId());  // 使用 eventId 作为更新条件
+
+            // 执行更新操作
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;  // 返回是否成功更新
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new Exception("Error updating event: " + e.getMessage());
+        } finally {
+            // 释放数据库连接
+            databaseConnectionManager.releaseConnection(connection);
+        }
+    }
 }

@@ -15,10 +15,11 @@ public class fundingApplicationMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
     private ClubDataMapper clubDataMapper;
     private FacultyAdministratorMapper facultyAdministratorMapper;
-    private EventDataMapper eventDataMapper;
+    private final EventDataMapper eventDataMapper;
 
-    public fundingApplicationMapper(DatabaseConnectionManager databaseConnectionManager) {
+    public fundingApplicationMapper(DatabaseConnectionManager databaseConnectionManager, EventDataMapper eventDataMapper) {
         this.databaseConnectionManager = databaseConnectionManager;
+        this.eventDataMapper = eventDataMapper;
     }
     public fundingApplication findfundingApplicationById(int Id) throws Exception {
         var connection = databaseConnectionManager.nextConnection();
@@ -54,8 +55,6 @@ public class fundingApplicationMapper {
     public List<Event> getRelatedEvents(int fundingApplicationId) throws Exception {
         var connection = databaseConnectionManager.nextConnection();
         List<Event> events = new ArrayList<>();
-
-
         String sql = "SELECT event_id FROM funding_application_events WHERE funding_application_id = ?";
 
         PreparedStatement stmt = connection.prepareStatement(sql);

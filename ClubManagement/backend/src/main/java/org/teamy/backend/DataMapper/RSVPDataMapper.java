@@ -39,4 +39,26 @@ public class RSVPDataMapper {
         }
         return null;
     }
+
+    public void saveRSVP(RSVP rsvp) throws SQLException {
+        var connection = databaseConnectionManager.nextConnection();
+        try {
+            PreparedStatement stmt = connection.prepareStatement(
+                    "INSERT INTO rsvps (student_id, event, number,participates_id) VALUES (?, ?, ?,?)"
+            );
+            stmt.setInt(1, rsvp.getSubmitterId());
+            stmt.setInt(2, rsvp.getEventId());
+            stmt.setInt(3, rsvp.getNumber());
+
+            // 将 List<Integer> 转换为 PostgreSQL 的 Array 类型
+            List<Integer> participatesIdList = rsvp.getParticipantIds();
+            Integer[] participatesIdArray = participatesIdList.toArray(new Integer[0]);
+            Array sqlArray = connection.createArrayOf("INTEGER", participatesIdArray);
+            stmt.setArray(4,sqlArray);
+
+            stmt.executeUpdate();
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+    }
 }
