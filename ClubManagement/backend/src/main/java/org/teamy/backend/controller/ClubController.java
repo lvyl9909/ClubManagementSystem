@@ -14,6 +14,7 @@ import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.service.ClubService;
 import org.teamy.backend.model.request.ResponseEntity;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -83,7 +84,7 @@ public class ClubController extends HttpServlet {
                         try {
                             // 解析请求体中的Club数据，假设请求体是JSON格式
                             Club club = parseClubFromRequest(req);
-
+                            System.out.println(club.toString());
                             // 调用Service层保存Club
                             clubService.saveClub(club);
                             return ResponseEntity.create(club);
@@ -119,8 +120,14 @@ public class ClubController extends HttpServlet {
     }
 
     private Club parseClubFromRequest(HttpServletRequest req) throws IOException {
+        BufferedReader reader = req.getReader();
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        System.out.println("Received JSON: " + sb.toString());
         Club club = mapper.readValue(req.getInputStream(), Club.class);
-        System.out.println(club.toString());
 
         // 校验数据
         if (club.getName() == null || club.getName().isEmpty()) {
@@ -128,30 +135,6 @@ public class ClubController extends HttpServlet {
         }
         return club;
     }
-
-//    private void viewClub(HttpServletRequest req, HttpServletResponse resp, Integer ClubId) throws Exception {
-//        PrintWriter out = resp.getWriter();
-//        Club club = clubService.getClubById(ClubId);
-//        if (club != null) {
-//            out.write("{\"name\":\"" + club.getName() + "\", \"description\":\"" + club.getDescription() + "\"}");
-//        } else {
-//            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//            out.write("{\"error\":\"Club not found.\"}");
-//        }
-//    }
-
-//    private void listClubs(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-//        List<Club> clubs = clubService.getAllClub();
-//        resp.setContentType("application/json");
-//        resp.setCharacterEncoding("UTF-8");
-//        PrintWriter out = resp.getWriter();
-//
-//        // Use Gson to convert the list to JSON and return it
-//        Gson gson = new Gson();
-//        String json = gson.toJson(clubs);
-//        out.print(json);
-//        out.flush();
-//    }
     private ResponseEntity listClubs() {
         List<Club> clubs = clubService.getAllClub();
         return ResponseEntity.ok(clubs);

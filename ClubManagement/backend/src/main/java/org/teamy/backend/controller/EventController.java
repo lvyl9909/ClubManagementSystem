@@ -1,5 +1,6 @@
 package org.teamy.backend.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -55,47 +56,124 @@ public class EventController extends HttpServlet {
             MarshallingRequestHandler.of(
                     mapper, // 使用Jackson的ObjectMapper
                     resp,
-                    () -> {
-                        try {
-                            // 解析请求体中的Club数据，假设请求体是JSON格式
-                            Event event = parseEventFromRequest(req);
-
-                            // 调用Service层保存Club
-                            boolean isSaved = eventService.saveEvent(event);
-
-                            if (isSaved) {
-                                return ResponseEntity.ok(null);
-                            } else {
-                                return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
-                                        Error.builder()
-                                                .status(HttpServletResponse.SC_BAD_REQUEST)
-                                                .message("Failed to save the event.")
-                                                .reason("Failed to save the event.")
-                                                .build()
-                                );
-                            }
-                        } catch (IllegalArgumentException e) {
-                            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
-                                    Error.builder()
-                                            .status(HttpServletResponse.SC_BAD_REQUEST)
-                                            .message("Failed to save the event.")
-                                            .reason(e.getMessage())
-                                            .build()
-                            );
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                    Error.builder()
-                                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                                            .message("An error occurred while saving the event.")
-                                            .reason(e.getMessage())
-                                            .build()
-                            );
-                        }
-                    }
+                    () -> saveEvent(req)
             ).handle();
-            }
+        } else if (pathInfo.equals("/applyRSVP")) {
+            MarshallingRequestHandler.of(
+                    mapper,  // 使用 Jackson 的 ObjectMapper
+                    resp,
+                    () -> applyForRSVP(req)
+            ).handle();
+        }else if (pathInfo.equals("/update")) {
+            MarshallingRequestHandler.of(
+                    mapper,  // 使用 Jackson 的 ObjectMapper
+                    resp,
+                    () -> updateEvent(req)
+            ).handle();
+        } else if (pathInfo.equals("/delete")) {
+            MarshallingRequestHandler.of(
+                    mapper,
+                    resp,
+                    () -> deleteEvent(req)
+            ).handle();
+        }
     }
+
+    private ResponseEntity deleteEvent(HttpServletRequest req) {
+        try {
+            List<Integer> eventsId = mapper.readValue(req.getInputStream(), new TypeReference<List<Integer>>() {});
+            // 调用删除事件的方法
+            eventService.deleteEvent(eventsId);
+            return ResponseEntity.ok(null);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                            .message("Invalid request parameters.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                            .message("An error occurred while deleting events.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        }
+    }
+
+    private ResponseEntity updateEvent(HttpServletRequest req) {
+        try {
+            // 从请求体中解析 Event 对象
+            Event event = mapper.readValue(req.getInputStream(), Event.class);
+
+            // 调用更新事件的方法
+            boolean isUpdated = eventService.updateEvent(event);
+
+            if (isUpdated) {
+                return ResponseEntity.ok(null);
+            } else {
+                return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                        Error.builder()
+                                .status(HttpServletResponse.SC_BAD_REQUEST)
+                                .message("Failed to update the event.")
+                                .reason("Event update operation failed.")
+                                .build()
+                );
+            }
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                            .message("Invalid request parameters.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                            .message("An error occurred while updating the event.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        }
+    }
+
+    private ResponseEntity applyForRSVP(HttpServletRequest req) {
+        try {
+            // 从请求中解析必要的参数
+            int eventId = Integer.parseInt(req.getParameter("eventId"));
+            int studentId = Integer.parseInt(req.getParameter("studentId"));
+            int numTickets = Integer.parseInt(req.getParameter("numTickets"));
+
+            // 获取 participates_id 的列表，假设是 JSON 格式
+            String participatesJson = req.getParameter("participates_id");
+            List<Integer> participates_id = mapper.readValue(participatesJson, new TypeReference<List<Integer>>() {});
+            eventService.applyForRSVP(eventId, studentId, numTickets, participates_id);
+            return ResponseEntity.ok(null); // 成功返回空响应
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                            .message("Invalid request parameters.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                            .message("An error occurred while applying RSVP.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        }
+    }
+
 
     private ResponseEntity searchEventsByTitle(String title) {
         try {
@@ -159,4 +237,44 @@ public class EventController extends HttpServlet {
                             .build());
         }
     }
+    private ResponseEntity saveEvent(HttpServletRequest req) {
+        try {
+            // 解析请求体中的Club数据，假设请求体是JSON格式
+            Event event = parseEventFromRequest(req);
+
+            // 调用Service层保存Club
+            boolean isSaved = eventService.saveEvent(event);
+
+            if (isSaved) {
+                return ResponseEntity.ok(null);
+            } else {
+                return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                        Error.builder()
+                                .status(HttpServletResponse.SC_BAD_REQUEST)
+                                .message("Failed to save the event.")
+                                .reason("Failed to save the event.")
+                                .build()
+                );
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                            .message("Failed to save the event.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                            .message("An error occurred while saving the event.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        }
+
+    }
+
 }

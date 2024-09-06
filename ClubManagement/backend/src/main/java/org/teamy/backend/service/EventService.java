@@ -83,7 +83,6 @@ public class EventService {
             Ticket ticket = new Ticket(participates_id.get(i),rsvp.getId(), TicketStatus.Issued);
             unitOfWork.registerNewTicket(ticket);
         }
-
         // 提交事务
         unitOfWork.commit();
     }

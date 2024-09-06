@@ -14,8 +14,6 @@ public class Club {
     private List<Integer> eventsId;
     private List<Event> events;
     private List<fundingApplication> fundingApplications;
-    private final StudentService studentService;
-    private final EventService eventService;
 
     public Club(String name, String description) {
         this.name = name;
@@ -26,23 +24,10 @@ public class Club {
         this.students = new ArrayList<>();
         this.eventsId = new ArrayList<>();
 
-        this.studentService=null;
-        this.eventService =null;
     }
 
-    public Club(String name, String description, StudentService studentService, EventService eventService) {
-        this.name = name;
-        this.description = description;
-        this.studentId=new ArrayList<>();
-        this.events = new ArrayList<>();
-        this.fundingApplications = new ArrayList<>();
-        this.students = new ArrayList<>();
-        this.eventsId = new ArrayList<>();
-
-        this.studentService= studentService;
-        this.eventService = eventService;
+    public Club() {
     }
-
 
     @Override
     public String toString() {
@@ -76,19 +61,6 @@ public class Club {
         this.studentId = studentId;
     }
 
-    public List<Student> getStudents() {
-        if(students.isEmpty()){
-            for (Integer id:studentId){
-                try {
-                    Student student = studentService.getStudentById(id);
-                    students.add(student);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        return students;
-    }
 
     public void setStudents(List<Student> students) {
         this.students = students;
@@ -102,17 +74,11 @@ public class Club {
         this.eventsId = eventsId;
     }
 
+    public List<Student> getStudents() {
+        return students;
+    }
+
     public List<Event> getEvents() {
-        if(events.isEmpty()){
-            for (Integer id:eventsId){
-                try {
-                    Event event = eventService.getEventById(id);
-                    events.add(event);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
         return events;
     }
 

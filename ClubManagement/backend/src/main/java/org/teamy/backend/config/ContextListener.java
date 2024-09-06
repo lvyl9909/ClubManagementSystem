@@ -17,6 +17,7 @@ import org.teamy.backend.service.*;
 public class ContextListener implements ServletContextListener {
     public static final String CLUB_SERVICE = "clubService";
     public static final String STUDENT_SERVICE = "studentService";
+    public static final String STUDENT_CLUB_SERVICE = "studentClubService";
     public static final String EVENT_SERVICE = "eventService";
     public static final String RSVP_SERVICE = "rsvpService";
     public static final String TICKET_SERVICE = "ticketService";
@@ -54,6 +55,7 @@ public class ContextListener implements ServletContextListener {
         sce.getServletContext().setAttribute(RSVP_SERVICE, new RSVPService(new RSVPDataMapper(databaseConnectionManager)));
         sce.getServletContext().setAttribute(TICKET_SERVICE, new TicketService(new TicketDataMapper(databaseConnectionManager)));
         sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager),new ClubService(new ClubDataMapper(databaseConnectionManager)),new RSVPService(new RSVPDataMapper(databaseConnectionManager)),new TicketService(new TicketDataMapper(databaseConnectionManager))));
+        sce.getServletContext().setAttribute(STUDENT_CLUB_SERVICE, new StudentClubService(new StudentClubDataMapper(databaseConnectionManager)));
 
         var mapper = Jackson2ObjectMapperBuilder.json()
                 .modules(new JavaTimeModule())
