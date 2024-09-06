@@ -15,7 +15,12 @@ public class TicketService {
             throw new IllegalArgumentException("Club ID must be positive");
         }
 
-        Ticket ticket = ticketDataMapper.findTicketById(id);
+        Ticket ticket = null;
+        try {
+            ticket = ticketDataMapper.findTicketById(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return ticket;
     }
 }

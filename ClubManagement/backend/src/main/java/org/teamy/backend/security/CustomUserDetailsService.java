@@ -6,7 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.teamy.backend.DataMapper.StudentDataMapper;
 import org.teamy.backend.model.Person;
 import org.teamy.backend.security.model.Role;
-
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;

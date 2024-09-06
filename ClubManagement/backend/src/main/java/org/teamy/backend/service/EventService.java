@@ -3,6 +3,7 @@ package org.teamy.backend.service;
 import org.teamy.backend.DataMapper.EventDataMapper;
 import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
+import org.teamy.backend.model.exception.NotFoundException;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,17 +25,11 @@ public class EventService {
         }
         return event;
     }
-    public Event getEventByTitle(String title) throws Exception {
+    public List<Event> getEventByTitle(String title) throws Exception {
         if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Club name cannot be null or empty");
+            throw new IllegalArgumentException("Title cannot be null or empty.");
         }
-
-        Event event = eventDataMapper.findEventByTitle(title);
-//        if (club == null) {
-//            throw new Exception("Club with name '" + title + "' not found");
-//        }
-
-        return event;
+        return  eventDataMapper.findEventsByTitle(title);
     }
 
     public boolean saveEvent(Event event) throws Exception {

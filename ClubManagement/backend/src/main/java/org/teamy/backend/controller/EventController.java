@@ -32,31 +32,16 @@ public class EventController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String idParam = req.getParameter("id"); // 获取查询字符串中的 "id" 参数
+        String titleParam = req.getParameter("title"); // 获取查询字符串中的 "title" 参数
 
         RequestHandler handler = () -> {
-            if (Objects.equals(idParam, "-1")) {
-                return listEvents();
+            if (titleParam != null && !titleParam.trim().isEmpty()) {
+                return searchEventsByTitle(titleParam);  // 如果有 title 参数，则进行模糊搜索
+            } else if (Objects.equals(idParam, "-1")) {
+                return listEvents();  // 如果 id 为 -1，则返回所有事件
             } else {
-                try {
-                    Integer eventId = Integer.valueOf(idParam); // 将id参数转换为整数
-                    return viewEvent(eventId);
-                } catch (NumberFormatException e) {
-                    return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
-                            Error.builder()
-                                    .status(HttpServletResponse.SC_BAD_REQUEST)
-                                    .message("Invalid ID format")
-                                    .reason(e.getMessage())
-                                    .build()
-                    );
-                } catch (Exception e) {
-                    return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                            Error.builder()
-                                    .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                                    .message("error")
-                                    .reason(e.getMessage())
-                                    .build()
-                    );
-                }
+                Integer eventId = Integer.valueOf(idParam);
+                return viewEvent(eventId);  // 根据 ID 获取事件
             }
         };
 
@@ -112,6 +97,21 @@ public class EventController extends HttpServlet {
             }
     }
 
+    private ResponseEntity searchEventsByTitle(String title) {
+        try {
+            List<Event> events = eventService.getEventByTitle(title);
+            return ResponseEntity.of(HttpServletResponse.SC_OK, events);
+        } catch (Exception e) {
+            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                            .message("Failed to search events by title")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        }
+    }
+
     private Event parseEventFromRequest(HttpServletRequest req) throws IOException {
         Event event = mapper.readValue(req.getInputStream(), Event.class);
         System.out.println(event.toString());
@@ -119,7 +119,6 @@ public class EventController extends HttpServlet {
         if ( event.getTitle().isEmpty()||event.getTitle() == null ) {
             throw new IllegalArgumentException("Event name cannot be empty");
         }
-
         return event;
     }
     private ResponseEntity viewEvent(Integer eventId) {
@@ -127,18 +126,37 @@ public class EventController extends HttpServlet {
         try {
             event = eventService.getEventById(eventId);
             return ResponseEntity.ok(event);
-        } catch (Exception e) {
-            return ResponseEntity.of(HttpServletResponse.SC_NOT_FOUND,
+        }catch (NumberFormatException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()
-                            .status(HttpServletResponse.SC_NOT_FOUND)
-                            .message("Event not found.")
+                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                            .message("Invalid ID format")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                            .message("error")
                             .reason(e.getMessage())
                             .build()
             );
         }
     }
     private ResponseEntity listEvents() {
-        List<Event> events = eventService.getAllEvents();
-        return ResponseEntity.ok(events);
+
+        List<Event> events = null;
+        try {
+            events = eventService.getAllEvents();
+            return ResponseEntity.ok(events);
+        } catch (Exception e) {
+            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                            .message("error")
+                            .reason(e.getMessage())
+                            .build());
+        }
     }
 }
