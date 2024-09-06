@@ -1,0 +1,29 @@
+.club-management {
+    padding: 20px;
+}
+
+.rectangle-button {
+    width: 300px; /* 增加按钮宽度 */
+    height: 80px; /* 增加按钮高度 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 2px solid gray;
+    border-radius: 5px;
+    color: #000;
+    font-size: 18px; /* 增加字体大小 */
+    cursor: pointer;
+    margin-bottom: 20px; /* 增加按钮间距 */
+    transition: all 0.3s ease;
+}
+
+.rectangle-button img {
+    width: 40px; /* 调整图片宽度 */
+    height: 40px; /* 调整图片高度 */
+    margin-right: 15px; /* 增加图片与文字的间距 */
+}
+
+.rectangle-button:hover {
+    border-color: #1890ff; /* 鼠标悬停时改变按钮边框颜色 */
+}

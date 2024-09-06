@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import Main from "../pages/main";
 import Home from "../pages/home/home";
 import Club from "../pages/club/club";
+import ManageClub from "../pages/club/manageclub";
 import Event from "../pages/event/event";
 import PageOne from "../pages/other/pageone";
 import PageTwo from "../pages/other/pagetwo";
@@ -33,6 +34,14 @@ const routes = createBrowserRouter([
                         <Club />
                     </PrivateRoute>
                 ) // 保护 Club 路由
+            },
+            {
+                path: 'club/manage', // 新增 ManageClub 路由
+                element: (
+                    <PrivateRoute>
+                        <ManageClub />
+                    </PrivateRoute>
+                ) // 保护 ManageClub 路由
             },
             {
                 path: 'event',
