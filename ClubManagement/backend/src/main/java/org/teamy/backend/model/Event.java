@@ -1,5 +1,7 @@
 package org.teamy.backend.model;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Event {
+    private Integer id;
     private String title;
     private String description;
     private String date;
@@ -19,6 +22,7 @@ public class Event {
     private Integer clubId;
     private Integer capacity;
     private List<RSVP> rsvps;
+    private EventStatus status;
     public Integer getClubId() {
         return clubId;
     }
@@ -43,6 +47,17 @@ public class Event {
     }
 
 
+    public Event(Integer id,String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId,String status) {
+        this.id=id;
+        this.clubId = clubId;
+        this.title = title;
+        this.description = description;
+        this.date = date.toString();
+        this.time = time.toString();
+        this.venueName = venueName;
+        this.cost = cost;
+        this.status = EventStatus.valueOf(status);
+    }
     public Event(String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId) {
         this.clubId = clubId;
         this.title = title;
@@ -51,29 +66,26 @@ public class Event {
         this.time = time.toString();
         this.venueName = venueName;
         this.cost = cost;
+        this.status = EventStatus.Ongoing;
     }
 
     public Event() {
     }
 
-    public Event(String title, String description, String venueName, BigDecimal cost, Integer clubId) {
-        this.title = title;
-        this.description = description;
-        this.venueName = venueName;
-        this.cost = cost;
-        this.clubId = clubId;
+    public Integer getId() {
+        return id;
     }
 
-    public Event(String title, String description, String date, String time, String venueName, BigDecimal cost, Integer clubId, Integer capacity) {
-        this.title = title;
-        this.description = description;
-        this.date = date;
-        this.time = time;
-        this.venueName = venueName;
-        this.cost = cost;
-        this.clubId = clubId;
-        this.capacity = capacity;
-        this.rsvps = new ArrayList<>();
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public EventStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EventStatus status) {
+        this.status = status;
     }
 
     public String getTitle() {

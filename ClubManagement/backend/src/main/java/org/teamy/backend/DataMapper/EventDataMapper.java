@@ -26,7 +26,17 @@ public class EventDataMapper {
             stmt.setInt(1, Id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Event( rs.getString("title"), rs.getString("description"),rs.getString("venue"),rs.getBigDecimal("cost"),rs.getInt("club_id"));
+                return new Event(
+                        rs.getInt("event_id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getDate("date"),
+                        rs.getTime("time"),
+                        rs.getString("venue"),            // 你可能需要确认 venue 是字符串还是 ID
+                        rs.getBigDecimal("cost"),
+                        rs.getInt("club_id"),
+                        rs.getString("status") // 将状态从数据库转换为枚举类型
+                );
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -55,22 +65,34 @@ public class EventDataMapper {
         }
     }
 
-    public Event findEventByTitle(String title) throws Exception {
+    public List<Event> findEventsByTitle(String title) throws SQLException {
         var connection = databaseConnectionManager.nextConnection();
+        List<Event> events = new ArrayList<>();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM events WHERE title = ?");
-            stmt.setString(1, title);
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM events WHERE title LIKE ?");
+            stmt.setString(1, "%" + title + "%");  // 使用模糊匹配
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Event( rs.getString("title"), rs.getString("description"),rs.getString("venue"),rs.getBigDecimal("cost"),rs.getInt("club_id"));
+
+            while (rs.next()) {
+                Event event = new Event(
+                        rs.getInt("event_id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getDate("date"),
+                        rs.getTime("time"),
+                        rs.getString("venue"),            // 你可能需要确认 venue 是字符串还是 ID
+                        rs.getBigDecimal("cost"),
+                        rs.getInt("club_id"),
+                        rs.getString("status") // 将状态从数据库转换为枚举类型
+                );
+                events.add(event);
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         } finally {
             databaseConnectionManager.releaseConnection(connection);
         }
-        return null;
+
+        return events;
     }
 
     public boolean saveEvent(Event event) throws Exception {
@@ -107,13 +129,15 @@ public class EventDataMapper {
 
             while (rs.next()) {
                 Event event = new Event(
+                        rs.getInt("event_id"),
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getDate("date"),
                         rs.getTime("time"),
-                        rs.getString("venue"),
+                        rs.getString("venue"),            // 你可能需要确认 venue 是字符串还是 ID
                         rs.getBigDecimal("cost"),
-                        rs.getInt("club_id")
+                        rs.getInt("club_id"),
+                        rs.getString("status") // 将状态从数据库转换为枚举类型
                 );
                 events.add(event);
             }
