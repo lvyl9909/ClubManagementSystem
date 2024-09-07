@@ -4,6 +4,7 @@ import {
     Table, Tag, Space, Button, Col, Row, Input, Form, Modal, InputNumber, TimePicker, DatePicker,
     Select, Divider, Tabs, message, AutoComplete
 } from 'antd';
+import moment from 'moment';
 import {Link} from "react-router-dom";
 import {doCall} from "../../router/api";
 import {SearchOutlined} from "@ant-design/icons";
@@ -28,14 +29,17 @@ function Event() {
     //     { id: 1, title: 'AI Seminar', description: 'Discussing AI trends', date: '2024-09-10', time: '14:00', venueName: 'Room A'},
     //     { id: 2, title: 'React Workshop', description: 'Learn React basics', date: '2024-09-12', time: '10:00', venueName: 'Room B' },
     // ]);
-    const [clubs, setClubs] = useState([]);
+    const [clubOptions, setClubOptions] = useState([]);
+    const [selectedClub, setSelectedClub] = useState(null);
+    const [dateRange, setDateRange] = useState('all');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
     const [studentSearchResults, setStudentSearchResults] = useState([]);
-    const [participants, setParticipants] = useState([{ name: '', email: '' }]);
+    const [participants, setParticipants] = useState([{ email: '' }]);
     const [participantsIds, setParticipantsIds] = useState([]);
+
 
     useEffect(() => {
         const fetchAllEvent = async () => {
@@ -52,6 +56,8 @@ function Event() {
                 if (res.ok) {
                     const data = await res.json();
                     setAllEvents(data);
+                    const uniqueClubs = [...new Set(data.map(event => event.clubId))];
+                    setClubOptions(uniqueClubs);
                     console.log(data, 'data------');
                 } else {
                     setError('Failed to load club information');
@@ -66,6 +72,32 @@ function Event() {
 
             fetchAllEvent();
         }, []);
+
+    const handleClubFilter = (clubId) => {
+        setSelectedClub(clubId);
+    };
+
+    const handleDateFilter = (value) => {
+        setDateRange(value);
+    };
+
+    const filterByDate = (events) => {
+        const today = moment();
+        if (dateRange === 'past3days') {
+            return events.filter(event => moment(event.date).isAfter(today.subtract(3, 'days')));
+        } else if (dateRange === 'pastweek') {
+            return events.filter(event => moment(event.date).isAfter(today.subtract(7, 'days')));
+        } else if (dateRange === 'thismonth') {
+            return events.filter(event => moment(event.date).isSame(today, 'month'));
+        } else {
+            return events;
+        }
+    };
+
+    const filteredEvents = allEvents
+        .filter(event => event.title.toLowerCase().includes(searchTerm))
+        .filter(event => !selectedClub || event.clubId === selectedClub)
+        .filter(filterByDate);
     //
     useEffect(() => {
         const fetchRsvpedEvents = async () => {
@@ -105,7 +137,7 @@ function Event() {
     // }, []);
     const getStatusTagColor = (status) => {
         if (status === 'Issued') return 'green';
-        if (status === 'pending') return 'geekblue';
+        if (status === 'Cancelled') return 'red';
         return 'volcano';
     };
 
@@ -168,10 +200,22 @@ function Event() {
     //         console.error('Error creating event:', error);
     //     }
     // };
-    const handleViewTicket = (eventId) => {
-        // Add functionality to handle viewing ticket here
-        console.log(`Viewing ticket for event ID: ${eventId}`);
 
+    const handleCancelTicket = async (ticketId) => {
+        try {
+            const res = await doCall(`${path}/student/tickets/delete/?id=${ticketId}`, 'POST');  // Assuming cancelRSVP is the correct API endpoint
+            if (res.ok) {
+                message.success('Ticket canceled successfully');
+                // Optionally remove the event from rsvpedEvents after canceling
+                setRsvpedEvents(rsvpedEvents.filter(ticket => ticket.ticketId !== ticketId));
+            } else {
+                console.error('Error canceling ticket:', res.statusText);
+                message.error('Failed to cancel the ticket');
+            }
+        } catch (error) {
+            console.error('Error canceling ticket:', error);
+            message.error('An error occurred while canceling the ticket');
+        }
     };
 
     const handleSearch = async (value) => {
@@ -243,7 +287,7 @@ function Event() {
             participants[index] = { ...participants[index], email: selectedStudent.email };
             form.setFieldsValue({ participants });
 
-            // Store the student ID for backend submission
+            // Update participantsIds
             setParticipantsIds(prevIds => {
                 const updatedIds = [...prevIds];
                 updatedIds[index] = selectedStudent.id;
@@ -251,7 +295,13 @@ function Event() {
             });
         }
     };
-
+    const handleRemoveParticipant = (index) => {
+        setParticipantsIds(prevIds => {
+            const updatedIds = [...prevIds];
+            updatedIds.splice(index, 1);
+            return updatedIds;
+        });
+    };
 
     const isEventRsvped = (eventId) => {
         return rsvpedEvents.some(event => event.eventId === eventId);
@@ -287,21 +337,21 @@ function Event() {
                                 title="Action"
                                 key="action"
                                 render={(_, record) => (
-                                    <Button type="primary" onClick={() => handleViewTicket(record.id)}>
-                                        View Ticket
+                                    <Button danger onClick={() => handleCancelTicket(record.ticketId)}>
+                                        Cancel Ticket
                                     </Button>
                                 )}
                             />
                         </Table>
                     </Col>
                 </Row>
+
             </TabPane>
 
             {/* Tab 2: All Events */}
             <TabPane tab="All Events" key="2">
                 <Row justify="center" style={{ marginBottom: 16 }}>
                     <Col span={24}>
-                        {/*<h2>All Events</h2>*/}
                         <Search
                             placeholder="Search events"
                             allowClear
@@ -309,33 +359,44 @@ function Event() {
                             enterButton
                             style={{ marginBottom: 16 }}
                         />
-                        <Table
-                            dataSource={allEvents.filter(event =>
-                                event.title.toLowerCase().includes(searchTerm) ||
-                                event.description.toLowerCase().includes(searchTerm)
-                            )}
-                            rowKey="id"
+                        <Select
+                            style={{ width: 200, marginRight: 16 }}
+                            placeholder="Filter by Club"
+                            onChange={handleClubFilter}
+                            allowClear
                         >
+                            {clubOptions.map(clubId => (
+                                <Option key={clubId} value={clubId}>Club {clubId}</Option>
+                            ))}
+                        </Select>
+
+                        {/* Date Filter */}
+                        <Select
+                            style={{ width: 200 }}
+                            placeholder="Filter by Date"
+                            onChange={handleDateFilter}
+                            allowClear
+                        >
+                            <Option value="past3days">Past 3 Days</Option>
+                            <Option value="pastweek">Past Week</Option>
+                            <Option value="thismonth">This Month</Option>
+                            <Option value="all">All Dates</Option>
+                        </Select>
+
+                        {/* Filtered Events Table */}
+                        <Table dataSource={filteredEvents} rowKey="id">
                             <Column title="Title" dataIndex="title" key="title" />
                             <Column title="Description" dataIndex="description" key="description" />
                             <Column title="Date" dataIndex="date" key="date" />
                             <Column title="Time" dataIndex="time" key="time" />
                             <Column title="Venue" dataIndex="venueName" key="venueName" />
-                            <Column
-                                title="Action"
-                                key="action"
-                                render={(_, record) => (
-                                    isEventRsvped(record.id) ? (
-                                        <Button type="default" disabled>
-                                            Already Joined
-                                        </Button>
-                                    ) : (
-                                        <Button  onClick={() => handleOpenModal(record.id)}>
-                                            Get Ticket
-                                        </Button>
-                                    )
-                                )}
-                            />
+                            <Column title="Action" key="action" render={(_, record) => (
+                                isEventRsvped(record.id) ? (
+                                    <Button disabled>Already Joined</Button>
+                                ) : (
+                                    <Button onClick={() => handleOpenModal(record.id)}>Get Ticket</Button>
+                                )
+                            )} />
                         </Table>
                     </Col>
                 </Row>
@@ -345,6 +406,7 @@ function Event() {
                     visible={isModalVisible}
                     onCancel={handleCloseModal}
                     footer={null}
+                    width={600}
                 >
                     <Form form={form} onFinish={handleRsvpSubmit}>
                         <Form.Item
@@ -360,11 +422,11 @@ function Event() {
                                 <>
                                     {fields.map(({ key, name, fieldKey, ...restField }, index) => (
                                         <Row key={key} gutter={16} align="middle">
-                                            <Col span={16}>
+                                            <Col span={18}>
                                                 <Form.Item
                                                     {...restField}
-                                                    name={[name, 'email']}
-                                                    fieldKey={[fieldKey, 'email']}
+                                                    name={[name, 'studentId']}
+                                                    fieldKey={[fieldKey, 'studentId']}
                                                     rules={[{ required: true, message: 'Please search and select a participant!' }]}
                                                     label="Search Participant by Email"
                                                 >
@@ -379,9 +441,16 @@ function Event() {
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            <Col span={4}>
-                                                <Button type="link" onClick={() => remove(name)} danger>
-                                                    Remove
+                                            <Col span={6} style={{ textAlign: 'right' }}>
+                                                <Button
+                                                    type="link"
+                                                    danger
+                                                    onClick={() => {
+                                                        remove(name);
+                                                        handleRemoveParticipant(index);
+                                                    }}
+                                                >
+                                                    Remove Participant
                                                 </Button>
                                             </Col>
                                         </Row>
