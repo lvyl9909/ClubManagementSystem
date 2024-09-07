@@ -103,4 +103,12 @@ public class TicketEventDTO {
     public void setClubId(Integer clubId) {
         this.clubId = clubId;
     }
+
+    public Integer getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Integer eventId) {
+        this.eventId = eventId;
+    }
 }
