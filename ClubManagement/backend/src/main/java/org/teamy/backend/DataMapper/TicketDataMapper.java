@@ -64,16 +64,19 @@ public class TicketDataMapper {
     public void deleteTicket(Integer ticketId)throws SQLException{
         var connection = databaseConnectionManager.nextConnection();
         try {
+            System.out.println("start delete");
             // 更新事件状态为 "Cancelled"
             PreparedStatement stmt = connection.prepareStatement("UPDATE tickets SET status = ?::ticket_status WHERE ticket_id = ?");
-            stmt.setString(1, "Cancelled");
+            stmt.setString(1, TicketStatus.Cancelled.name());
             stmt.setInt(2, ticketId);
 
             int rowsAffected = stmt.executeUpdate();
+            System.out.println("influence row:"+rowsAffected);
             if (rowsAffected == 0) {
                 throw new RuntimeException("No ticket found with id: " + ticketId);
             }
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         } finally {
             databaseConnectionManager.releaseConnection(connection);

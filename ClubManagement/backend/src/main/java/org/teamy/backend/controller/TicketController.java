@@ -31,7 +31,8 @@ public class TicketController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
-        if (pathInfo != null && pathInfo.equals("/delete")) {
+        System.out.println(pathInfo);
+        if (pathInfo != null && pathInfo.equals("/delete/")) {
             MarshallingRequestHandler.of(
                     mapper, // 使用Jackson的ObjectMapper
                     resp,
@@ -43,10 +44,12 @@ public class TicketController extends HttpServlet {
     private ResponseEntity deleteTicket(HttpServletRequest req) {
         try {
             String idParam = req.getParameter("id"); // 获取查询字符串中的 "id" 参数
+            System.out.println("deleteid:"+idParam);
             // 调用删除事件的方法
             if (idParam == null) {
                 throw new IllegalArgumentException("Missing 'id' parameter.");
             }
+
             ticketService.deleteTicket(Integer.valueOf(idParam));
             return ResponseEntity.ok(null);
         } catch (IllegalArgumentException e) {
