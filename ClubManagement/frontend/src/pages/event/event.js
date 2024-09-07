@@ -29,9 +29,11 @@ function Event() {
     //     { id: 1, title: 'AI Seminar', description: 'Discussing AI trends', date: '2024-09-10', time: '14:00', venueName: 'Room A'},
     //     { id: 2, title: 'React Workshop', description: 'Learn React basics', date: '2024-09-12', time: '10:00', venueName: 'Room B' },
     // ]);
+    const [clubs, setClubs] = useState([]);
     const [clubOptions, setClubOptions] = useState([]);
-    const [selectedClub, setSelectedClub] = useState(null);
-    const [dateRange, setDateRange] = useState('all');
+    const [selectedClubId, setSelectedClubId] = useState(null);
+
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -53,12 +55,12 @@ function Event() {
                 //         'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
                 //     }
                 // });
-                if (res.ok) {
+                if (res.ok ) {
                     const data = await res.json();
                     setAllEvents(data);
-                    const uniqueClubs = [...new Set(data.map(event => event.clubId))];
-                    setClubOptions(uniqueClubs);
-                    console.log(data, 'data------');
+                    const uniqueClubIds = [...new Set(data.map(event => event.clubId))];
+                    fetchClubNames(uniqueClubIds);
+                    // console.log(data, 'data------');
                 } else {
                     setError('Failed to load club information');
                 }
@@ -73,31 +75,37 @@ function Event() {
             fetchAllEvent();
         }, []);
 
-    const handleClubFilter = (clubId) => {
-        setSelectedClub(clubId);
-    };
+    const fetchClubNames = async (clubIds) => {
+        try {
+            const clubNamesPromises = clubIds.map(async (id) => {
+                const res = await doCall(`${path}/student/clubs/?id=${id}`, 'GET');
+                if (res.ok) {
+                    const data = await res.json();
+                    return { id, name: data.name };
+                }
+                return { id, name: `Club ${id}` }; // Fallback if name is not available
+            });
 
-    const handleDateFilter = (value) => {
-        setDateRange(value);
-    };
-
-    const filterByDate = (events) => {
-        const today = moment();
-        if (dateRange === 'past3days') {
-            return events.filter(event => moment(event.date).isAfter(today.subtract(3, 'days')));
-        } else if (dateRange === 'pastweek') {
-            return events.filter(event => moment(event.date).isAfter(today.subtract(7, 'days')));
-        } else if (dateRange === 'thismonth') {
-            return events.filter(event => moment(event.date).isSame(today, 'month'));
-        } else {
-            return events;
+            const clubs = await Promise.all(clubNamesPromises);
+            setClubOptions(clubs);
+        } catch (error) {
+            console.error('Error fetching club names:', error);
         }
     };
 
+    const handleClubFilter = (clubId) => {
+        setSelectedClubId(clubId);
+    };
+
+
+
+
+
     const filteredEvents = allEvents
         .filter(event => event.title.toLowerCase().includes(searchTerm))
-        .filter(event => !selectedClub || event.clubId === selectedClub)
-        .filter(filterByDate);
+        .filter(event => !selectedClubId || event.clubId === selectedClubId)
+
+
     //
     useEffect(() => {
         const fetchRsvpedEvents = async () => {
@@ -117,24 +125,24 @@ function Event() {
         fetchRsvpedEvents();
     }, []);
 
-    // useEffect(() => {
-    //     const fetchClubs = async () => {
-    //         try {
-    //             const response = await fetch(`${path}/student/clubs/?id=-1`);
-    //             if (response.ok) {
-    //                 const data = await response.json();
-    //                 setClubs(data);
-    //             } else {
-    //                 setError('Failed to load club information');
-    //             }
-    //         } catch (error) {
-    //             console.error('Error:', error);
-    //             setError('An error occurred while fetching the club information');
-    //         }
-    //     };
-    //
-    //     fetchClubs();
-    // }, []);
+    useEffect(() => {
+        const fetchClubs = async () => {
+            try {
+                const response = await doCall(`${path}/student/clubs/?id=-1`,'GET');
+                if (response.ok) {
+                    const data = await response.json();
+                    setClubs(data);
+                } else {
+                    setError('Failed to load club information');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                setError('An error occurred while fetching the club information');
+            }
+        };
+
+        fetchClubs();
+    }, []);
     const getStatusTagColor = (status) => {
         if (status === 'Issued') return 'green';
         if (status === 'Cancelled') return 'red';
@@ -336,11 +344,19 @@ function Event() {
                             <Column
                                 title="Action"
                                 key="action"
-                                render={(_, record) => (
-                                    <Button danger onClick={() => handleCancelTicket(record.ticketId)}>
-                                        Cancel Ticket
-                                    </Button>
-                                )}
+                                render={(_, record) => {
+                                    const isCancelled = record.ticketStatus === "Cancelled";
+                                    return (
+                                        <Button
+                                            danger={!isCancelled}
+                                            disabled={isCancelled}
+                                            style={isCancelled ? { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' } : {}}
+                                            onClick={() => handleCancelTicket(record.ticketId)}
+                                        >
+                                            {isCancelled ? 'Cancelled' : 'Cancel Ticket'}
+                                        </Button>
+                                    );
+                                }}
                             />
                         </Table>
                     </Col>
@@ -350,56 +366,44 @@ function Event() {
 
             {/* Tab 2: All Events */}
             <TabPane tab="All Events" key="2">
-                <Row justify="center" style={{ marginBottom: 16 }}>
-                    <Col span={24}>
-                        <Search
-                            placeholder="Search events"
-                            allowClear
-                            onSearch={handleSearch}
-                            enterButton
-                            style={{ marginBottom: 16 }}
-                        />
-                        <Select
-                            style={{ width: 200, marginRight: 16 }}
-                            placeholder="Filter by Club"
-                            onChange={handleClubFilter}
-                            allowClear
-                        >
-                            {clubOptions.map(clubId => (
-                                <Option key={clubId} value={clubId}>Club {clubId}</Option>
+                <Row gutter={[16, 16]} justify="left" style={{ marginBottom: 16 }}>
+                    <Col>
+                        <Search placeholder="Search events" onSearch={handleSearch} enterButton />
+                    </Col>
+                    <Col>
+                        <Select placeholder="Filter by Club" onChange={handleClubFilter} allowClear>
+                            {clubOptions.map(club => (
+                                <Option key={club.id} value={club.id}>{club.name}</Option>
                             ))}
                         </Select>
-
-                        {/* Date Filter */}
-                        <Select
-                            style={{ width: 200 }}
-                            placeholder="Filter by Date"
-                            onChange={handleDateFilter}
-                            allowClear
-                        >
-                            <Option value="past3days">Past 3 Days</Option>
-                            <Option value="pastweek">Past Week</Option>
-                            <Option value="thismonth">This Month</Option>
-                            <Option value="all">All Dates</Option>
-                        </Select>
-
-                        {/* Filtered Events Table */}
-                        <Table dataSource={filteredEvents} rowKey="id">
-                            <Column title="Title" dataIndex="title" key="title" />
-                            <Column title="Description" dataIndex="description" key="description" />
-                            <Column title="Date" dataIndex="date" key="date" />
-                            <Column title="Time" dataIndex="time" key="time" />
-                            <Column title="Venue" dataIndex="venueName" key="venueName" />
-                            <Column title="Action" key="action" render={(_, record) => (
-                                isEventRsvped(record.id) ? (
-                                    <Button disabled>Already Joined</Button>
-                                ) : (
-                                    <Button onClick={() => handleOpenModal(record.id)}>Get Ticket</Button>
-                                )
-                            )} />
-                        </Table>
                     </Col>
                 </Row>
+                <Table dataSource={filteredEvents} rowKey="id">
+                    <Column title="Title" dataIndex="title" key="title" />
+                    <Column title="Description" dataIndex="description" key="description" />
+                    <Column title="Date" dataIndex="date" key="date" />
+                    <Column title="Time" dataIndex="time" key="time" />
+                    <Column title="Venue" dataIndex="venueName" key="venueName" />
+                    <Column
+                        title="Action"
+                        key="action"
+                        render={(_, record) => {
+                            // Check if the event is RSVPed
+                            const rsvpedTicket = rsvpedEvents.find(event => event.eventId === record.id);
+                            const isRSVPed = rsvpedTicket && rsvpedTicket.ticketStatus !== "Cancelled";
+
+                            return (
+                                <Button type="primary" ghost
+                                    disabled={isRSVPed}
+                                    style={isRSVPed ? { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' } : {}}
+                                    onClick={() => handleOpenModal(record.id)}
+                                >
+                                    {isRSVPed ? 'Already Joined' : 'Get Ticket'}
+                                </Button>
+                            );
+                        }}
+                    />
+                </Table>
                 {/* Modal for getting tickets */}
                 <Modal
                     title="Get Ticket"
