@@ -31,8 +31,9 @@ export async function doCall(path, method, data) {
     };
 
     const accessToken = localStorage.getItem('accessToken');
-    const tokenType = localStorage.getItem('type')
-    if (accessToken) {
+    const tokenType = localStorage.getItem('type');
+
+    if (accessToken &&!path.includes('/auth/token')){
         headers.Authorization = `${tokenType} ${accessToken}`;
         // console.log("type",localStorage.getItem('type'));
     }
@@ -49,9 +50,16 @@ export async function doCall(path, method, data) {
         credentials: 'include',
     });
 
-    if (res.status === 401 && accessToken) {
-        await refreshToken(accessToken);
-        return doCall(path, method, data);
+
+    if (res.status === 401) {
+        if (path.includes('/auth/token')) {
+            return res;
+        }
+        if (accessToken) {
+            console.warn('Token expired, attempting to refresh...');
+            await refreshToken(accessToken);
+            return doCall(path, method, data);
+        }
     }
 
     if (res.status > 299) {
