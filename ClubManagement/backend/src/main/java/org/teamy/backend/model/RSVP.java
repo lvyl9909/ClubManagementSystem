@@ -42,8 +42,19 @@ public class RSVP {
     }
 
 
-
-
+    @Override
+    public String toString() {
+        return "RSVP{" +
+                "id=" + id +
+                ", submitterId=" + submitterId +
+                ", eventId=" + eventId +
+                ", event=" + event +
+                ", submitter=" + submitter +
+                ", number=" + number +
+                ", participantIds=" + participantIds +
+                ", participants=" + participants +
+                '}';
+    }
 
     public void setEvent(Event event) {
         this.event = event;

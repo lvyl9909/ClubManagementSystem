@@ -14,19 +14,24 @@ import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.service.EventService;
+import org.teamy.backend.service.StudentService;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @WebServlet("/student/events/*")
 public class EventController extends HttpServlet {
     EventService eventService;
+    StudentService studentService;
     private ObjectMapper mapper;
 
     @Override
     public void init() throws ServletException {
         eventService = (EventService) getServletContext().getAttribute(ContextListener.EVENT_SERVICE);
+        studentService = (StudentService) getServletContext().getAttribute(ContextListener.STUDENT_SERVICE);
         mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
 
     }
@@ -51,7 +56,6 @@ public class EventController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo(); // Gets the path info of the URL
-
         if (pathInfo.equals("/save")) {
             MarshallingRequestHandler.of(
                     mapper, // 使用Jackson的ObjectMapper
@@ -146,14 +150,22 @@ public class EventController extends HttpServlet {
     private ResponseEntity applyForRSVP(HttpServletRequest req) {
         try {
             // 从请求中解析必要的参数
-            int eventId = Integer.parseInt(req.getParameter("eventId"));
-            int studentId = Integer.parseInt(req.getParameter("studentId"));
-            int numTickets = Integer.parseInt(req.getParameter("numTickets"));
+            BufferedReader reader = req.getReader();
+            StringBuilder jsonBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonBuilder.append(line);
+            }
+            String json = jsonBuilder.toString();
 
-            // 获取 participates_id 的列表，假设是 JSON 格式
-            String participatesJson = req.getParameter("participates_id");
-            List<Integer> participates_id = mapper.readValue(participatesJson, new TypeReference<List<Integer>>() {});
-            eventService.applyForRSVP(eventId, studentId, numTickets, participates_id);
+            Map<String, Object> jsonMap = mapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+
+            int eventId = (Integer) jsonMap.get("eventId");
+            int numTickets = (Integer) jsonMap.get("numTickets");
+
+            List<Integer> participatesId = (List<Integer>) jsonMap.get("participants_id");
+            System.out.println("participant:"+participatesId);
+            eventService.applyForRSVP(eventId, Math.toIntExact(studentService.getCurrentStudent().getId()), numTickets, participatesId);
             return ResponseEntity.ok(null); // 成功返回空响应
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,

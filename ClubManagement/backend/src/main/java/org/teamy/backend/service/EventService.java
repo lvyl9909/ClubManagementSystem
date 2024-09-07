@@ -16,8 +16,10 @@ public class EventService {
     RSVPDataMapper rsvpDataMapper;
     TicketDataMapper ticketDataMapper;
 
-    public EventService(EventDataMapper eventDataMapper) {
+    public EventService(EventDataMapper eventDataMapper,RSVPDataMapper rsvpDataMapper,TicketDataMapper ticketDataMapper) {
         this.eventDataMapper = eventDataMapper;
+        this.rsvpDataMapper = rsvpDataMapper;
+        this.ticketDataMapper = ticketDataMapper;
     }
     public Event getEventById(Integer id) throws Exception {
         if (id <= 0) {
@@ -80,7 +82,7 @@ public class EventService {
 
         // 创建多个 Ticket 记录
         for (int i = 0; i < numTickets; i++) {
-            Ticket ticket = new Ticket(participates_id.get(i),rsvp.getId(), TicketStatus.Issued);
+            Ticket ticket = new Ticket(participates_id.get(i),rsvp.getId(),eventId, TicketStatus.Issued);
             unitOfWork.registerNewTicket(ticket);
         }
         // 提交事务

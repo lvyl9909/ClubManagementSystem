@@ -7,7 +7,7 @@ public class Ticket {
     private Integer rsvpId;
     private RSVP rsvp;
     private Event event;
-    private Integer EventId;
+    private Integer eventId;
     private TicketStatus status;
 
     public Ticket(Integer id,Integer studentId, Integer rsvpId, TicketStatus status,Integer eventId) {
@@ -15,11 +15,12 @@ public class Ticket {
         this.studentId = studentId;
         this.rsvpId = rsvpId;
         this.status = status;
-        this.EventId = eventId;
+        this.eventId = eventId;
     }
-    public Ticket(Integer studentId, Integer rsvpId, TicketStatus status) {
+    public Ticket(Integer studentId, Integer rsvpId,Integer eventId, TicketStatus status) {
         this.studentId = studentId;
         this.rsvpId = rsvpId;
+        this.eventId = eventId;
         this.status = status;
     }
 
@@ -32,7 +33,7 @@ public class Ticket {
                 ", rsvpId=" + rsvpId +
                 ", rsvp=" + rsvp +
                 ", event=" + event +
-                ", EventId=" + EventId +
+                ", EventId=" + eventId +
                 ", status=" + status +
                 '}';
     }
@@ -58,11 +59,11 @@ public class Ticket {
     }
 
     public Integer getEventId() {
-        return EventId;
+        return eventId;
     }
 
     public void setEventId(Integer eventId) {
-        EventId = eventId;
+        eventId = eventId;
     }
 
     public void setId(Integer id) {

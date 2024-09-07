@@ -51,7 +51,7 @@ public class ContextListener implements ServletContextListener {
         sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager );
         sce.getServletContext().setAttribute(CLUB_SERVICE, new ClubService(new ClubDataMapper(databaseConnectionManager)));
         sce.getServletContext().setAttribute(USER_DETAILS_SERVICE, new CustomUserDetailsService(new StudentDataMapper(databaseConnectionManager)));
-        sce.getServletContext().setAttribute(EVENT_SERVICE, new EventService(new EventDataMapper(databaseConnectionManager)));
+        sce.getServletContext().setAttribute(EVENT_SERVICE, new EventService(new EventDataMapper(databaseConnectionManager),new RSVPDataMapper(databaseConnectionManager),new TicketDataMapper(databaseConnectionManager)));
         sce.getServletContext().setAttribute(RSVP_SERVICE, new RSVPService(new RSVPDataMapper(databaseConnectionManager)));
         sce.getServletContext().setAttribute(TICKET_SERVICE, new TicketService(new TicketDataMapper(databaseConnectionManager),new RSVPDataMapper(databaseConnectionManager),new EventDataMapper(databaseConnectionManager)) );
         sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager),new ClubService(new ClubDataMapper(databaseConnectionManager)),new RSVPService(new RSVPDataMapper(databaseConnectionManager)),new TicketService(new TicketDataMapper(databaseConnectionManager),new RSVPDataMapper(databaseConnectionManager),new EventDataMapper(databaseConnectionManager)) ));

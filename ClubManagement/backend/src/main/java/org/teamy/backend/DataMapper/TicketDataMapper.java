@@ -42,14 +42,22 @@ public class TicketDataMapper {
         var connection = databaseConnectionManager.nextConnection();
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO tickets (student_id, rsvp,status,event_id) VALUES (?, ?,?,?)"
+                    "INSERT INTO tickets (student_id, rsvp,status,event_id) VALUES (?, ?,?::ticket_status,?)"
             );
+            System.out.println("studentid:"+ticket.getStudentId()+"RsvpId:"+ticket.getRsvpId()+"status:"+ticket.getStatus().name()+"EventId:"+ticket.getEventId());
             stmt.setInt(1, ticket.getStudentId());
             stmt.setInt(2, ticket.getRsvpId());
             stmt.setString(3,ticket.getStatus().name());
             stmt.setInt(4,ticket.getEventId());
-            stmt.executeUpdate();
-        } finally {
+            int rowsAffected = stmt.executeUpdate();  // 检查受影响的行数
+            System.out.println(rowsAffected);
+            if (rowsAffected == 0) {
+                throw new SQLException("Inserting ticket failed, no rows affected.");
+            }
+        } catch (SQLException e){
+            e.printStackTrace();  // 打印异常信息
+            throw new RuntimeException("Error inserting ticket: " + e.getMessage());
+        } finally{
             databaseConnectionManager.releaseConnection(connection);
         }
     }
