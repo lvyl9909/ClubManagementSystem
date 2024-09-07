@@ -41,10 +41,12 @@ public class TicketService {
         Map<Ticket,Event> result = new HashMap<>();
         // 查询 Ticket
         List<Ticket>tickets = ticketDataMapper.getTicketsFromStudent(Math.toIntExact(studentId));
-
         // 查询 Event
         for(Ticket ticket :tickets){
+            System.out.println("ticket:"+ticket);
+
             Event event = identityMapManager.getEvent(ticket.getEventId());
+            System.out.println(event);
             if (event == null) {
                 event = eventDataMapper.findEventById(ticket.getEventId());
                 identityMapManager.addEvent(event);

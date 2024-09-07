@@ -16,6 +16,7 @@ import org.teamy.backend.service.ClubService;
 import org.teamy.backend.service.StudentService;
 import org.teamy.backend.service.TicketService;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,7 @@ public class UserDetailedController extends HttpServlet {
     private ResponseEntity listTickets()  {
         Map<Ticket, Event> ticketInfo = null;
         try {
+            System.out.println("current student id:"+studentService.getCurrentStudent().getId());
             ticketInfo = ticketService.getTicketInfo(studentService.getCurrentStudent().getId());
         } catch (Exception e) {
             throw new RuntimeException(e);

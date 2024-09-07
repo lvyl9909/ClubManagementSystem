@@ -23,6 +23,20 @@ public class Ticket {
         this.status = status;
     }
 
+    @Override
+    public String toString() {
+        return "Ticket{" +
+                "id=" + id +
+                ", studentId=" + studentId +
+                ", student=" + student +
+                ", rsvpId=" + rsvpId +
+                ", rsvp=" + rsvp +
+                ", event=" + event +
+                ", EventId=" + EventId +
+                ", status=" + status +
+                '}';
+    }
+
     public Student getStudent() {
         return student;
     }
