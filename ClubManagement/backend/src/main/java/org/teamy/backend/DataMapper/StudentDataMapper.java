@@ -117,34 +117,54 @@ public class StudentDataMapper {
             databaseConnectionManager.releaseConnection(connection);
         }
     }
-//    public List<Student> findStudentByName(String name) throws Exception {
-//        var connection = databaseConnectionManager.nextConnection();
-//
-//        List<Student> students = null;
-//        try {
-//            students = new ArrayList<>();
-//
-//            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students WHERE name = ?");
-//            stmt.setString(1, name);
-//            ResultSet rs = stmt.executeQuery();
-//
-//            while (rs.next()) {
-//                Student student = new Student(
-//                        rs.getString("name"),
-//                        rs.getString("email"),
-//                        rs.getLong("phone_number"),
-//                        rs.getString("student_id")
-//                );
-//                students.add(student);
-//            }
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        } finally {
-//            databaseConnectionManager.releaseConnection(connection);
-//        }
-//
-//        return students;
-//    }
+    public List<Student> findStudentByName(String name) throws Exception {
+        var connection = databaseConnectionManager.nextConnection();
+
+        List<Student> students = null;
+        try {
+            students = new ArrayList<>();
+
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students WHERE LOWER(name) LIKE LOWER(?)");
+            stmt.setString(1, "%" + name + "%");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
+
+                students.add(student);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+
+        return students;
+    }
+    public List<Student> findStudentByEmail(String email) throws Exception {
+        var connection = databaseConnectionManager.nextConnection();
+
+        List<Student> students = null;
+        try {
+            students = new ArrayList<>();
+
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students WHERE LOWER(email) LIKE LOWER(?)");
+            stmt.setString(1, "%" + email + "%");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
+
+                students.add(student);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+
+        return students;
+    }
 
 //    public void saveStudent(Student student) throws Exception {
 //        var connection = databaseConnectionManager.nextConnection();

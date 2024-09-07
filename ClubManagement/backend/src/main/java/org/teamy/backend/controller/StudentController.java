@@ -19,7 +19,9 @@ import org.teamy.backend.service.StudentService;
 
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @WebServlet("/student/students/*")
@@ -40,9 +42,12 @@ public class StudentController  extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String idParam = req.getParameter("id"); // 获取查询字符串中的 "id" 参数
+        String nameParam = req.getParameter("query"); // 获取查询字符串中的 "title" 参数
 
         RequestHandler handler = () -> {
-            if (Objects.equals(idParam, "-1")) {
+            if (nameParam != null && !nameParam.trim().isEmpty()) {
+                return searchStudent(nameParam);  // 如果有 title 参数，则进行模糊搜索
+            }else if (Objects.equals(idParam, "-1")) {
                 return listStudents();
             }
             return null;
@@ -62,7 +67,19 @@ public class StudentController  extends HttpServlet {
     }
 
     private ResponseEntity listStudents() {
-        List<Student> students = studentService.getAllStudent();
-        return ResponseEntity.ok(students);
+        try {
+            List<Student> students = studentService.getAllStudent();
+            return ResponseEntity.ok(students);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private ResponseEntity searchStudent(String parameter){
+        try {
+            List<Student> students =studentService.searchStudent(parameter);
+            return ResponseEntity.ok(students);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

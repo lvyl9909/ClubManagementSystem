@@ -10,7 +10,9 @@ import org.teamy.backend.model.Student;
 import org.teamy.backend.model.Ticket;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StudentService {
     private StudentDataMapper studentDataMapper;
@@ -99,6 +101,31 @@ public class StudentService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    public List<Student> searchStudent(String parameters) {
+        Map<Long, Student> studentsMap = new HashMap<>();  // 使用学生 ID 去重
+        List<Student> studentsByName;
+        List<Student> studentsByEmail;
+
+        try {
+            // 模糊搜索按名字
+            studentsByName = studentDataMapper.findStudentByName(parameters);
+            for (Student student : studentsByName) {
+                studentsMap.put(student.getId(), student);  // 以学生 ID 为键，去重
+            }
+
+            // 模糊搜索按邮箱
+            studentsByEmail = studentDataMapper.findStudentByEmail(parameters);
+            for (Student student : studentsByEmail) {
+                studentsMap.put(student.getId(), student);  // 再次按学生 ID 存入 Map，若有重复会自动覆盖
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // 返回去重后的学生列表
+        return new ArrayList<>(studentsMap.values());
     }
 
 }
