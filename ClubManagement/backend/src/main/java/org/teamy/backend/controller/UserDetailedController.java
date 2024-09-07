@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.teamy.backend.DTO.TicketEventDTO;
 import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.model.*;
 import org.teamy.backend.model.exception.Error;
@@ -18,6 +19,7 @@ import org.teamy.backend.service.TicketService;
 
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +76,17 @@ public class UserDetailedController extends HttpServlet {
             throw new RuntimeException(e);
         }
 //        List<Ticket> tickets = studentService.getLazyLoadedTickets(studentService.getCurrentStudent());
-        return ResponseEntity.ok(ticketInfo);
+        return ResponseEntity.ok(convertMapToDTOList(ticketInfo));
+    }
+    public List<TicketEventDTO> convertMapToDTOList(Map<Ticket, Event> ticketInfo) {
+        List<TicketEventDTO> dtoList = new ArrayList<>();
+        for (Map.Entry<Ticket, Event> entry : ticketInfo.entrySet()) {
+            Ticket ticket = entry.getKey();
+            Event event = entry.getValue();
+            TicketEventDTO dto = new TicketEventDTO(ticket, event);
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
     private ResponseEntity listRSVP() {
         List<RSVP> rsvps = studentService.getLazyLoadedRSVP(studentService.getCurrentStudent());
