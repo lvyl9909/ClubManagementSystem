@@ -9,6 +9,7 @@ public class TicketEventDTO {
     private Integer ticketId;
     private String ticketStatus;
     private String title;
+    private Integer eventId;
     private String description;
     private String date;
     private String time;
@@ -21,6 +22,7 @@ public class TicketEventDTO {
         this.ticketId = ticket.getId();
         this.ticketStatus = ticket.getStatus().name();  // 假设 ticket status 是枚举类型
 
+        this.eventId =event.getId();
         this.title = event.getTitle();
         this.description = event.getDescription();
         this.date = event.getSqlDate().toString();
