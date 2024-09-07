@@ -8,6 +8,7 @@ import org.teamy.backend.model.Event;
 import org.teamy.backend.model.RSVP;
 import org.teamy.backend.model.Ticket;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,5 +56,12 @@ public class TicketService {
         }
         // 将 Ticket 和 Event 信息打包返回
         return result;
+    }
+    public void deleteTicket(Integer id){
+        try {
+            ticketDataMapper.deleteTicket(id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
