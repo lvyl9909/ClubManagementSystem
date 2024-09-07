@@ -31,10 +31,10 @@ export async function doCall(path, method, data) {
     };
 
     const accessToken = localStorage.getItem('accessToken');
-    const tokenType = localStorage.getItem('type');
+    const type = localStorage.getItem('type');
 
     if (accessToken &&!path.includes('/auth/token')){
-        headers.Authorization = `${tokenType} ${accessToken}`;
+        headers.Authorization = `${type} ${accessToken}`;
         // console.log("type",localStorage.getItem('type'));
     }
 

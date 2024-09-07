@@ -2,7 +2,7 @@ import React,{ useState, useEffect }  from "react";
 import {useParams} from "react-router";
 import {
     Table, Tag, Space, Button, Col, Row, Input, Form, Modal, InputNumber, TimePicker, DatePicker,
-    Select, Divider, Tabs, message
+    Select, Divider, Tabs, message, AutoComplete
 } from 'antd';
 import {Link} from "react-router-dom";
 import {doCall} from "../../router/api";
@@ -33,6 +33,7 @@ function Event() {
     const [error, setError] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
+    const [studentSearchResults, setStudentSearchResults] = useState([]);
 
     useEffect(() => {
         const fetchAllEvent = async () => {
@@ -197,24 +198,21 @@ function Event() {
     };
     // Submit the RSVP request with participant details
     const handleRsvpSubmit = async (values) => {
-        const numTickets = values.numTickets;
-        const numParticipants = values.participants.length;
-
-
-        if (numTickets !== numParticipants) {
-            message.error('The number of tickets must match the number of participants!');
-            return;
-        }
         try {
+            const participantsIds = values.participants.map(participant => participant.studentId);
+            const submitterId = values.submitterId;  // Assuming we fetch submitter's student ID separately
+
             const res = await doCall(`${path}/student/events/applyRSVP`, 'POST', {
                 eventId: selectedEvent,
+                studentId: submitterId,
                 numTickets: values.numTickets,
-                participants: values.participants,
+                participants_id: participantsIds,
             });
+
             if (res.ok) {
                 const updatedEvent = allEvents.find(event => event.id === selectedEvent);
                 setRsvpedEvents([...rsvpedEvents, updatedEvent]);
-                setIsModalVisible(false);
+                handleCloseModal();
                 form.resetFields();
             } else {
                 console.error('Error applying for RSVP:', res.statusText);
@@ -223,9 +221,18 @@ function Event() {
             console.error('Error applying for RSVP:', error);
         }
     };
-    const isEventRsvped = (eventId) => {
-        return rsvpedEvents.some(event => event.id === eventId);
+
+    const handleSearchStudent = async (value) => {
+        if (value) {
+            const res = await doCall(`${path}/student/students/email=${value}`, 'GET');
+            const studentsData = await res.json();
+            setStudentSearchResults(studentsData);
+        }
     };
+    const isEventRsvped = (eventId) => {
+        return rsvpedEvents.some(event => event.eventId === eventId);
+    };
+
 
 
 
@@ -241,16 +248,16 @@ function Event() {
                                 title="Title"
                                 dataIndex="title"
                                 key="title"
-                                render={text => <span style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>{text}</span>} // Title in blue
+                                render={text => <span style={{ color: 'royalblue', textDecoration: 'underline', cursor: 'pointer' }}>{text}</span>} // Title in blue
                             />
                             <Column title="Date" dataIndex="date" key="date" />
                             <Column title="Time" dataIndex="time" key="time" />
                             <Column title="Venue" dataIndex="venueName" key="venueName" />
                             <Column
                                 title="Status"
-                                dataIndex="status"
-                                key="status"
-                                render={status => <Tag color={getStatusTagColor(status)}>{status.toUpperCase()}</Tag>}
+                                dataIndex="ticketStatus"
+                                key="ticketStatus"
+                                render={ticketStatus => <Tag color={getStatusTagColor(ticketStatus)}>{ticketStatus}</Tag>}
                             />
                             <Column
                                 title="Action"
@@ -329,26 +336,22 @@ function Event() {
                                 <>
                                     {fields.map(({ key, name, fieldKey, ...restField }) => (
                                         <Row key={key} gutter={16} align="middle">
-                                            <Col span={10}>
+                                            <Col span={16}>
                                                 <Form.Item
                                                     {...restField}
-                                                    name={[name, 'name']}
-                                                    fieldKey={[fieldKey, 'name']}
-                                                    rules={[{ required: true, message: 'Please input the participant name!' }]}
-                                                    label="Participant Name"
+                                                    name={[name, 'studentId']}
+                                                    fieldKey={[fieldKey, 'studentId']}
+                                                    rules={[{ required: true, message: 'Please search and select a participant!' }]}
+                                                    label="Search Participant by Email"
                                                 >
-                                                    <Input placeholder="Enter participant name" />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={10}>
-                                                <Form.Item
-                                                    {...restField}
-                                                    name={[name, 'email']}
-                                                    fieldKey={[fieldKey, 'email']}
-                                                    rules={[{ required: true, message: 'Please input the participant email!' }, { type: 'email', message: 'Please input a valid email!' }]}
-                                                    label="Email"
-                                                >
-                                                    <Input placeholder="Enter participant email" />
+                                                    <AutoComplete
+                                                        placeholder="Enter email"
+                                                        onSearch={handleSearchStudent}
+                                                        options={studentSearchResults.map(student => ({
+                                                            label: `${student.name} (${student.email})`,
+                                                            value: student.studentId,
+                                                        }))}
+                                                    />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={4}>
