@@ -2,7 +2,7 @@ import React,{ useState, useEffect }  from "react";
 import {useParams} from "react-router";
 import {
     Table, Tag, Space, Button, Col, Row, Input, Form, Modal, InputNumber, TimePicker, DatePicker,
-    Select, Divider,Tabs
+    Select, Divider, Tabs, message
 } from 'antd';
 import {Link} from "react-router-dom";
 import {doCall} from "../../router/api";
@@ -15,12 +15,14 @@ const { TabPane } = Tabs;
 
 
 
+
 function Event() {
     //const { clubId } = useParams();
     const path = process.env.REACT_APP_API_BASE_URL
     //const { id } = useParams();
     const [allEvents, setAllEvents] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const [rsvpedEvents, setRsvpedEvents] = useState([]);
     // const [rsvpedEvents] = useState([
     //     { id: 1, title: 'AI Seminar', description: 'Discussing AI trends', date: '2024-09-10', time: '14:00', venueName: 'Room A'},
@@ -103,13 +105,9 @@ function Event() {
         if (status === 'pending') return 'geekblue';
         return 'volcano';
     };
-    const onSearch = (value, _e, info) => console.log(info?.source, value);
 
-    // // const getStatusTagColor = (status) => {
-    // //     if (status === 'confirmed') return 'green';
-    // //     if (status === 'pending') return 'gold';
-    // //     return 'volcano';
-    // };
+
+
 
     // const handleRsvp = async (eventId) => {
     //     try {
@@ -188,27 +186,48 @@ function Event() {
         }
     };
 
-    // const handleGetTicket = async (eventId) => {
-    //     try {
-    //         const res = await doCall(`${path}/student/events/applyRSVP`, 'POST', {
-    //             eventId: eventId,
-    //             studentId: 123,
-    //             numTickets: 1,
-    //         });
-    //         if (res.ok) {
-    //             const updatedEvent = allEvents.find(event => event.id === eventId);
-    //             setRsvpedEvents([...rsvpedEvents, updatedEvent]);
-    //         } else {
-    //             console.error('Error applying for RSVP:', res.statusText);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error applying for RSVP:', error);
-    //     }
-    // };
-    //
-    // const isEventRsvped = (eventId) => {
-    //     return rsvpedEvents.some(event => event.id === eventId);
-    // };
+    const handleOpenModal = (eventId) => {
+        console.log("Opening modal for event ID:", eventId);
+        setSelectedEvent(eventId);
+        setIsModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalVisible(false);  // Hide the modal
+    };
+    // Submit the RSVP request with participant details
+    const handleRsvpSubmit = async (values) => {
+        const numTickets = values.numTickets;
+        const numParticipants = values.participants.length;
+
+
+        if (numTickets !== numParticipants) {
+            message.error('The number of tickets must match the number of participants!');
+            return;
+        }
+        try {
+            const res = await doCall(`${path}/student/events/applyRSVP`, 'POST', {
+                eventId: selectedEvent,
+                numTickets: values.numTickets,
+                participants: values.participants,
+            });
+            if (res.ok) {
+                const updatedEvent = allEvents.find(event => event.id === selectedEvent);
+                setRsvpedEvents([...rsvpedEvents, updatedEvent]);
+                setIsModalVisible(false);
+                form.resetFields();
+            } else {
+                console.error('Error applying for RSVP:', res.statusText);
+            }
+        } catch (error) {
+            console.error('Error applying for RSVP:', error);
+        }
+    };
+    const isEventRsvped = (eventId) => {
+        return rsvpedEvents.some(event => event.id === eventId);
+    };
+
+
 
     return (
         <Tabs defaultActiveKey="1">
@@ -271,24 +290,92 @@ function Event() {
                             <Column title="Date" dataIndex="date" key="date" />
                             <Column title="Time" dataIndex="time" key="time" />
                             <Column title="Venue" dataIndex="venueName" key="venueName" />
-                            {/*<Column*/}
-                            {/*    title="Action"*/}
-                            {/*    key="action"*/}
-                            {/*    render={(_, record) => (*/}
-                            {/*        isEventRsvped(record.id) ? (*/}
-                            {/*            <Button type="default" disabled>*/}
-                            {/*                Already Joined*/}
-                            {/*            </Button>*/}
-                            {/*        ) : (*/}
-                            {/*            <Button type="primary" onClick={() => handleGetTicket(record.id)}>*/}
-                            {/*                Get Ticket*/}
-                            {/*            </Button>*/}
-                            {/*        )*/}
-                            {/*    )}*/}
-                            {/*/>*/}
+                            <Column
+                                title="Action"
+                                key="action"
+                                render={(_, record) => (
+                                    isEventRsvped(record.id) ? (
+                                        <Button type="default" disabled>
+                                            Already Joined
+                                        </Button>
+                                    ) : (
+                                        <Button  onClick={() => handleOpenModal(record.id)}>
+                                            Get Ticket
+                                        </Button>
+                                    )
+                                )}
+                            />
                         </Table>
                     </Col>
                 </Row>
+                {/* Modal for getting tickets */}
+                <Modal
+                    title="Get Ticket"
+                    visible={isModalVisible}
+                    onCancel={handleCloseModal}
+                    footer={null}
+                >
+                    <Form form={form} onFinish={handleRsvpSubmit}>
+                        <Form.Item
+                            name="numTickets"
+                            label="Number of Tickets"
+                            rules={[{ required: true, message: 'Please input the number of tickets!' }]}
+                        >
+                            <InputNumber min={1} max={5} />
+                        </Form.Item>
+
+                        <Form.List name="participants">
+                            {(fields, { add, remove }) => (
+                                <>
+                                    {fields.map(({ key, name, fieldKey, ...restField }) => (
+                                        <Row key={key} gutter={16} align="middle">
+                                            <Col span={10}>
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, 'name']}
+                                                    fieldKey={[fieldKey, 'name']}
+                                                    rules={[{ required: true, message: 'Please input the participant name!' }]}
+                                                    label="Participant Name"
+                                                >
+                                                    <Input placeholder="Enter participant name" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={10}>
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, 'email']}
+                                                    fieldKey={[fieldKey, 'email']}
+                                                    rules={[{ required: true, message: 'Please input the participant email!' }, { type: 'email', message: 'Please input a valid email!' }]}
+                                                    label="Email"
+                                                >
+                                                    <Input placeholder="Enter participant email" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={4}>
+                                                <Button type="link" onClick={() => remove(name)} danger>
+                                                    Remove
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    ))}
+                                    <Form.Item>
+                                        <Button type="dashed" onClick={() => add()} block>
+                                            Add Participant
+                                        </Button>
+                                    </Form.Item>
+                                </>
+                            )}
+                        </Form.List>
+
+                        <Form.Item>
+                            <Row justify="center">
+                                <Button type="primary" htmlType="submit">
+                                    Submit RSVP
+                                </Button>
+                            </Row>
+                        </Form.Item>
+                    </Form>
+                </Modal>
             </TabPane>
         </Tabs>
     );
