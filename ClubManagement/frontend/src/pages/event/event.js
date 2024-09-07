@@ -34,6 +34,8 @@ function Event() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
     const [studentSearchResults, setStudentSearchResults] = useState([]);
+    const [participants, setParticipants] = useState([{ name: '', email: '' }]);
+    const [participantsIds, setParticipantsIds] = useState([]);
 
     useEffect(() => {
         const fetchAllEvent = async () => {
@@ -198,15 +200,17 @@ function Event() {
     };
     // Submit the RSVP request with participant details
     const handleRsvpSubmit = async (values) => {
+        if (values.numTickets !== participantsIds.length) {
+            message.error('Number of tickets must match the number of participants.');
+            return;
+        }
         try {
-            const participantsIds = values.participants.map(participant => participant.studentId);
             const submitterId = values.submitterId;  // Assuming we fetch submitter's student ID separately
-
             const res = await doCall(`${path}/student/events/applyRSVP`, 'POST', {
                 eventId: selectedEvent,
                 studentId: submitterId,
                 numTickets: values.numTickets,
-                participants_id: participantsIds,
+                participants_id: participantsIds,  // Send participant IDs stored internally
             });
 
             if (res.ok) {
@@ -214,6 +218,7 @@ function Event() {
                 setRsvpedEvents([...rsvpedEvents, updatedEvent]);
                 handleCloseModal();
                 form.resetFields();
+                setParticipantsIds([]); // Clear participants after submission
             } else {
                 console.error('Error applying for RSVP:', res.statusText);
             }
@@ -222,6 +227,7 @@ function Event() {
         }
     };
 
+
     const handleSearchStudent = async (value) => {
         if (value) {
             const res = await doCall(`${path}/student/students/?query=${value}`, 'GET');
@@ -229,6 +235,24 @@ function Event() {
             setStudentSearchResults(studentsData);
         }
     };
+    // Handle selection of a student from the AutoComplete dropdown
+    const handleSelectStudent = (value, index) => {
+        const selectedStudent = studentSearchResults.find(student => student.email === value);
+        if (selectedStudent) {
+            const participants = form.getFieldValue('participants') || [];
+            participants[index] = { ...participants[index], email: selectedStudent.email };
+            form.setFieldsValue({ participants });
+
+            // Store the student ID for backend submission
+            setParticipantsIds(prevIds => {
+                const updatedIds = [...prevIds];
+                updatedIds[index] = selectedStudent.id;
+                return updatedIds;
+            });
+        }
+    };
+
+
     const isEventRsvped = (eventId) => {
         return rsvpedEvents.some(event => event.eventId === eventId);
     };
@@ -334,22 +358,23 @@ function Event() {
                         <Form.List name="participants">
                             {(fields, { add, remove }) => (
                                 <>
-                                    {fields.map(({ key, name, fieldKey, ...restField }) => (
+                                    {fields.map(({ key, name, fieldKey, ...restField }, index) => (
                                         <Row key={key} gutter={16} align="middle">
                                             <Col span={16}>
                                                 <Form.Item
                                                     {...restField}
-                                                    name={[name, 'studentId']}
-                                                    fieldKey={[fieldKey, 'studentId']}
+                                                    name={[name, 'email']}
+                                                    fieldKey={[fieldKey, 'email']}
                                                     rules={[{ required: true, message: 'Please search and select a participant!' }]}
                                                     label="Search Participant by Email"
                                                 >
                                                     <AutoComplete
                                                         placeholder="Enter email"
                                                         onSearch={handleSearchStudent}
+                                                        onSelect={(value) => handleSelectStudent(value, index)}
                                                         options={studentSearchResults.map(student => ({
                                                             label: `${student.name} (${student.email})`,
-                                                            value: student.studentId,
+                                                            value: student.email
                                                         }))}
                                                     />
                                                 </Form.Item>
