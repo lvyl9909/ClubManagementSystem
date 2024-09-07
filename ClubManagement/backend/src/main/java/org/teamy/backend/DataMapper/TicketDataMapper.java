@@ -65,7 +65,7 @@ public class TicketDataMapper {
         var connection = databaseConnectionManager.nextConnection();
         try {
             // 更新事件状态为 "Cancelled"
-            PreparedStatement stmt = connection.prepareStatement("UPDATE tickets SET status = ? WHERE ticket_id = ?");
+            PreparedStatement stmt = connection.prepareStatement("UPDATE tickets SET status = ?::ticket_status WHERE ticket_id = ?");
             stmt.setString(1, "Cancelled");
             stmt.setInt(2, ticketId);
 
