@@ -70,7 +70,7 @@ public class EventDataMapper {
         List<Event> events = new ArrayList<>();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM events WHERE title LIKE ?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM events WHERE LOWER(title) LIKE LOWER(?)");
             stmt.setString(1, "%" + title + "%");  // 使用模糊匹配
             ResultSet rs = stmt.executeQuery();
 

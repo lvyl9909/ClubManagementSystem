@@ -58,7 +58,6 @@ public class UserDetailedController extends HttpServlet {
                             .build()
             );        };
         MarshallingRequestHandler.of(mapper, resp, handler).handle();
-
     }
 
     private ResponseEntity listClubs() {
