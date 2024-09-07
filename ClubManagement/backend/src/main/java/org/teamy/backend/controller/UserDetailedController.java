@@ -7,24 +7,23 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.config.ContextListener;
-import org.teamy.backend.model.Club;
-import org.teamy.backend.model.RSVP;
-import org.teamy.backend.model.Student;
-import org.teamy.backend.model.Ticket;
+import org.teamy.backend.model.*;
 import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.service.ClubService;
 import org.teamy.backend.service.StudentService;
+import org.teamy.backend.service.TicketService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/student/userdetailed/*")
 public class UserDetailedController extends HttpServlet {
     StudentService studentService;
-
+    TicketService ticketService;
     ClubService clubService;
     private ObjectMapper mapper;
 
@@ -32,6 +31,7 @@ public class UserDetailedController extends HttpServlet {
     public void init() throws ServletException {
         clubService = (ClubService) getServletContext().getAttribute(ContextListener.CLUB_SERVICE);
         studentService = (StudentService) getServletContext().getAttribute(ContextListener.STUDENT_SERVICE);
+        ticketService = (TicketService) getServletContext().getAttribute(ContextListener.TICKET_SERVICE);
         mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
         System.out.println("success init");
     }
@@ -65,9 +65,15 @@ public class UserDetailedController extends HttpServlet {
         List<Club> clubs = studentService.getLazyLoadedClubs(studentService.getCurrentStudent());
         return ResponseEntity.ok(clubs);
     }
-    private ResponseEntity listTickets() {
-        List<Ticket> tickets = studentService.getLazyLoadedTickets(studentService.getCurrentStudent());
-        return ResponseEntity.ok(tickets);
+    private ResponseEntity listTickets()  {
+        Map<Ticket, Event> ticketInfo = null;
+        try {
+            ticketInfo = ticketService.getTicketInfo(studentService.getCurrentStudent().getId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+//        List<Ticket> tickets = studentService.getLazyLoadedTickets(studentService.getCurrentStudent());
+        return ResponseEntity.ok(ticketInfo);
     }
     private ResponseEntity listRSVP() {
         List<RSVP> rsvps = studentService.getLazyLoadedRSVP(studentService.getCurrentStudent());

@@ -77,7 +77,27 @@ public class TicketDataMapper {
         List<Ticket> tickets = new ArrayList<>();
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM tickets WHERE event_id = ?");
-            stmt.setInt(1, eventId);  // 使用模糊匹配
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Ticket ticket = new Ticket( rs.getInt("ticket_id"), rs.getInt("student_id"),rs.getInt("rsvp"), TicketStatus.valueOf(rs.getString("status")) ,rs.getInt("event_id")
+                );
+                tickets.add(ticket);
+            }
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+
+        return tickets;
+    }
+
+    public List<Ticket> getTicketsFromStudent(Integer studentId) throws SQLException {
+        var connection = databaseConnectionManager.nextConnection();
+        List<Ticket> tickets = new ArrayList<>();
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM tickets WHERE student_id = ?");
+            stmt.setInt(1, studentId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
