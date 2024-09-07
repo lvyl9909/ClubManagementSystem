@@ -224,7 +224,7 @@ function Event() {
 
     const handleSearchStudent = async (value) => {
         if (value) {
-            const res = await doCall(`${path}/student/students/email=${value}`, 'GET');
+            const res = await doCall(`${path}/student/students/?query=${value}`, 'GET');
             const studentsData = await res.json();
             setStudentSearchResults(studentsData);
         }

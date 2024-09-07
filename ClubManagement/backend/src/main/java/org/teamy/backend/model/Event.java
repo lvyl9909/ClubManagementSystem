@@ -113,7 +113,7 @@ public class Event {
     }
 
     public Date getSqlDate() {
-        return Date.valueOf(LocalDate.parse(date));  // 在这里手动转换为 java.sql.Date
+        return Date.valueOf(LocalDate.parse(date));
     }
 
     public String getTime() {

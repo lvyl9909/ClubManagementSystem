@@ -32,6 +32,12 @@ public class Student extends Person{
         this.clubId = new ArrayList<>();
         this.ticketsId = new ArrayList<>();
     }
+    public Student(Long id, String username, String name, String email, Long phoneNumber, boolean isActive) {
+        super(id, name,email,  phoneNumber, username, isActive);
+        this.rsvpsId = new ArrayList<>();
+        this.clubId = new ArrayList<>();
+        this.ticketsId = new ArrayList<>();
+    }
 
     public Student(String name, String email, Long phoneNumber) {
         super(name, email, phoneNumber);

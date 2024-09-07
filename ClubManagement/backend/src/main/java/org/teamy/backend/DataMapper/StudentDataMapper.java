@@ -129,7 +129,7 @@ public class StudentDataMapper {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
+                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getBoolean("isactive"));
 
                 students.add(student);
             }
@@ -153,7 +153,7 @@ public class StudentDataMapper {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
+                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getBoolean("isactive"));
 
                 students.add(student);
             }
