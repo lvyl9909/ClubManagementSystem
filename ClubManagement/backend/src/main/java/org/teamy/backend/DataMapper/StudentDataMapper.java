@@ -97,6 +97,26 @@ public class StudentDataMapper {
         }
         return ids;
     }
+
+    public List<Student> getAllStudent(){
+        var connection = databaseConnectionManager.nextConnection();
+        List<Student> students = new ArrayList<>();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
+                students.add(student);
+            }
+            return students;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+    }
 //    public List<Student> findStudentByName(String name) throws Exception {
 //        var connection = databaseConnectionManager.nextConnection();
 //

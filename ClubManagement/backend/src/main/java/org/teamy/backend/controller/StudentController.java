@@ -43,7 +43,7 @@ public class StudentController  extends HttpServlet {
 
         RequestHandler handler = () -> {
             if (Objects.equals(idParam, "-1")) {
-                return listClubs();
+                return listStudents();
             }
             return null;
         };
@@ -61,7 +61,8 @@ public class StudentController  extends HttpServlet {
 
     }
 
-    private void listStudents(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.getWriter().write("Listing all students...");
+    private ResponseEntity listStudents() {
+        List<Student> students = studentService.getAllStudent();
+        return ResponseEntity.ok(students);
     }
 }

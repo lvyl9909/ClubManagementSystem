@@ -93,5 +93,12 @@ public class StudentService {
         }
         return student.getRsvps();
     }
+    public List<Student> getAllStudent(){
+        try {
+            return studentDataMapper.getAllStudent();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
