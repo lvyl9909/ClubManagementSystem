@@ -48,14 +48,14 @@ public class Event {
     }
 
 
-    public Event(Integer id,String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId,String status,Integer capacity) {
+    public Event(Integer id,String title, String description, Date date, Time time, Integer venueId, BigDecimal cost, Integer clubId,String status,Integer capacity) {
         this.id=id;
         this.clubId = clubId;
         this.title = title;
         this.description = description;
         this.date = date.toString();
         this.time = time.toString();
-        this.venueName = venueName;
+        this.venueId = venueId;
         this.cost = cost;
         this.status = EventStatus.valueOf(status);
         this.capacity = capacity;

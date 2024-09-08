@@ -32,7 +32,7 @@ public class EventDataMapper {
                         rs.getString("description"),
                         rs.getDate("date"),
                         rs.getTime("time"),
-                        rs.getString("venue"),            // 你可能需要确认 venue 是字符串还是 ID
+                        rs.getInt("venue"),            // 你可能需要确认 venue 是字符串还是 ID
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
@@ -83,7 +83,7 @@ public class EventDataMapper {
                         rs.getString("description"),
                         rs.getDate("date"),
                         rs.getTime("time"),
-                        rs.getString("venue"),            // 你可能需要确认 venue 是字符串还是 ID
+                        rs.getInt("venue"),            // 你可能需要确认 venue 是字符串还是 ID
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
@@ -137,7 +137,7 @@ public class EventDataMapper {
                         rs.getString("description"),
                         rs.getDate("date"),
                         rs.getTime("time"),
-                        rs.getString("venue"),            // 你可能需要确认 venue 是字符串还是 ID
+                        rs.getInt("venue"),            // 你可能需要确认 venue 是字符串还是 ID
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
