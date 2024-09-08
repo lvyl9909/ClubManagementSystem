@@ -79,6 +79,7 @@ public class StudentClubDataMapper {
                 throw new RuntimeException("No record found with clubId: " + clubId + " and studentId: " + studentId);
             }
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         } finally {
             databaseConnectionManager.releaseConnection(connection);

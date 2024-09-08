@@ -74,7 +74,12 @@ public class EventController extends HttpServlet {
                     resp,
                     () -> updateEvent(req)
             ).handle();
-        } else if (pathInfo.equals("/delete")) {
+        }
+    }
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo(); // Gets the path info of the URL
+        if (pathInfo.equals("/delete")) {
             MarshallingRequestHandler.of(
                     mapper,
                     resp,
@@ -88,7 +93,7 @@ public class EventController extends HttpServlet {
             List<Integer> eventsId = mapper.readValue(req.getInputStream(), new TypeReference<List<Integer>>() {});
             // 调用删除事件的方法
             eventService.deleteEvent(eventsId);
-            return ResponseEntity.ok(null);
+            return ResponseEntity.delete(null);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()

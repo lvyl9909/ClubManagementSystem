@@ -31,4 +31,8 @@ public class ResponseEntity {
         return new ResponseEntity(HttpServletResponse.SC_CREATED, body);
     }
 
+    public static ResponseEntity delete(Object body) {
+        return new ResponseEntity(HttpServletResponse.SC_NO_CONTENT, body);
+    }
+
 }

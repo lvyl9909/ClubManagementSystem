@@ -50,7 +50,7 @@ public class StudentClubController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();  // 获取 URL 的路径信息
-
+        System.out.println(pathInfo);
         if (pathInfo.equals("/add")) {
             MarshallingRequestHandler.of(
                     mapper,
@@ -72,6 +72,7 @@ public class StudentClubController extends HttpServlet {
             Integer clubId = Integer.parseInt(req.getParameter("clubId"));
             Integer studentId = Integer.parseInt(req.getParameter("studentId"));
 
+            System.out.println(clubId+studentId);
             // 调用服务层方法
             studentClubService.deleteAdmin(clubId, studentId);
 
