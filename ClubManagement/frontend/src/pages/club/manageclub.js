@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, Card, Table, Button, Input, Space } from 'antd';
 import "./club.css";
+import {useParams} from "react-router";
 import {doCall} from "../../router/api";
 
 const { Search } = Input;
@@ -11,7 +12,7 @@ function ManageClub() {
     const [error, setError] = useState(null);
 
 
-    const id = 1;
+    const id = useParams().id;
     const [clubDetails, setClubDetails] = useState(null);
     const [membersData, setMembersData] = useState([]);
 
@@ -26,7 +27,7 @@ function ManageClub() {
 
     const membersColumns = [
         { title: 'Name', dataIndex: 'name', key: 'name', align: 'center' },
-        { title: 'Student ID', dataIndex: 'studentId', key: 'studentId', align: 'center' },
+        { title: 'Student Username', dataIndex: 'username', key: 'username', align: 'center' },
         {
             title: 'Action',
             key: 'action',
