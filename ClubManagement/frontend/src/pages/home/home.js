@@ -40,6 +40,13 @@ const Home = () => {
         return <p style={{ color: 'red' }}>{error}</p>;
     }
 
+    const getRoleText = (roles) => {
+        // console.log("Role value:", roles[0]);
+        if (roles[0] === 'USER') return 'Student';
+        if (roles[0] === 'ADMIN') return 'Faculty Admin';
+        return 'Unknown Role';
+    };
+
     return(
     <Row className="home">
         <Col span={8}>
@@ -48,12 +55,12 @@ const Home = () => {
                     <img src={userImg} />
                     <div className="userinfo">
                         <p className="name">{user.name}</p>
-                        <p className="access">Admin</p>
+                        <p className="access">{getRoleText(user.roles)}</p>
                     </div>
                 </div>
                 <div className="login-info">
-                    <p>Student ID:<span>1435712</span></p>
-                    {/*<p><span>Master of software engineering</span></p>*/}
+                    <p>User Name:<span>{user.username}</span></p>
+                    <p>Email:<span>{user.email}</span></p>
                 </div>
             </Card>
         </Col>

@@ -14,6 +14,9 @@ const { Search } = Input;
 const { TabPane } = Tabs;
 
 
+// export const [studentSearchResults, setStudentSearchResults] = useState([]);
+// export const [participantsIds, setParticipantsIds] = useState([]);
+// export const [form] = Form.useForm();
 
 
 
@@ -287,7 +290,6 @@ function Event() {
         }
     };
 
-
     const handleSearchStudent = async (value) => {
         if (value) {
             const res = await doCall(`${path}/student/students/?query=${value}`, 'GET');
@@ -295,7 +297,7 @@ function Event() {
             setStudentSearchResults(studentsData);
         }
     };
-    // Handle selection of a student from the AutoComplete dropdown
+// Handle selection of a student from the AutoComplete dropdown
     const handleSelectStudent = (value, index) => {
         const selectedStudent = studentSearchResults.find(student => student.email === value);
         if (selectedStudent) {
@@ -311,6 +313,8 @@ function Event() {
             });
         }
     };
+
+
     const handleRemoveParticipant = (index) => {
         setParticipantsIds(prevIds => {
             const updatedIds = [...prevIds];

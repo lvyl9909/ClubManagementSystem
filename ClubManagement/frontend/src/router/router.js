@@ -13,11 +13,11 @@ import PrivateRoute from "./PrivateRoute"; // 引入 PrivateRoute 组件
 const routes = createBrowserRouter([
     {
         path: '/',
-        element: <Main />, // 使用 JSX 元素
+        element: <Main />,
         children: [
             {
                 path: '/',
-                element: <Navigate to="/login" replace /> // 默认重定向到 login
+                element: <Navigate to="/login" replace />
             },
             {
                 path: 'home',
@@ -33,7 +33,7 @@ const routes = createBrowserRouter([
                     <PrivateRoute>
                         <Club />
                     </PrivateRoute>
-                ) // 保护 Club 路由
+                )
             },
             {
                 path: '/club/manage/:id',
