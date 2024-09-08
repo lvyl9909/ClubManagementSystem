@@ -21,6 +21,7 @@ public class Event {
     private BigDecimal cost;
     private Integer clubId;
     private Integer capacity;
+    private Integer currentCapacity;
     private List<RSVP> rsvps;
     private EventStatus status;
     public Integer getClubId() {
@@ -47,7 +48,7 @@ public class Event {
     }
 
 
-    public Event(Integer id,String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId,String status) {
+    public Event(Integer id,String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId,String status,Integer capacity) {
         this.id=id;
         this.clubId = clubId;
         this.title = title;
@@ -57,8 +58,10 @@ public class Event {
         this.venueName = venueName;
         this.cost = cost;
         this.status = EventStatus.valueOf(status);
+        this.capacity = capacity;
+        this.currentCapacity = capacity;
     }
-    public Event(String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId) {
+    public Event(String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId,Integer capacity) {
         this.clubId = clubId;
         this.title = title;
         this.description = description;
@@ -67,6 +70,8 @@ public class Event {
         this.venueName = venueName;
         this.cost = cost;
         this.status = EventStatus.Ongoing;
+        this.capacity =capacity;
+        this.currentCapacity = capacity;
     }
 
     public Event() {
@@ -176,4 +181,11 @@ public class Event {
         this.clubId = clubId;
     }
 
+    public Integer getCurrentCapacity() {
+        return currentCapacity;
+    }
+
+    public void setCurrentCapacity(Integer currentCapacity) {
+        this.currentCapacity = currentCapacity;
+    }
 }
