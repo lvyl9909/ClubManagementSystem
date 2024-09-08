@@ -58,10 +58,15 @@ function ManageClub() {
     const [venues, setVenues] = useState([]); // State to hold the list of venues
     const [createModalVisible, setCreateModalVisible] = useState(false);
 
+    const [fundingApplications, setFundingApplications] = useState([]);
+    const [createFundingModalVisible, setCreateFundingModalVisible] = useState(false); // Modal for creating new funding
 
 
 
-        const fetchStudents = async () => {
+
+
+
+    const fetchStudents = async () => {
             try {
                 const response = await doCall(`${path}/student/admin/?id=${id}`, 'GET');
                 const data = await response.json();
@@ -224,6 +229,8 @@ function ManageClub() {
     const getStatusTagColor = (status) => {
         if (status === 'Ongoing') return 'green';
         if (status === 'Cancelled') return 'red';
+        if (status === 'submitted') return 'blue';
+        if (status === 'reviewed') return 'purple'
         return 'volcano';
     };
 
@@ -350,6 +357,49 @@ function ManageClub() {
         } catch (error) {
             console.error('Error creating event:', error);
             message.error('An error occurred while creating the event');
+        }
+    };
+
+    const fetchFundingApplications = async () => {
+        try {
+            const res = await doCall(`${path}/student/fundingappliction?clubid=${id}`, 'GET');
+            if (res.ok) {
+                const data = await res.json();
+                setFundingApplications(data);  // Set the funding applications in state
+            } else {
+                message.error('Failed to fetch funding applications');
+            }
+        } catch (error) {
+            console.error('Error fetching funding applications:', error);
+            message.error('An error occurred while fetching funding applications');
+        }
+    };
+    useEffect(() => {
+        fetchFundingApplications();
+    }, [id]);
+
+    const handleCreateFundingApplication = async (values) => {
+        try {
+            const newFunding = {
+                title: values.title,
+                description: values.description,
+                amount: values.amount,
+                semester: values.semester,
+                date: moment().format('YYYY-MM-DD'),
+                clubId: id,
+            };
+
+            const res = await doCall(`${path}/student/fundingappliction/save`, 'POST', newFunding);
+            if (res.ok) {
+                message.success('Funding application submitted successfully');
+                setCreateFundingModalVisible(false);  // Close the modal
+                fetchFundingApplications();  // Refresh the funding list
+            } else {
+                message.error('Failed to submit funding application');
+            }
+        } catch (error) {
+            console.error('Error submitting funding application:', error);
+            message.error('An error occurred while submitting the funding application');
         }
     };
 
@@ -567,7 +617,59 @@ function ManageClub() {
                 </TabPane>
 
                 <TabPane tab="Funding" key="3">
-                    <h3>Funding Section</h3>
+                    <Row gutter={[16, 16]} style={{ width: '100%' }}>
+                        <Col span={24}>
+                            <Card title="Club Funding Applications">
+                                <Button
+                                    type="primary"
+                                    style={{ marginBottom: '16px' }}
+                                    onClick={() => setCreateFundingModalVisible(true)}
+                                >
+                                    Create New Funding Application
+                                </Button>
+                                <Table dataSource={fundingApplications} rowKey="id">
+                                    <Column title="Description" dataIndex="description" key="description" />
+                                    <Column title="Amount" dataIndex="amount" key="username" />
+                                    <Column title="Semester" dataIndex="semester" key="semester" />
+                                    <Column title="date" dataIndex="date" key="date" />
+                                    <Column title="status" dataIndex="status" key="status"
+                                            render={status => <Tag color={getStatusTagColor(status)}>{status}</Tag>}/>
+                                </Table>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    {/* Modal for creating new funding application */}
+                    <Modal
+                        visible={createFundingModalVisible}
+                        title="Create New Funding Application"
+                        onCancel={() => setCreateFundingModalVisible(false)}
+                        footer={null}
+                    >
+                        <Form form={form} onFinish={handleCreateFundingApplication}>
+                            <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please enter the title' }]}>
+                                <Input />
+                            </Form.Item>
+                            <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Please enter the description' }]}>
+                                <Input.TextArea rows={3} />
+                            </Form.Item>
+                            <Form.Item name="amount" label="Amount" rules={[{ required: true, message: 'Please enter the amount' }]}>
+                                <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+                            </Form.Item>
+                            <Form.Item name="semester" label="Semester" rules={[{ required: true, message: 'Please select a semester' }]}>
+                                <Select placeholder="Select a semester">
+                                    <Option value={1}>1</Option>
+                                    <Option value={2}>2</Option>
+                                </Select>
+                            </Form.Item>
+                            {/* The date will be set to today's date automatically */}
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit">
+                                    Submit Application
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
                 </TabPane>
             </Tabs>
         </div>
