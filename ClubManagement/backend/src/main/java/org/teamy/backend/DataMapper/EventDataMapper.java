@@ -158,7 +158,7 @@ public class EventDataMapper {
         var connection = databaseConnectionManager.nextConnection();
 
         // SQL 更新语句，更新指定的事件
-        String query = "UPDATE events SET title = ?, description = ?, date = ?, time = ?, venue = ?, cost = ?, club_id = ?, status = ?,capacity = ? WHERE event_id = ?";
+        String query = "UPDATE events SET title = ?, description = ?, date = ?, time = ?, venue = ?, cost = ?, club_id = ?, status = ?::event_status,capacity = ? WHERE event_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, event.getTitle());
             stmt.setString(2, event.getDescription());
