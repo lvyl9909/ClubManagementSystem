@@ -101,7 +101,7 @@ public class EventDataMapper {
     public boolean saveEvent(Event event) throws Exception {
         var connection = databaseConnectionManager.nextConnection();
 
-        String query = "INSERT INTO events (title, description,date,time,venue,cost,club_id,status) VALUES (?,?,?,?,?,?,?,?)";
+        String query = "INSERT INTO events (title, description,date,time,venue,cost,club_id,status) VALUES (?,?,?,?,?,?,?,?::event_status)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, event.getTitle());
             stmt.setString(2, event.getDescription());
