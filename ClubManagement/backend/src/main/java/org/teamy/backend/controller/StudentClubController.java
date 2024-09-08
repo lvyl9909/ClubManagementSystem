@@ -57,7 +57,12 @@ public class StudentClubController extends HttpServlet {
                     resp,
                     () -> addAdmin(req)
             ).handle();
-        } else if (pathInfo.equals("/delete")) {
+        }
+    }
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo(); // Gets the path info of the URL
+        if (pathInfo.equals("/delete")) {
             MarshallingRequestHandler.of(
                     mapper,
                     resp,
@@ -65,7 +70,6 @@ public class StudentClubController extends HttpServlet {
             ).handle();
         }
     }
-
     private ResponseEntity deleteAdmin(HttpServletRequest req) {
         try {
             // 从请求体中解析 clubId 和 studentId
@@ -76,7 +80,7 @@ public class StudentClubController extends HttpServlet {
             // 调用服务层方法
             studentClubService.deleteAdmin(clubId, studentId);
 
-            return ResponseEntity.ok(null);
+            return ResponseEntity.delete(null);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
