@@ -346,13 +346,13 @@ function Event() {
                             />
                             <Column title="Date" dataIndex="date" key="date" />
                             <Column title="Time" dataIndex="time" key="time" />
-                            <Column title="Venue" dataIndex="venueName" key="venueName" />
-                            <Column
-                                title="Status"
-                                dataIndex="ticketStatus"
-                                key="ticketStatus"
-                                render={ticketStatus => <Tag color={getStatusTagColor(ticketStatus)}>{ticketStatus}</Tag>}
-                            />
+                            {/*<Column title="Venue" dataIndex="venueName" key="venueName" />*/}
+                            {/*<Column*/}
+                            {/*    title="Status"*/}
+                            {/*    dataIndex="ticketStatus"*/}
+                            {/*    key="ticketStatus"*/}
+                            {/*    render={ticketStatus => <Tag color={getStatusTagColor(ticketStatus)}>{ticketStatus}</Tag>}*/}
+                            {/*/>*/}
                             <Column
                                 title="Action"
                                 key="action"
@@ -395,7 +395,7 @@ function Event() {
                     <Column title="Description" dataIndex="description" key="description" />
                     <Column title="Date" dataIndex="date" key="date" />
                     <Column title="Time" dataIndex="time" key="time" />
-                    <Column title="Venue" dataIndex="venueName" key="venueName" />
+                    {/*<Column title="Venue" dataIndex="venueName" key="venueName" />*/}
                     <Column title="Tickets Left" dataIndex="currentCapacity" key="currentCapacity" />
                     <Column
                         title="Action"
@@ -404,15 +404,16 @@ function Event() {
                             // Check if the event is RSVPed
                             const rsvpedTicket = rsvpedEvents.find(event => event.eventId === record.id);
                             const isRSVPed = rsvpedTicket && rsvpedTicket.ticketStatus !== "Cancelled";
+                            const isCancelledByClub = record.status === 'Cancelled'
                             const isEventFull = record.currentCapacity <= 0;
 
                             return (
                                 <Button type="primary" ghost
-                                    disabled={isRSVPed || isEventFull}
+                                    disabled={isRSVPed || isEventFull || isCancelledByClub}
                                     style={isRSVPed ? { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' } : {}}
                                     onClick={() => handleOpenModal(record.id)}
                                 >
-                                    {isRSVPed ? 'Already Joined' :isEventFull?'Full': 'Get Ticket'}
+                                    {isRSVPed ? 'Already Joined' :isEventFull?'Full': isCancelledByClub? 'Cancelled by Club': 'Get Ticket'}
                                 </Button>
                             );
                         }}
