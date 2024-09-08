@@ -1,39 +1,41 @@
 package org.teamy.backend.model;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
+import java.util.SimpleTimeZone;
 
-public class fundingApplication {
+public class FundingApplication {
     private String description;
     private BigDecimal amount;
     private Integer semester;
+    private Integer clubId;
+
     private Club club;
     private fundingApplicationStatus status;
-    private List<Event> event;
-    private Date date;
+//    private List<Event> event;
+    private String date;
     private FacultyAdministrator reviewer;
+    private Integer reviewerId;
 
-    public fundingApplication(String description, BigDecimal amount, Integer semester, Club club, fundingApplicationStatus status, List<Event> event, Date date, FacultyAdministrator reviewer) {
+
+    public FundingApplication(String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date, Integer reviewerId) {
         this.description = description;
         this.amount = amount;
         this.semester = semester;
-        this.club = club;
+        this.clubId = clubId;
         this.status = status;
-        this.event = event;
-        this.date = date;
-        this.reviewer = reviewer;
+        this.date = date.toString();
+        this.reviewerId = reviewerId;
     }
 
-    public fundingApplication(String description, BigDecimal amount, Integer semester, Club club, fundingApplicationStatus status, Date date) {
+    public FundingApplication(String description, BigDecimal amount, Integer semester, Club club, fundingApplicationStatus status, Date date) {
         this.description = description;
         this.amount = amount;
         this.semester = semester;
         this.club = club;
         this.status = status;
-        this.date = date;
-        this.event = new ArrayList<>();
+        this.date = date.toString();
         this.reviewer = null;
     }
 
@@ -77,19 +79,16 @@ public class fundingApplication {
         this.status = status;
     }
 
-    public List<Event> getEvent() {
-        return event;
-    }
 
-    public void setEvent(List<Event> event) {
-        this.event = event;
-    }
-
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
+    public java.sql.Date getSqlDate() {
+        return java.sql.Date.valueOf(LocalDate.parse(date));
+    }
 
-    public void setDate(Date date) {
+
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -99,5 +98,21 @@ public class fundingApplication {
 
     public void setReviewer(FacultyAdministrator reviewer) {
         this.reviewer = reviewer;
+    }
+
+    public Integer getClubId() {
+        return clubId;
+    }
+
+    public void setClubId(Integer clubId) {
+        this.clubId = clubId;
+    }
+
+    public Integer getReviewerId() {
+        return reviewerId;
+    }
+
+    public void setReviewerId(Integer reviewerId) {
+        this.reviewerId = reviewerId;
     }
 }

@@ -1,8 +1,5 @@
 package org.teamy.backend.model;
 
-import org.teamy.backend.service.EventService;
-import org.teamy.backend.service.StudentService;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +11,7 @@ public class Club {
     private List<Student> students;
     private List<Integer> eventsId;
     private List<Event> events;
-    private List<fundingApplication> fundingApplications;
+    private List<FundingApplication> FundingApplications;
 
     public Club(Integer id,String name, String description) {
         this.id=id;
@@ -22,7 +19,7 @@ public class Club {
         this.description = description;
         this.studentId=new ArrayList<>();
         this.events = new ArrayList<>();
-        this.fundingApplications = new ArrayList<>();
+        this.FundingApplications = new ArrayList<>();
         this.students = new ArrayList<>();
         this.eventsId = new ArrayList<>();
 
@@ -89,12 +86,12 @@ public class Club {
     }
 
     //还需要加lazy load
-    public List<fundingApplication> getFundingApplications() {
-        return fundingApplications;
+    public List<FundingApplication> getFundingApplications() {
+        return FundingApplications;
     }
 
-    public void setFundingApplications(List<fundingApplication> fundingApplications) {
-        this.fundingApplications = fundingApplications;
+    public void setFundingApplications(List<FundingApplication> FundingApplications) {
+        this.FundingApplications = FundingApplications;
     }
 
     public Integer getId() {

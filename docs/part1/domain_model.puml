@@ -29,7 +29,7 @@ class Club{
     description
     ClubMembership
     events
-    fundingApplications
+    FundingApplications
 }
 
 class Venue{
