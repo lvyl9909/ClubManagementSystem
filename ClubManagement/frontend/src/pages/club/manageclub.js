@@ -1,13 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import {Col, Row, Card, Table, Button, Input, Modal, Form, Tabs, AutoComplete, Divider, Tag} from 'antd';
+import {
+    Col,
+    Row,
+    Card,
+    Table,
+    Button,
+    Input,
+    Modal,
+    Form,
+    Tabs,
+    AutoComplete,
+    Divider,
+    Tag,
+    DatePicker,
+    message, InputNumber, TimePicker, Select
+} from 'antd';
 import "./club.css";
 import {useParams} from "react-router";
 import {doCall} from "../../router/api";
+import moment from "moment";
 // import { handleSearchStudent, handleSelectStudent } from '../event/event';
 const { Column } = Table;
 const { TabPane } = Tabs;
 
 const { Search } = Input;
+const { Option } = Select;
 
 
 function ManageClub() {
@@ -35,8 +52,11 @@ function ManageClub() {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for multi-select
     const [bulkLoading, setBulkLoading] = useState(false); // Loading state for bulk action
 
-    const [isAddEventVisible, setAddEventVisible] = useState(false);
-    const [newEvent, setNewEvent] = useState({ title: '', date: '', venue: '' });
+    const [editModalVisible, setEditModalVisible] = useState(false); // Modal visibility state
+    const [currentEvent, setCurrentEvent] = useState(null); // Event being edited
+    const [form] = Form.useForm(); // Ant Design form instance
+    const [venues, setVenues] = useState([]); // State to hold the list of venues
+    const [createModalVisible, setCreateModalVisible] = useState(false);
 
 
 
@@ -207,12 +227,131 @@ function ManageClub() {
         return 'volcano';
     };
 
+
+    const fetchVenues = async () => {
+        try {
+            const res = await doCall(`${path}/student/venues/getAllVenue`, 'GET');
+            if (res.ok) {
+                const data = await res.json();
+                setVenues(data); // Set the venues for dropdown
+            } else {
+                message.error('Failed to fetch venue data');
+            }
+        } catch (error) {
+            console.error('Error fetching venue data:', error);
+            message.error('An error occurred while fetching venue data');
+        }
+    };
+    useEffect(() => {
+        fetchVenues(); // Fetch venues when the component loads
+    }, []);
     // Edit event handler
-    const handleEditEvent = (eventId) => {
-        console.log('Edit event:', eventId);
-        // You can implement the logic to navigate to an event edit page or open a modal here
+
+    const handleEditEvent = async (event) => {
+        setCurrentEvent(event);
+        // try {
+            // // Fetch all venues from the backend
+            // const res = await doCall(`${path}/student/venues/getAllVenue`, 'GET');
+            // if (res.ok) {
+            //     const venueData = await res.json();
+            //     setVenues(venueData);
+            //
+            //     // Find the venue name based on venueId
+            //     const currentVenue = venueData.find(venue => venue.id === event.venueId);
+            //
+            //     // Set form fields with event and venue details
+        const selectedVenue = venues.find(venue => venue.id === event.venueId);
+
+        // Set form fields with event details, including the preselected venue ID
+        form.setFieldsValue({
+            title: event.title,
+            description: event.description,
+            date: moment(event.date, 'YYYY-MM-DD'),
+            time: moment(event.time, 'HH:mm:ss'),
+            venueId: selectedVenue ? selectedVenue.id : '',  // Prefill the venue ID
+            cost: event.cost,
+            capacity: event.capacity,
+        });
+
+        // Show the modal
+        setEditModalVisible(true);
+    };
+    //         } else {
+    //             message.error('Failed to fetch venue details');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching venue details:', error);
+    //         message.error('An error occurred while fetching venue details');
+    //     }
+    //
+    //     // Show modal after setting form values
+    //     setEditModalVisible(true);
+    // };
+
+
+    // Handle updating the event
+    const handleUpdateEvent = async (values) => {
+        try {
+            const updatedEvent = {
+                ...currentEvent,
+                title: values.title,
+                description: values.description,
+                date: values.date.format('YYYY-MM-DD'),  // Format date for backend
+                time: values.time.format('HH:mm:ss'),    // Format time for backend
+                venueId: values.venueId,  // Correctly send the venue ID
+                cost: values.cost,
+                capacity: values.capacity,
+                clubId: currentEvent.clubId,  // Ensure clubId is included
+            };
+            console.log("events",updatedEvent)
+
+            const res = await doCall(`${path}/student/events/update`, 'POST', updatedEvent);
+            if (res.ok) {
+                message.success('Event updated successfully');
+                setEditModalVisible(false); // Close the modal
+                fetchClubEvents(); // Refresh the events
+            } else {
+                message.error('Failed to update event');
+            }
+        } catch (error) {
+            console.error('Error updating event:', error);
+            message.error('An error occurred while updating the event');
+        }
     };
 
+
+    const handleCreateNewEvent = () => {
+        form.resetFields(); // Reset form for a new event
+        setCreateModalVisible(true); // Show create modal
+    };
+
+    // Handle event creation submission
+    const handleCreateEvent = async (values) => {
+        try {
+            const newEvent = {
+                title: values.title,
+                description: values.description,
+                date: values.date.format('YYYY-MM-DD'),
+                time: values.time.format('HH:mm:ss'),
+                venueId: values.venueId,
+                cost: values.cost,
+                capacity: values.capacity,
+                clubId: id,
+            };
+
+            const res = await doCall(`${path}/student/events/save`, 'POST', newEvent);
+            if (res.ok) {
+                message.success('Event created successfully');
+                setCreateModalVisible(false); // Close the modal
+                fetchClubEvents(); // Refresh the events list
+            } else {
+                message.error('Failed to create event');
+            }
+        } catch (error) {
+            console.error('Error creating event:', error);
+            message.error('An error occurred while creating the event');
+        }
+    };
 
     return (
         <div className="club-management">
@@ -274,17 +413,21 @@ function ManageClub() {
                     <Row gutter={[16, 16]} style={{ width: '100%' }}>
                         <Col span={24}>
                             <Card title="Club Events">
-                                <div style={{ marginBottom: 16 }}>
-                                    <Button
-                                        type="danger"
-                                        onClick={handleBulkDelete}
-                                        disabled={!hasSelected}
-                                        loading={bulkLoading}
-                                    >
-                                        {bulkLoading ? 'Deleting...' : 'Delete Selected'}
-                                    </Button>
-                                    {hasSelected ? ` Selected ${selectedRowKeys.length} ${selectedRowKeys.length === 1 ? 'item' : 'items'}` : ''}
-                                </div>
+                                <Button
+                                    danger
+                                    style={{ marginBottom: '16px' }}
+                                    onClick={handleBulkDelete}
+                                    disabled={!hasSelected}
+                                    loading={bulkLoading}
+                                >
+                                    {bulkLoading ? 'Deleting...' : 'Delete Selected'}
+                                </Button>
+                                {hasSelected ? ` Selected ${selectedRowKeys.length} ${selectedRowKeys.length === 1 ? 'item' : 'items'}` : ''}
+                                <Button type="primary" style={{ marginLeft: '20px' }} onClick={handleCreateNewEvent}>
+                                    Create New Event
+                                </Button>
+
+
 
                                 <Table
                                     rowSelection={rowSelection} // Enable row selection
@@ -294,12 +437,25 @@ function ManageClub() {
                                 >
                                     <Column title="Title" dataIndex="title" key="title" />
                                     <Column title="Date" dataIndex="date" key="date" />
-                                    <Column title="Venue" dataIndex="venueName" key="venueName" />
+                                    {/*<Column title="Venue" dataIndex="venueName" key="venueName" />*/}
                                     <Column
                                         title="Status"
                                         dataIndex="status"
                                         key="status"
                                         render={status => <Tag color={getStatusTagColor(status)}>{status}</Tag>}
+                                    />
+                                    <Column
+                                        title="Action"
+                                        key="action"
+                                        render={(text, record) => (
+                                            <Button
+                                                type="primary" ghost
+                                                onClick={() => handleEditEvent(record)}
+                                                disabled={record.status === 'Cancelled'}  // Disable if status is "Cancelled"
+                                            >
+                                                Edit
+                                            </Button>
+                                        )}
                                     />
                                     {/*<Column*/}
                                     {/*    title="Action"*/}
@@ -326,6 +482,88 @@ function ManageClub() {
                             </Card>
                         </Col>
                     </Row>
+                    <Modal
+                        visible={editModalVisible}
+                        title="Edit Event"
+                        onCancel={() => setEditModalVisible(false)}
+                        footer={null}
+                    >
+                        <Form form={form} onFinish={handleUpdateEvent}>
+                            <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please input the title' }]}>
+                                <Input />
+                            </Form.Item>
+                            <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Please input the description' }]}>
+                                <Input.TextArea rows={3} />
+                            </Form.Item>
+                            <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Please select the date' }]}>
+                                <DatePicker />
+                            </Form.Item>
+                            <Form.Item name="time" label="Time" rules={[{ required: true, message: 'Please select the time' }]}>
+                                <TimePicker format="HH:mm:ss" />
+                            </Form.Item>
+                            <Form.Item name="venueId" label="Venue Name" rules={[{ required: true, message: 'Please select a venue' }]}>
+                                <Select placeholder="Select a venue">
+                                    {venues.map(venue => (
+                                        <Option key={venue.id} value={venue.id}>
+                                            {venue.name}  {/* Display venue name but return venue ID */}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item name="cost" label="Cost" rules={[{ required: true, message: 'Please input the cost' }]}>
+                                <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+                            </Form.Item>
+                            <Form.Item name="capacity" label="Capacity" rules={[{ required: true, message: 'Please input the capacity' }]}>
+                                <InputNumber min={1} style={{ width: '100%' }} />
+                            </Form.Item>
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit">
+                                    Update Event
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+                    <Modal
+                        visible={createModalVisible}
+                        title="Create New Event"
+                        onCancel={() => setCreateModalVisible(false)}
+                        footer={null}
+                    >
+                        <Form form={form} onFinish={handleCreateEvent}>
+                            <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please enter the event title' }]}>
+                                <Input />
+                            </Form.Item>
+                            <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Please enter the event description' }]}>
+                                <Input.TextArea rows={3} />
+                            </Form.Item>
+                            <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Please select the date' }]}>
+                                <DatePicker />
+                            </Form.Item>
+                            <Form.Item name="time" label="Time" rules={[{ required: true, message: 'Please select the time' }]}>
+                                <TimePicker format="HH:mm:ss" />
+                            </Form.Item>
+                            <Form.Item name="venueId" label="Venue Name" rules={[{ required: true, message: 'Please select a venue' }]}>
+                                <Select placeholder="Select a venue">
+                                    {venues.map(venue => (
+                                        <Option key={venue.id} value={venue.id}>
+                                            {venue.name}  {/* Display venue name but return venue ID */}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item name="cost" label="Cost" rules={[{ required: true, message: 'Please enter the cost' }]}>
+                                <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+                            </Form.Item>
+                            <Form.Item name="capacity" label="Capacity" rules={[{ required: true, message: 'Please enter the capacity' }]}>
+                                <InputNumber min={1} style={{ width: '100%' }} />
+                            </Form.Item>
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit">
+                                    Create Event
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
                 </TabPane>
 
                 <TabPane tab="Funding" key="3">
