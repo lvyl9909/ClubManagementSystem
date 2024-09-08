@@ -229,8 +229,8 @@ function ManageClub() {
     const getStatusTagColor = (status) => {
         if (status === 'Ongoing') return 'green';
         if (status === 'Cancelled') return 'red';
-        if (status === 'submitted') return 'blue';
-        if (status === 'reviewed') return 'purple'
+        if (status === 'Submitted') return 'blue';
+        if (status === 'Reviewed') return 'purple'
         return 'volcano';
     };
 

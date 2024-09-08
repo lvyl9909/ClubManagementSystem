@@ -44,7 +44,7 @@ const UpperHeader =() => {
                 menu={{items}}
             >
                 <a onClick={(e) => e.preventDefault()}>
-                    <Avatar size={36} src={<img src={require("../../assets/images/user.png")}/> }/>
+                    <Avatar size={36} src={<img src={require("../../assets/images/user.jpeg")}/> }/>
                 </a>
             </Dropdown>
         </Header>

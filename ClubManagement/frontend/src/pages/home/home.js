@@ -8,7 +8,7 @@ import {doCall} from "../../router/api";
 const iconToElement = (name) => React.createElement(Icon[name]);
 const Home = () => {
     const path = process.env.REACT_APP_API_BASE_URL;
-    const userImg = require("../../assets/images/user.png")
+    const userImg = require("../../assets/images/user.jpeg")
     const [user, setUser] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
