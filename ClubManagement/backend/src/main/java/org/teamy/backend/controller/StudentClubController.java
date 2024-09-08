@@ -7,8 +7,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.config.ContextListener;
+import org.teamy.backend.model.Student;
 import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
+import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.service.ClubService;
 import org.teamy.backend.service.EventService;
@@ -16,17 +18,35 @@ import org.teamy.backend.service.StudentClubService;
 import org.teamy.backend.service.StudentService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/student/admin/*")
 public class StudentClubController extends HttpServlet {
     StudentClubService studentClubService;
     private ObjectMapper mapper;
+    StudentService studentService;
     @Override
     public void init() throws ServletException {
         studentClubService = (StudentClubService) getServletContext().getAttribute(ContextListener.STUDENT_CLUB_SERVICE);
         mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
         System.out.println("success init");
     }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String idParam = req.getParameter("id");
+
+        RequestHandler handler = () -> {
+            if (idParam != null) {
+                int id = Integer.parseInt(idParam);
+                return findallStudent(id);
+            }
+            return null;
+        };
+        MarshallingRequestHandler.of(mapper, resp, handler).handle();
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();  // 获取 URL 的路径信息
@@ -103,6 +123,18 @@ public class StudentClubController extends HttpServlet {
                             .reason(e.getMessage())
                             .build()
             );
+        }
+    }
+    private ResponseEntity findallStudent(int id) {
+        List<Student> students = new ArrayList<>();
+        try {
+            List<Integer> studentsid = studentClubService.findStudentIdByClubId(id);
+            for (Integer studentid : studentsid) {
+                students.add(studentService.getStudentById(studentid));
+            }
+            return ResponseEntity.ok(students);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
