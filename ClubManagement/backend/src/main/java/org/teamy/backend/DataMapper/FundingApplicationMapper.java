@@ -11,11 +11,9 @@ import java.util.List;
 
 public class FundingApplicationMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-    private final EventDataMapper eventDataMapper;
 
-    public FundingApplicationMapper(DatabaseConnectionManager databaseConnectionManager, EventDataMapper eventDataMapper) {
+    public FundingApplicationMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
-        this.eventDataMapper = eventDataMapper;
     }
     public FundingApplication findfundingApplicationById(int Id) throws Exception {
         var connection = databaseConnectionManager.nextConnection();

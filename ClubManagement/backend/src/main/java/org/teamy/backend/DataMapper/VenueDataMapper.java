@@ -8,6 +8,8 @@ import org.teamy.backend.model.Venue;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VenueDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
@@ -31,5 +33,23 @@ public class VenueDataMapper {
             databaseConnectionManager.releaseConnection(connection);
         }
         return null;
+    }
+    public List<Venue> getAllVenue(){
+        var connection = databaseConnectionManager.nextConnection();
+        List<Venue> venues =new ArrayList<>();
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM venues");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Venue venue = new Venue( rs.getInt("id"),rs.getString("name"), rs.getString("description"),rs.getString("location"),  rs.getInt("capacity"));
+                venues.add(venue);
+            }
+            return venues;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
     }
 }

@@ -27,6 +27,11 @@ public class FundingApplicationController extends HttpServlet {
     private ObjectMapper mapper;
 
     @Override
+    public void init() throws ServletException {
+        fundingApplicationService = (FundingApplicationService) getServletContext().getAttribute(ContextListener.FUNDING_APPLICATION_SERVICE);
+        mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
+    }
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String idParam = req.getParameter("clubid"); // 获取查询字符串中的 "id" 参数
 
@@ -41,11 +46,6 @@ public class FundingApplicationController extends HttpServlet {
     }
 
 
-    @Override
-    public void init() throws ServletException {
-        fundingApplicationService = (FundingApplicationService) getServletContext().getAttribute(ContextListener.EVENT_SERVICE);
-        mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
-    }
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo(); // Gets the path info of the URL
         if (pathInfo.equals("/save")) {

@@ -21,6 +21,10 @@ public class ContextListener implements ServletContextListener {
     public static final String EVENT_SERVICE = "eventService";
     public static final String RSVP_SERVICE = "rsvpService";
     public static final String TICKET_SERVICE = "ticketService";
+    public static final String VENUE_SERVICE = "venueService";
+    public static final String FUNDING_APPLICATION_SERVICE = "fundingApplicationService";
+
+
 
     public static final String DATABASE_SERVICE = "databaseService";
     public static final String MAPPER = "mapper";
@@ -56,6 +60,8 @@ public class ContextListener implements ServletContextListener {
         sce.getServletContext().setAttribute(TICKET_SERVICE, new TicketService(new TicketDataMapper(databaseConnectionManager),new RSVPDataMapper(databaseConnectionManager),new EventDataMapper(databaseConnectionManager)) );
         sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager),new ClubService(new ClubDataMapper(databaseConnectionManager)),new RSVPService(new RSVPDataMapper(databaseConnectionManager)),new TicketService(new TicketDataMapper(databaseConnectionManager),new RSVPDataMapper(databaseConnectionManager),new EventDataMapper(databaseConnectionManager)) ));
         sce.getServletContext().setAttribute(STUDENT_CLUB_SERVICE, new StudentClubService(new StudentClubDataMapper(databaseConnectionManager)));
+        sce.getServletContext().setAttribute(VENUE_SERVICE, new VenueService(new VenueDataMapper(databaseConnectionManager)));
+        sce.getServletContext().setAttribute(FUNDING_APPLICATION_SERVICE, new FundingApplicationService(new FundingApplicationMapper(databaseConnectionManager)));
 
         var mapper = Jackson2ObjectMapperBuilder.json()
                 .modules(new JavaTimeModule())
