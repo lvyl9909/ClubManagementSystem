@@ -1,14 +1,13 @@
 package org.teamy.backend.model;
 
-public class Venue {
-    private Integer id;
+public class Venue extends DomainObject {
     private String name;
     private String description;
     private String location;
     private Integer capacity;
 
     public Venue(Integer id,String name, String description, String location, Integer capacity) {
-        this.id=id;
+        this.setId(id);
         this.name = name;
         this.description = description;
         this.location = location;
@@ -47,11 +46,4 @@ public class Venue {
         this.description = description;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }
