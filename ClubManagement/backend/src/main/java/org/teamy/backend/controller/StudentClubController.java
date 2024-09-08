@@ -31,7 +31,6 @@ public class StudentClubController extends HttpServlet {
         studentClubService = (StudentClubService) getServletContext().getAttribute(ContextListener.STUDENT_CLUB_SERVICE);
         mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
         studentService = (StudentService) getServletContext().getAttribute(ContextListener.STUDENT_SERVICE);
-        System.out.println("success init");
     }
 
     @Override
@@ -130,7 +129,6 @@ public class StudentClubController extends HttpServlet {
         List<Student> students = new ArrayList<>();
         try {
             List<Integer> studentsId = studentClubService.findStudentIdByClubId(id);
-            System.out.println(studentsId);
             for (Integer studentid : studentsId) {
                 students.add(studentService.getStudentById(studentid));
             }
