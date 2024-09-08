@@ -25,7 +25,7 @@ const routes = createBrowserRouter([
                     <PrivateRoute>
                         <Home />
                     </PrivateRoute>
-                ) // 保护 Home 路由
+                )
             },
             {
                 path: 'club',
@@ -36,12 +36,12 @@ const routes = createBrowserRouter([
                 ) // 保护 Club 路由
             },
             {
-                path: 'club/manage', // 新增 ManageClub 路由
+                path: '/club/manage/:id',
                 element: (
                     <PrivateRoute>
                         <ManageClub />
                     </PrivateRoute>
-                ) // 保护 ManageClub 路由
+                )
             },
             {
                 path: 'event',
@@ -49,7 +49,7 @@ const routes = createBrowserRouter([
                     <PrivateRoute>
                         <Event />
                     </PrivateRoute>
-                ) // 保护 Event 路由
+                )
             },
             {
                 path: 'other',
@@ -60,7 +60,7 @@ const routes = createBrowserRouter([
                             <PrivateRoute>
                                 <PageOne />
                             </PrivateRoute>
-                        ) // 保护 PageOne 路由
+                        )
                     },
                     {
                         path: 'pageTwo',
@@ -68,7 +68,7 @@ const routes = createBrowserRouter([
                             <PrivateRoute>
                                 <PageTwo />
                             </PrivateRoute>
-                        ) // 保护 PageTwo 路由
+                        )
                     }
                 ]
             }
@@ -76,7 +76,7 @@ const routes = createBrowserRouter([
     },
     {
         path: '/login',
-        element: <Login /> // 登录页面不需要保护
+        element: <Login />
     }
 ]);
 

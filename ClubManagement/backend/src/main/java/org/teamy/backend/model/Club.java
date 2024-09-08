@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Club {
+    private Integer id;
     private String name;
     private String description;
     private List<Integer> studentId;
@@ -15,7 +16,8 @@ public class Club {
     private List<Event> events;
     private List<fundingApplication> fundingApplications;
 
-    public Club(String name, String description) {
+    public Club(Integer id,String name, String description) {
+        this.id=id;
         this.name = name;
         this.description = description;
         this.studentId=new ArrayList<>();
@@ -93,5 +95,13 @@ public class Club {
 
     public void setFundingApplications(List<fundingApplication> fundingApplications) {
         this.fundingApplications = fundingApplications;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

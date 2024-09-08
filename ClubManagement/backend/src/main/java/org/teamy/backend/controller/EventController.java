@@ -215,6 +215,8 @@ public class EventController extends HttpServlet {
         Event event = null;
         try {
             event = eventService.getEventById(eventId);
+            Integer currentCapacity = eventService.getCurrentCapacity(event);
+            event.setCurrentCapacity(currentCapacity);
             return ResponseEntity.ok(event);
         }catch (NumberFormatException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,

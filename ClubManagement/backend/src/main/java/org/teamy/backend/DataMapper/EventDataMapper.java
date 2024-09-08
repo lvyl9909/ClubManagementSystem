@@ -35,7 +35,8 @@ public class EventDataMapper {
                         rs.getString("venue"),            // 你可能需要确认 venue 是字符串还是 ID
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
-                        rs.getString("status") // 将状态从数据库转换为枚举类型
+                        rs.getString("status"), // 将状态从数据库转换为枚举类型
+                        rs.getInt("capacity")
                 );
             }
         } catch (SQLException e) {
@@ -84,7 +85,8 @@ public class EventDataMapper {
                         rs.getString("venue"),            // 你可能需要确认 venue 是字符串还是 ID
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
-                        rs.getString("status") // 将状态从数据库转换为枚举类型
+                        rs.getString("status"), // 将状态从数据库转换为枚举类型
+                        rs.getInt("capacity")
                 );
                 events.add(event);
             }
@@ -137,7 +139,8 @@ public class EventDataMapper {
                         rs.getString("venue"),            // 你可能需要确认 venue 是字符串还是 ID
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
-                        rs.getString("status") // 将状态从数据库转换为枚举类型
+                        rs.getString("status"), // 将状态从数据库转换为枚举类型
+                        rs.getInt("capacity")
                 );
                 events.add(event);
             }
@@ -154,7 +157,7 @@ public class EventDataMapper {
         var connection = databaseConnectionManager.nextConnection();
 
         // SQL 更新语句，更新指定的事件
-        String query = "UPDATE events SET title = ?, description = ?, date = ?, time = ?, venue = ?, cost = ?, club_id = ?, status = ? WHERE event_id = ?";
+        String query = "UPDATE events SET title = ?, description = ?, date = ?, time = ?, venue = ?, cost = ?, club_id = ?, status = ?,capacity = ? WHERE event_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, event.getTitle());
             stmt.setString(2, event.getDescription());
@@ -165,6 +168,7 @@ public class EventDataMapper {
             stmt.setInt(7, event.getClub());
             stmt.setString(8, event.getStatus().name());  // 假设状态是枚举类型
             stmt.setInt(9, event.getId());  // 使用 eventId 作为更新条件
+            stmt.setInt(10,event.getCapacity());
 
             // 执行更新操作
             int rowsAffected = stmt.executeUpdate();

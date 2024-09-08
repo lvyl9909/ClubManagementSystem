@@ -53,7 +53,6 @@ public class StudentController  extends HttpServlet {
             return null;
         };
         MarshallingRequestHandler.of(mapper, resp, handler).handle();
-
     }
 
     private ResponseEntity listClubs() {

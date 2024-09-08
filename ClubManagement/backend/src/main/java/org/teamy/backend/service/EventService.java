@@ -36,7 +36,12 @@ public class EventService {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be null or empty.");
         }
-        return  eventDataMapper.findEventsByTitle(title);
+        List<Event>events=  eventDataMapper.findEventsByTitle(title);
+        for(Event event:events){
+            Integer currentCapacity = getCurrentCapacity(event);
+            event.setCurrentCapacity(currentCapacity);
+        }
+        return events;
     }
 
     public boolean saveEvent(Event event) throws Exception {
@@ -51,7 +56,12 @@ public class EventService {
 
     public List<Event> getAllEvents() {
         try {
-            return eventDataMapper.getAllEvent();
+            List<Event>events =  eventDataMapper.getAllEvent();
+            for(Event event:events){
+                Integer currentCapacity = getCurrentCapacity(event);
+                event.setCurrentCapacity(currentCapacity);
+            }
+            return events;
         } catch (Exception e) {
             // Exceptions are handled here, such as logging or throwing custom exceptions
             System.err.println("Error occurred while fetching clubs: " + e.getMessage());
@@ -94,5 +104,14 @@ public class EventService {
             eventDeleteUoW.addDeleteEvents(eventId);
         }
         eventDeleteUoW.commit();
+    }
+
+    public Integer getCurrentCapacity(Event event)throws Exception{
+        List<Ticket> tickets = ticketDataMapper.getTicketsFromEvent(event.getId());
+        int count=0;
+        for(Ticket ticket:tickets){
+            if(ticket.getStatus().equals(TicketStatus.Issued))count++;
+        }
+        return event.getCapacity()-count;
     }
 }

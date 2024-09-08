@@ -4,17 +4,50 @@ import { Col, Row, Card, Table } from 'antd'
 import "./home.css"
 import * as Icon from "@ant-design/icons";
 import {useAuth} from '../../router/auth';
+import {doCall} from "../../router/api";
 const iconToElement = (name) => React.createElement(Icon[name]);
 const Home = () => {
+    const path = process.env.REACT_APP_API_BASE_URL;
     const userImg = require("../../assets/images/user.png")
+    const [user, setUser] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const res = await doCall(`${path}/student/userdetailed/info`, 'GET');
+                if (res.ok === true) {
+                    const data = await res.json();
+                    setUser(data);
+                } else {
+                    setError('Failed to fetch user information');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                setError('An error occurred while fetching user data');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+
+    if (error) {
+        return <p style={{ color: 'red' }}>{error}</p>;
+    }
+
     return(
     <Row className="home">
         <Col span={8}>
-            <Card hoverable>
+            <Card hoverable style={{ width: 400, textAlign: 'center' }}>
                 <div className="user">
                     <img src={userImg} />
                     <div className="userinfo">
-                        <p className="name">Ben</p>
+                        <p className="name">{user.name}</p>
                         <p className="access">Admin</p>
                     </div>
                 </div>
