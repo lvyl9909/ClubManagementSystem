@@ -41,6 +41,9 @@ public class FundingApplication {
         this.reviewer = null;
     }
 
+    public FundingApplication() {
+    }
+
     public String getDescription() {
         return description;
     }
