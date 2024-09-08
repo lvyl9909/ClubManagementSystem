@@ -2,14 +2,15 @@ package org.teamy.backend.DTO;
 
 import org.teamy.backend.model.Event;
 import org.teamy.backend.model.Ticket;
+import org.teamy.backend.model.Venue;
 
 import java.math.BigDecimal;
 
-public class TicketEventDTO {
-    private Integer ticketId;
-    private String ticketStatus;
-    private String title;
+public class EventVenueDTO {
+    private String venueName;
+    private String venueLocation;
     private Integer eventId;
+    private String title;
     private String description;
     private String date;
     private String time;
@@ -17,10 +18,9 @@ public class TicketEventDTO {
     private BigDecimal cost;
     private Integer clubId;
 
-    // 构造函数
-    public TicketEventDTO(Ticket ticket, Event event) {
-        this.ticketId = ticket.getId();
-        this.ticketStatus = ticket.getStatus().name();  // 假设 ticket status 是枚举类型
+    public EventVenueDTO(Venue venue, Event event) {
+        this.venueName = venue.getName();  // 假设 ticket status 是枚举类型
+        this.venueLocation =venue.getLocation();
 
         this.eventId =event.getId();
         this.title = event.getTitle();
@@ -32,20 +32,28 @@ public class TicketEventDTO {
         this.clubId = event.getClub();
     }
 
-    public Integer getTicketId() {
-        return ticketId;
+    public String getVenueName() {
+        return venueName;
     }
 
-    public void setTicketId(Integer ticketId) {
-        this.ticketId = ticketId;
+    public void setVenueName(String venueName) {
+        this.venueName = venueName;
     }
 
-    public String getTicketStatus() {
-        return ticketStatus;
+    public String getVenueLocation() {
+        return venueLocation;
     }
 
-    public void setTicketStatus(String ticketStatus) {
-        this.ticketStatus = ticketStatus;
+    public void setVenueLocation(String venueLocation) {
+        this.venueLocation = venueLocation;
+    }
+
+    public Integer getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Integer eventId) {
+        this.eventId = eventId;
     }
 
     public String getTitle() {
@@ -80,11 +88,11 @@ public class TicketEventDTO {
         this.time = time;
     }
 
-    public Integer getVenueName() {
+    public Integer getVenueId() {
         return venueId;
     }
 
-    public void setVenueName(Integer venueId) {
+    public void setVenueId(Integer venueId) {
         this.venueId = venueId;
     }
 
@@ -102,13 +110,5 @@ public class TicketEventDTO {
 
     public void setClubId(Integer clubId) {
         this.clubId = clubId;
-    }
-
-    public Integer getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Integer eventId) {
-        this.eventId = eventId;
     }
 }

@@ -33,7 +33,7 @@ public class FundingApplicationMapper {
 
 
             if (rs.next()) {
-                return new FundingApplication(rs.getString("description"),
+                return new FundingApplication(rs.getInt("application_id"),rs.getString("description"),
                         rs.getBigDecimal("amount"), rs.getInt("semester"),
                         rs.getInt("club"), status,
                         rs.getDate("date"), rs.getInt("reviewer"));
@@ -56,7 +56,7 @@ public class FundingApplicationMapper {
             while (rs.next()) {
                 String statusString = rs.getString("status");
                 fundingApplicationStatus status = fundingApplicationStatus.fromString(statusString);
-                FundingApplication fundingApplication = new FundingApplication(rs.getString("description"),
+                FundingApplication fundingApplication = new FundingApplication(rs.getInt("application_id"),rs.getString("description"),
                         rs.getBigDecimal("amount"), rs.getInt("semester"),
                         rs.getInt("club"), status,
                         rs.getDate("date"), rs.getInt("reviewer"));

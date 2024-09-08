@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.SimpleTimeZone;
 
 public class FundingApplication {
+    private Integer id;
     private String description;
     private BigDecimal amount;
     private Integer semester;
@@ -19,7 +20,8 @@ public class FundingApplication {
     private Integer reviewerId;
 
 
-    public FundingApplication(String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date, Integer reviewerId) {
+    public FundingApplication(Integer id,String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date, Integer reviewerId) {
+        this.id=id;
         this.description = description;
         this.amount = amount;
         this.semester = semester;
@@ -114,5 +116,13 @@ public class FundingApplication {
 
     public void setReviewerId(Integer reviewerId) {
         this.reviewerId = reviewerId;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

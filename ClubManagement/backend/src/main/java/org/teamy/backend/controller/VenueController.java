@@ -35,7 +35,6 @@ public class VenueController extends HttpServlet {
         RequestHandler handler = () -> {
             return viewAllVenue();  // 根据 ID 获取事件
         };
-
         MarshallingRequestHandler.of(mapper, resp, handler).handle();
     }
 
