@@ -1,20 +1,20 @@
 package org.teamy.backend.model;
 
 public enum fundingApplicationStatus {
-    submitted,
-    reviewed,
-    approved,
-    rejected;
+    Submitted,
+    Reviewed,
+    Approved,
+    Rejected;
     public static fundingApplicationStatus fromString(String status) {
         switch (status) {
             case "submitted":
-                return submitted;
+                return Submitted;
             case "reviewed":
-                return reviewed;
+                return Reviewed;
             case "approved":
-                return approved;
+                return Approved;
             case "rejected":
-                return rejected;
+                return Rejected;
             default:
                 throw new IllegalArgumentException("Unknown status: " + status);
         }
