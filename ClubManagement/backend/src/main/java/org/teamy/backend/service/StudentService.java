@@ -44,7 +44,12 @@ public class StudentService {
             throw new IllegalArgumentException("Club ID must be positive");
         }
 
-        Student student = studentDataMapper.findStudentById(id);
+        Student student = null;
+        try {
+            student = studentDataMapper.findStudentById(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return student;
     }
 

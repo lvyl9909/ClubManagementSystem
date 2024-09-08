@@ -30,6 +30,7 @@ public class StudentClubController extends HttpServlet {
     public void init() throws ServletException {
         studentClubService = (StudentClubService) getServletContext().getAttribute(ContextListener.STUDENT_CLUB_SERVICE);
         mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
+        studentService = (StudentService) getServletContext().getAttribute(ContextListener.STUDENT_SERVICE);
         System.out.println("success init");
     }
 
@@ -40,7 +41,7 @@ public class StudentClubController extends HttpServlet {
         RequestHandler handler = () -> {
             if (idParam != null) {
                 int id = Integer.parseInt(idParam);
-                return findallStudent(id);
+                return findAllStudent(id);
             }
             return null;
         };
@@ -125,16 +126,31 @@ public class StudentClubController extends HttpServlet {
             );
         }
     }
-    private ResponseEntity findallStudent(int id) {
+    private ResponseEntity findAllStudent(int id) {
         List<Student> students = new ArrayList<>();
         try {
-            List<Integer> studentsid = studentClubService.findStudentIdByClubId(id);
-            for (Integer studentid : studentsid) {
+            List<Integer> studentsId = studentClubService.findStudentIdByClubId(id);
+            System.out.println(studentsId);
+            for (Integer studentid : studentsId) {
                 students.add(studentService.getStudentById(studentid));
             }
             return ResponseEntity.ok(students);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                            .message("Invalid request parameters.")
+                            .reason(e.getMessage())
+                            .build()
+            );
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                            .message("An error occurred while adding the admin.")
+                            .reason(e.getMessage())
+                            .build()
+            );
         }
     }
 }
