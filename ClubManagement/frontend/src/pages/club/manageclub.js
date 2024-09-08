@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {Col, Row, Card, Table, Button, Input, Modal, Form, Tabs, AutoComplete, Divider} from 'antd';
+import {Col, Row, Card, Table, Button, Input, Modal, Form, Tabs, AutoComplete, Divider, Tag} from 'antd';
 import "./club.css";
 import {useParams} from "react-router";
 import {doCall} from "../../router/api";
@@ -25,12 +25,15 @@ function ManageClub() {
 
     const [searching, setSearching] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
-    const [selectedStudent, setSelectedStudent] = useState(null); // Holds selected student's details (email and studentId)
+    const [selectedStudent, setSelectedStudent] = useState(null);
     const [studentSearchQuery, setStudentSearchQuery] = useState('');
     const [isAlreadyAdmin, setIsAlreadyAdmin] = useState(false);
-    const [user, setUser] = useState({}); // Current user info
+    const [user, setUser] = useState({});
 
-    const [events, setEvents] = useState([]);
+    const [allEvents, setAllEvents] = useState([]);
+    const [clubEvents, setClubEvents] = useState([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for multi-select
+    const [bulkLoading, setBulkLoading] = useState(false); // Loading state for bulk action
 
     const [isAddEventVisible, setAddEventVisible] = useState(false);
     const [newEvent, setNewEvent] = useState({ title: '', date: '', venue: '' });
@@ -57,7 +60,7 @@ function ManageClub() {
 
     const handleRemoveAdmin = async (studentId) => {
         try {
-            const response = await doCall(`${path}/student/admin/delete?clubId=${id}&studentId=${studentId}`, 'GET');
+            const response = await doCall(`${path}/student/admin/delete?clubId=${id}&studentId=${studentId}`, 'POST');
             const data = await response.json();
             setAdminData(data);
             setLoading(false);
@@ -132,18 +135,86 @@ function ManageClub() {
         fetchUserData();
     }, [id]);
 
-    const addEvent = () => {
-        setEvents([...events, { key: Date.now().toString(), ...newEvent }]);
-        setAddEventVisible(false);
-        setNewEvent({ title: '', date: '', venue: '' });
+
+
+
+        const fetchClubEvents = async () => {
+            try {
+                const res = await doCall(`${path}/student/events/?id=-1`, 'GET');
+                if (res.ok) {
+                    const data = await res.json();
+                    const filteredEvents = data.filter(event => String(event.clubId) === String(id));
+                    setAllEvents(data);
+                    setClubEvents(filteredEvents);
+                } else {
+                    setError('Failed to load events');
+                }
+            } catch (error) {
+                console.error('Error fetching events:', error);
+                setError('An error occurred while fetching events');
+            } finally {
+                setLoading(false);
+            }
+        };
+        useEffect(() => {
+            fetchClubEvents(); // Fetch events for the current club when the component loads
+        }, []);
+
+
+    const onSelectChange = (newSelectedRowKeys) => {
+        console.log('selectedRowKeys changed: ', newSelectedRowKeys);
+        setSelectedRowKeys(newSelectedRowKeys); // Set the selected rows
     };
 
-    const modifyEvent = (key) => {
-        alert(`Modify event with key: ${key}`);
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: onSelectChange,
     };
 
-    const deleteEvent = (key) => {
-        setEvents(events.filter((event) => event.key !== key));
+    const hasSelected = selectedRowKeys.length > 0;
+
+    // Handle bulk delete for selected events
+    const handleBulkDelete = () => {
+        Modal.confirm({
+            title: 'Are you sure you want to delete the selected events?',
+            content: `This action will delete ${selectedRowKeys.length} event(s).`,
+            okText: 'Yes',
+            cancelText: 'No',
+            onOk: async () => {
+                setBulkLoading(true);
+                try {
+                    // Convert the selectedRowKeys array into a comma-separated string
+                    const eventsIds = JSON.stringify(selectedRowKeys);
+
+                    // Pass the event IDs as a query parameter in the URL
+                    const res = await doCall(`${path}/student/events/deleteEvent?eventsId=${encodeURIComponent(eventsIds)}`, 'POST');
+
+                    if (res.ok) {
+                        setSelectedRowKeys([]); // Clear the selection after performing the action
+                        fetchClubEvents(); // Refresh the events after deletion
+                    } else {
+                        setError('Failed to delete events');
+                    }
+                } catch (error) {
+                    console.error('Error deleting events:', error);
+                    setError('An error occurred while deleting events');
+                } finally {
+                    setBulkLoading(false);
+                }
+            },
+        });
+    };
+
+    const getStatusTagColor = (status) => {
+        if (status === 'Ongoing') return 'green';
+        if (status === 'Cancelled') return 'red';
+        return 'volcano';
+    };
+
+    // Edit event handler
+    const handleEditEvent = (eventId) => {
+        console.log('Edit event:', eventId);
+        // You can implement the logic to navigate to an event edit page or open a modal here
     };
 
 
@@ -205,41 +276,58 @@ function ManageClub() {
 
                 <TabPane tab="Events" key="2">
                     <Row gutter={[16, 16]} style={{ width: '100%' }}>
-                        <Col span={16}>
-                            {/*<Card title="Events List">*/}
-                            {/*    <Table dataSource={events} rowKey="key">*/}
-                            {/*        <Column title="Title" dataIndex="title" key="title" />*/}
-                            {/*        <Column title="Date" dataIndex="date" key="date" />*/}
-                            {/*        <Column title="Venue" dataIndex="venue" key="venue" />*/}
-                            {/*        <Column title="Action" key="action" render={(text, record) => (*/}
-                            {/*            <>*/}
-                            {/*                <Button onClick={() => modifyEvent(record.key)} type="link">Modify</Button>*/}
-                            {/*                <Button onClick={() => deleteEvent(record.key)} type="link">Delete</Button>*/}
-                            {/*            </>*/}
-                            {/*        )} />*/}
-                            {/*    </Table>*/}
-                            {/*    <Button type="primary" onClick={() => setAddEventVisible(true)}>*/}
-                            {/*        Add Event*/}
-                            {/*    </Button>*/}
-                            {/*    <Modal*/}
-                            {/*        title="Add Event"*/}
-                            {/*        visible={isAddEventVisible}*/}
-                            {/*        onCancel={() => setAddEventVisible(false)}*/}
-                            {/*        onOk={addEvent}*/}
-                            {/*    >*/}
-                            {/*        <Form>*/}
-                            {/*            <Form.Item label="Title">*/}
-                            {/*                <Input value={newEvent.title} onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })} />*/}
-                            {/*            </Form.Item>*/}
-                            {/*            <Form.Item label="Date">*/}
-                            {/*                <Input value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })} />*/}
-                            {/*            </Form.Item>*/}
-                            {/*            <Form.Item label="Venue">*/}
-                            {/*                <Input value={newEvent.venue} onChange={(e) => setNewEvent({ ...newEvent, venue: e.target.value })} />*/}
-                            {/*            </Form.Item>*/}
-                            {/*        </Form>*/}
-                            {/*    </Modal>*/}
-                            {/*</Card>*/}
+                        <Col span={24}>
+                            <Card title="Club Events">
+                                <div style={{ marginBottom: 16 }}>
+                                    <Button
+                                        type="danger"
+                                        onClick={handleBulkDelete}
+                                        disabled={!hasSelected}
+                                        loading={bulkLoading}
+                                    >
+                                        {bulkLoading ? 'Deleting...' : 'Delete Selected'}
+                                    </Button>
+                                    {hasSelected ? ` Selected ${selectedRowKeys.length} ${selectedRowKeys.length === 1 ? 'item' : 'items'}` : ''}
+                                </div>
+
+                                <Table
+                                    rowSelection={rowSelection} // Enable row selection
+                                    dataSource={clubEvents}
+                                    rowKey="id"
+                                    loading={loading}
+                                >
+                                    <Column title="Title" dataIndex="title" key="title" />
+                                    <Column title="Date" dataIndex="date" key="date" />
+                                    <Column title="Venue" dataIndex="venueName" key="venueName" />
+                                    <Column
+                                        title="Status"
+                                        dataIndex="status"
+                                        key="status"
+                                        render={status => <Tag color={getStatusTagColor(status)}>{status}</Tag>}
+                                    />
+                                    {/*<Column*/}
+                                    {/*    title="Action"*/}
+                                    {/*    key="action"*/}
+                                    {/*    render={(text, record) => (*/}
+                                    {/*        <>*/}
+                                    {/*            <Button*/}
+                                    {/*                type="primary"*/}
+                                    {/*                style={{ marginRight: 8 }}*/}
+                                    {/*                onClick={() => handleEditEvent(record.eventId)}*/}
+                                    {/*            >*/}
+                                    {/*                Edit*/}
+                                    {/*            </Button>*/}
+                                    {/*            <Button*/}
+                                    {/*                type="danger"*/}
+                                    {/*                onClick={() => handleBulkDelete([record.eventId])}*/}
+                                    {/*            >*/}
+                                    {/*                Delete*/}
+                                    {/*            </Button>*/}
+                                    {/*        </>*/}
+                                    {/*    )}*/}
+                                    {/*/>*/}
+                                </Table>
+                            </Card>
                         </Col>
                     </Row>
                 </TabPane>
