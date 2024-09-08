@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, Card, Table, Button, Input, Space } from 'antd';
 import "./club.css";
+import {doCall} from "../../router/api";
 
 const { Search } = Input;
 
 function ManageClub() {
-    const id = -1;
+    const path = process.env.REACT_APP_API_BASE_URL
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+
+    const id = 1;
     const [clubDetails, setClubDetails] = useState(null);
-    const [membersData, setMembersData] = useState([
-        { key: '1', name: 'Ben', studentId: '1435712' },
-        { key: '2', name: 'Bob', studentId: '654321' },
-        { key: '3', name: 'Charlie', studentId: '789012' },
-    ]);
+    const [membersData, setMembersData] = useState([]);
 
     // 模拟学生数据
     const allStudents = [
@@ -36,11 +38,21 @@ function ManageClub() {
     ];
 
     useEffect(() => {
-        // 假设通过 id 获取俱乐部详情的 API
-        fetch(`/api/clubs/${id}`)
-            .then(response => response.json())
-            .then(data => setClubDetails(data))
-            .catch(error => console.error('Error fetching club details:', error));
+
+        const fetchStudents = async () => {
+            try {
+                // 使用 doCall 发送 GET 请求
+                const response = await doCall(`${path}/student/admin/?id=${id}`, 'GET');
+                const data = await response.json();
+                setMembersData(data);
+                setLoading(false);
+            } catch (err) {
+                setError('Failed to fetch student data');
+                setLoading(false);
+            }
+        };
+
+        fetchStudents();
     }, [id]);
 
     // 搜索学号的处理函数
