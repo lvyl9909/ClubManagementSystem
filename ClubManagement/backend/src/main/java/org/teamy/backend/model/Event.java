@@ -10,8 +10,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Event {
-    private Integer id;
+public class Event extends DomainObject {
     private String title;
     private String description;
     private String date;
@@ -49,7 +48,7 @@ public class Event {
 
 
     public Event(Integer id,String title, String description, Date date, Time time, Integer venueId, BigDecimal cost, Integer clubId,String status,Integer capacity) {
-        this.id=id;
+        this.setId(id);
         this.clubId = clubId;
         this.title = title;
         this.description = description;
@@ -75,14 +74,6 @@ public class Event {
     }
 
     public Event() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public EventStatus getStatus() {

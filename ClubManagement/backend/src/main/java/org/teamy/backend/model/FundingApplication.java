@@ -5,8 +5,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.SimpleTimeZone;
 
-public class FundingApplication {
-    private Integer id;
+public class FundingApplication extends DomainObject {
     private String description;
     private BigDecimal amount;
     private Integer semester;
@@ -21,7 +20,7 @@ public class FundingApplication {
 
 
     public FundingApplication(Integer id,String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date, Integer reviewerId) {
-        this.id=id;
+        this.setId(id);
         this.description = description;
         this.amount = amount;
         this.semester = semester;
@@ -121,11 +120,4 @@ public class FundingApplication {
         this.reviewerId = reviewerId;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }

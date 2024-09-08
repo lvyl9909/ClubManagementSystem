@@ -1,7 +1,6 @@
 package org.teamy.backend.model;
 
-public class Ticket {
-    private Integer id;
+public class Ticket extends DomainObject {
     private Integer studentId;
     private Student student;
     private Integer rsvpId;
@@ -11,7 +10,7 @@ public class Ticket {
     private TicketStatus status;
 
     public Ticket(Integer id,Integer studentId, Integer rsvpId, TicketStatus status,Integer eventId) {
-        this.id=id;
+        this.setId(id);
         this.studentId = studentId;
         this.rsvpId = rsvpId;
         this.status = status;
@@ -27,7 +26,7 @@ public class Ticket {
     @Override
     public String toString() {
         return "Ticket{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", studentId=" + studentId +
                 ", student=" + student +
                 ", rsvpId=" + rsvpId +
@@ -46,10 +45,6 @@ public class Ticket {
         this.student = student;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
     public Event getEvent() {
         return event;
     }
@@ -64,10 +59,6 @@ public class Ticket {
 
     public void setEventId(Integer eventId) {
         eventId = eventId;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Integer getStudentId() {

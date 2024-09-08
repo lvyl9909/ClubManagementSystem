@@ -3,8 +3,7 @@ package org.teamy.backend.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Club {
-    private Integer id;
+public class Club extends DomainObject {
     private String name;
     private String description;
     private List<Integer> studentId;
@@ -14,7 +13,7 @@ public class Club {
     private List<FundingApplication> FundingApplications;
 
     public Club(Integer id,String name, String description) {
-        this.id=id;
+        this.setId(id);  // Inherited from DomainObject
         this.name = name;
         this.description = description;
         this.studentId=new ArrayList<>();
@@ -22,7 +21,6 @@ public class Club {
         this.FundingApplications = new ArrayList<>();
         this.students = new ArrayList<>();
         this.eventsId = new ArrayList<>();
-
     }
 
     public Club() {
@@ -94,11 +92,4 @@ public class Club {
         this.FundingApplications = FundingApplications;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }
