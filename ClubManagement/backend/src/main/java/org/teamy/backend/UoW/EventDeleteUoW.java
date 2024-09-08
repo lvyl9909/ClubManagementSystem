@@ -14,6 +14,13 @@ public class EventDeleteUoW implements UnitOfWork{
     private final TicketDataMapper ticketDataMapper;
     private List<Integer> eventsId = new ArrayList<>();
 
+    @Override
+    public String toString() {
+        return "EventDeleteUoW{" +
+                "eventsId=" + eventsId +
+                '}';
+    }
+
     public EventDeleteUoW(EventDataMapper eventDataMapper, TicketDataMapper ticketDataMapper) {
         this.eventDataMapper = eventDataMapper;
         this.ticketDataMapper = ticketDataMapper;
@@ -26,8 +33,10 @@ public class EventDeleteUoW implements UnitOfWork{
     @Override
     public void commit() throws Exception {
         try {
+            System.out.println(eventsId);
             for (Integer eventId:eventsId){
                 eventDataMapper.deleteEvent(eventId);
+                System.out.println("Event Deleted");
                 List<Ticket> tickets = ticketDataMapper.getTicketsFromEvent(eventId);
                 for (Ticket ticket : tickets) {
                     ticketDataMapper.deleteTicket(ticket.getId());

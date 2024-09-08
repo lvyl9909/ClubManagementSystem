@@ -51,7 +51,7 @@ public class EventDataMapper {
 
         try {
             // 更新事件状态为 "Cancelled"
-            PreparedStatement stmt = connection.prepareStatement("UPDATE events SET status = ? WHERE event_id = ?");
+            PreparedStatement stmt = connection.prepareStatement("UPDATE events SET status = ?::event_status WHERE event_id = ?");
             stmt.setString(1, "Cancelled");
             stmt.setInt(2, eventId);
 
@@ -60,6 +60,7 @@ public class EventDataMapper {
                 throw new RuntimeException("No event found with id: " + eventId);
             }
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         } finally {
             databaseConnectionManager.releaseConnection(connection);

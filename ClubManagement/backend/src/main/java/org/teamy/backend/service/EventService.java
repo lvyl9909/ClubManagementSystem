@@ -103,6 +103,7 @@ public class EventService {
         for (Integer eventId : eventsId){
             eventDeleteUoW.addDeleteEvents(eventId);
         }
+        System.out.println(eventDeleteUoW.toString());
         eventDeleteUoW.commit();
     }
 

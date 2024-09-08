@@ -183,11 +183,7 @@ function ManageClub() {
             onOk: async () => {
                 setBulkLoading(true);
                 try {
-                    // Convert the selectedRowKeys array into a comma-separated string
-                    const eventsIds = JSON.stringify(selectedRowKeys);
-
-                    // Pass the event IDs as a query parameter in the URL
-                    const res = await doCall(`${path}/student/events/deleteEvent?eventsId=${encodeURIComponent(eventsIds)}`, 'POST');
+                    const res = await doCall(`${path}/student/events/delete`, 'POST', { eventsIds: selectedRowKeys });
 
                     if (res.ok) {
                         setSelectedRowKeys([]); // Clear the selection after performing the action

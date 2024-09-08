@@ -56,6 +56,7 @@ public class EventController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo(); // Gets the path info of the URL
+        System.out.println(pathInfo);
         if (pathInfo.equals("/save")) {
             MarshallingRequestHandler.of(
                     mapper, // 使用Jackson的ObjectMapper
@@ -86,9 +87,11 @@ public class EventController extends HttpServlet {
 
     private ResponseEntity deleteEvent(HttpServletRequest req) {
         try {
-            List<Integer> eventsId = mapper.readValue(req.getInputStream(), new TypeReference<List<Integer>>() {});
+            Map<String, List<Integer>> requestBody = mapper.readValue(req.getInputStream(), new TypeReference<Map<String, List<Integer>>>() {});
+            List<Integer> eventsIds = requestBody.get("eventsIds");
+            System.out.println(eventsIds);
             // 调用删除事件的方法
-            eventService.deleteEvent(eventsId);
+            eventService.deleteEvent(eventsIds);
             return ResponseEntity.ok(null);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
