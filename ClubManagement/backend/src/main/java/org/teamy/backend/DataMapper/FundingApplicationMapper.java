@@ -78,7 +78,7 @@ public class FundingApplicationMapper {
             stmt.setBigDecimal(2, fundingApplication.getAmount());
             stmt.setInt(3,fundingApplication.getSemester());
             stmt.setInt(4,fundingApplication.getClubId());
-            stmt.setString(5,fundingApplication.getStatus().name());
+            stmt.setString(5,fundingApplicationStatus.submitted.name());
             stmt.setDate(6,fundingApplication.getSqlDate());
             int rowsAffected = stmt.executeUpdate();  // 检查受影响的行数
             System.out.println(rowsAffected);
