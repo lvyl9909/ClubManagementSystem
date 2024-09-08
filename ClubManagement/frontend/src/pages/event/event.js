@@ -43,6 +43,7 @@ function Event() {
     const [participantsIds, setParticipantsIds] = useState([]);
 
 
+
     useEffect(() => {
         const fetchAllEvent = async () => {
             try {
@@ -257,10 +258,10 @@ function Event() {
             return;
         }
         try {
-            const submitterId = values.submitterId;  // Assuming we fetch submitter's student ID separately
+            //const submitterId = values.submitterId;
             const res = await doCall(`${path}/student/events/applyRSVP`, 'POST', {
                 eventId: selectedEvent,
-                studentId: submitterId,
+                //studentId: submitterId,
                 numTickets: values.numTickets,
                 participants_id: participantsIds,  // Send participant IDs stored internally
             });
@@ -270,7 +271,14 @@ function Event() {
                 setRsvpedEvents([...rsvpedEvents, updatedEvent]);
                 handleCloseModal();
                 form.resetFields();
-                setParticipantsIds([]); // Clear participants after submission
+                setParticipantsIds([]);
+                setAllEvents(prevEvents =>
+                    prevEvents.map(event =>
+                        event.id === selectedEvent
+                            ? { ...event, ticketsLeft: event.capacity - values.numTickets }
+                            : event
+                    )
+                );
             } else {
                 console.error('Error applying for RSVP:', res.statusText);
             }
@@ -384,6 +392,7 @@ function Event() {
                     <Column title="Date" dataIndex="date" key="date" />
                     <Column title="Time" dataIndex="time" key="time" />
                     <Column title="Venue" dataIndex="venueName" key="venueName" />
+                    <Column title="Tickets Left" dataIndex="currentCapacity" key="currentCapacity" />
                     <Column
                         title="Action"
                         key="action"
@@ -391,14 +400,15 @@ function Event() {
                             // Check if the event is RSVPed
                             const rsvpedTicket = rsvpedEvents.find(event => event.eventId === record.id);
                             const isRSVPed = rsvpedTicket && rsvpedTicket.ticketStatus !== "Cancelled";
+                            const isEventFull = record.currentCapacity <= 0;
 
                             return (
                                 <Button type="primary" ghost
-                                    disabled={isRSVPed}
+                                    disabled={isRSVPed || isEventFull}
                                     style={isRSVPed ? { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' } : {}}
                                     onClick={() => handleOpenModal(record.id)}
                                 >
-                                    {isRSVPed ? 'Already Joined' : 'Get Ticket'}
+                                    {isRSVPed ? 'Already Joined' :isEventFull?'Full': 'Get Ticket'}
                                 </Button>
                             );
                         }}

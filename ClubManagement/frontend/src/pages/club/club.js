@@ -1,10 +1,11 @@
 import React,{ useState, useEffect }  from "react";
 import {useParams} from "react-router";
-import {Table, Tag, Space, Button, Col, Row, Input, Form, Modal} from 'antd';
+import {Table, Tag, Space, Button, Col, Row, Input, Form, Modal, Typography, Divider} from 'antd';
 import {Link} from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import {doCall} from "../../router/api";
 const { Column } = Table;
+const { Title } = Typography;
 
 
 function Club() {
@@ -19,7 +20,7 @@ function Club() {
     useEffect(() => {
         const fetchClub = async () => {
             try {
-                const res = await doCall(`${path}/student/clubs/?id=-1`, 'GET');
+                const res = await doCall(`${path}/student/userdetailed/club`, 'GET');
                 if (res.ok === true) {
                     const data = await res.json();
                     setClubs(data);
@@ -72,9 +73,9 @@ function Club() {
     return (
         <>
             <Row justify="start" style={{ marginBottom: 16 }}>
-                <Col>
-                    <h2 style={{ fontSize: "32px", fontWeight: "bold" }}>My Managed Club</h2>
-                </Col>
+                <Divider orientation="left" orientationMargin="0">
+                    My Club
+                </Divider>
             </Row>
             <Table dataSource={clubs} rowKey="id">
                 <Column title="Name" dataIndex="name" key="name" />
@@ -83,10 +84,8 @@ function Club() {
                     title="Action"
                     key="action"
                     render={(text, record) => (
-                        <Button
-                            style={{ backgroundColor: "#1890ff", borderColor: "#1890ff", color: "#fff" }}
-                            onClick={() => navigate(`/club/manage`)}  // 跳转到管理页面
-                        >
+                        <Button type="primary" ghost
+                            onClick={() => navigate(`/club/manage/${record.id}`)}>
                             Manage
                         </Button>
                     )}
