@@ -8,25 +8,21 @@ import javax.swing.border.EmptyBorder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RSVP {
-    private Integer id;
+public class RSVP extends DomainObject {
     private Integer submitterId;
     private Integer eventId;
     private Event event;
     private Student submitter;
-    //private List<Ticket> tickets;
     private Integer number;
     private List<Integer> participantIds;
+    private List<Student> participants;
 
-    private List<Student> participants ;
-
-    public RSVP(Integer id, Integer submitterId, Integer eventId, Integer number, List<Integer>participantIds) {
-        this.id=id;
+    public RSVP(Integer id, Integer submitterId, Integer eventId, Integer number, List<Integer> participantIds) {
+        this.setId(id); // Inherited From DomainObject
         this.submitterId = submitterId;
         this.eventId = eventId;
         this.number = number;
         this.participantIds = participantIds;
-
     }
     public RSVP( Integer submitterId, Integer eventId, Integer number, List<Integer>participantIds) {
         this.submitterId = submitterId;
@@ -45,7 +41,7 @@ public class RSVP {
     @Override
     public String toString() {
         return "RSVP{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", submitterId=" + submitterId +
                 ", eventId=" + eventId +
                 ", event=" + event +
@@ -63,14 +59,6 @@ public class RSVP {
 
     public void setSubmitter(Student submitter) {
         this.submitter = submitter;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Event getEvent() {
