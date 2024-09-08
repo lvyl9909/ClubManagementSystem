@@ -168,8 +168,8 @@ public class EventDataMapper {
             stmt.setBigDecimal(6, event.getCost());
             stmt.setInt(7, event.getClub());
             stmt.setString(8, event.getStatus().name());  // 假设状态是枚举类型
-            stmt.setInt(9, event.getId());  // 使用 eventId 作为更新条件
-            stmt.setInt(10,event.getCapacity());
+            stmt.setInt(9,event.getCapacity());
+            stmt.setInt(10, event.getId());  // 使用 eventId 作为更新条件
 
             // 执行更新操作
             int rowsAffected = stmt.executeUpdate();
