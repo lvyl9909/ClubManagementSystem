@@ -15,17 +15,17 @@ const UpperHeader =() => {
                 </a>
             ),
         },
-        {
-            key: '2',
-            label: (
-                <a onClick={() => logout} target="_blank" rel="noopener noreferrer" >
-                    Logout
-                </a>
-            ),
-        }
+        // {
+        //     key: '2',
+        //     label: (
+        //         <a onClick={() => logout} target="_blank" rel="noopener noreferrer" >
+        //             Logout
+        //         </a>
+        //     ),
+        //}
     ]
     const logout = () => {
-        localStorage.removeItem('token')
+        //localStorage.removeItem('token')
         //navigate('/login')
     }
     return (
