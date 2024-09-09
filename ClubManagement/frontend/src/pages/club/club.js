@@ -85,7 +85,8 @@ function Club() {
                     key="action"
                     render={(text, record) => (
                         <Button type="primary" ghost
-                            onClick={() => navigate(`/club/manage/${record.id}`)}>
+                            onClick={() =>
+                                navigate(`/club/manage/${record.id}`)}>
                             Manage
                         </Button>
                     )}

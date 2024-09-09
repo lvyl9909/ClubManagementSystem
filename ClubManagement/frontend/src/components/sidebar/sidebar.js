@@ -3,6 +3,8 @@ import {Layout, Menu} from "antd";
 import MenuConfig from "../../config/config";
 import * as Icon from "@ant-design/icons"
 import { useNavigate } from 'react-router-dom'
+import {useAuth} from "../../router/auth";
+
 const { Header, Sider, Content } = Layout;
 
 const iconToElement = (name) => React.createElement(Icon[name]);
@@ -23,9 +25,17 @@ const items = MenuConfig.map((icon) => {
     return child
 })
 const SideBar =() => {
+    const {logout, user} = useAuth()
     const navigate = useNavigate()
-    const selectMenu = (e) => {
-        navigate(e.key)
+    const selectMenu = async (e) => {
+        if(e.key === 'logout'){
+            if(user && user.username){
+                await logout(user.username)
+            }
+            navigate('/login')
+        }else {
+            navigate(e.key)
+        }
     }
     return(
         <Sider trigger={null} collapsible>
