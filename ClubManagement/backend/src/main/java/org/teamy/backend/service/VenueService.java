@@ -37,11 +37,10 @@ public class VenueService {
     public List<Venue> getAllVenue()throws Exception{
         List<Venue> venues = null;
         try {
-            venues = venueRepository.getAllVenue();
+            venues = (List<Venue>) venueRepository.getAllVenue().values();
             return venues;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 }

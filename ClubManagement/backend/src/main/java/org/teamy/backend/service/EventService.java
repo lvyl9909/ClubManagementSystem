@@ -7,11 +7,9 @@ import org.teamy.backend.UoW.EventDeleteUoW;
 import org.teamy.backend.UoW.RSVPUoW;
 import org.teamy.backend.model.*;
 import org.teamy.backend.model.exception.NotFoundException;
-import org.teamy.backend.repository.ClubRepository;
-import org.teamy.backend.repository.EventRepository;
-import org.teamy.backend.repository.RSVPRepository;
-import org.teamy.backend.repository.TicketRepository;
+import org.teamy.backend.repository.*;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,17 +17,21 @@ public class EventService {
     EventRepository eventRepository;
     RSVPRepository rsvpRepository;
     TicketRepository ticketRepository;
+    VenueRepository venueRepository;
+    ClubRepository clubRepository;
     private static EventService instance;
-    public static synchronized EventService getInstance(EventRepository eventRepository, RSVPRepository rsvpRepository,TicketRepository ticketRepository) {
+    public static synchronized EventService getInstance(EventRepository eventRepository, RSVPRepository rsvpRepository,TicketRepository ticketRepository,VenueRepository venueRepository,ClubRepository clubRepository) {
         if (instance == null) {
-            instance = new EventService(eventRepository,rsvpRepository,ticketRepository);
+            instance = new EventService(eventRepository,rsvpRepository,ticketRepository, venueRepository, clubRepository);
         }
         return instance;
     }
-    private EventService(EventRepository eventRepository,RSVPRepository rsvpRepository,TicketRepository ticketRepository) {
+    private EventService(EventRepository eventRepository,RSVPRepository rsvpRepository,TicketRepository ticketRepository,VenueRepository venueRepository,ClubRepository clubRepository) {
         this.eventRepository = eventRepository;
         this.rsvpRepository = rsvpRepository;
         this.ticketRepository = ticketRepository;
+        this.clubRepository=clubRepository;
+        this.venueRepository = venueRepository;
     }
     public Event getEventById(Integer id) throws Exception {
         if (id <= 0) {
@@ -59,6 +61,14 @@ public class EventService {
         if (event ==null||event.getTitle() == null || event.getTitle().isEmpty()) {
             throw new IllegalArgumentException("Club cannot be empty");
         }
+        Venue venue = venueRepository.getVenueById(event.getVenueId());
+        Club club = clubRepository.findClubById(event.getClubId());
+        if(event.getCost().compareTo(BigDecimal.valueOf(club.getBudget()))>0){
+            throw new RuntimeException("budget not enough");
+        }
+        if(event.getCapacity()>venue.getCapacity()){
+            throw new RuntimeException("venue capacity not enough");
+        }
         // Recall methods in DAO layer
         return eventRepository.saveEvent(event);
     }
@@ -85,6 +95,14 @@ public class EventService {
             Event existingEvent = eventRepository.findEventById(event.getId());
             if (existingEvent == null) {
                 throw new Exception("Event not found with ID: " + event.getId());
+            }
+            Venue venue = venueRepository.getVenueById(event.getVenueId());
+            Club club = clubRepository.findClubById(event.getClubId());
+            if(event.getCost().compareTo(BigDecimal.valueOf(club.getBudget()))>0){
+                throw new RuntimeException("budget not enough");
+            }
+            if(event.getCapacity()>venue.getCapacity()){
+                throw new RuntimeException("venue capacity not enough");
             }
             // 调用 DataMapper 更新事件
             return eventRepository.updateEvent(event);
