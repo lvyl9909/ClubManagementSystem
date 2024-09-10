@@ -9,6 +9,21 @@ import java.util.List;
 public class VenueService {
     private final VenueDataMapper venueDataMapper;
 
+//    private static VenueService instance;
+//    private final VenueDataMapper venueDataMapper;
+//
+//    // 私有构造函数，防止外部直接创建实例
+//    private VenueService(DatabaseConnectionManager databaseConnectionManager) {
+//        this.venueDataMapper = new VenueDataMapper(databaseConnectionManager);
+//    }
+//
+//    // 提供全局访问点
+//    public static synchronized VenueService getInstance(DatabaseConnectionManager databaseConnectionManager) {
+//        if (instance == null) {
+//            instance = new VenueService(databaseConnectionManager);
+//        }
+//        return instance;
+//    }
     public VenueService(VenueDataMapper venueDataMapper) {
         this.venueDataMapper = venueDataMapper;
     }

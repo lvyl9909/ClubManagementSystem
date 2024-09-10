@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FundingApplicationMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
@@ -93,5 +94,70 @@ public class FundingApplicationMapper {
         } finally{
             databaseConnectionManager.releaseConnection(connection);
         }
+    }
+    public List<Integer> findApplicationIdByClubId(Integer clubId){
+        var connection = databaseConnectionManager.nextConnection();
+        List<Integer> applicationsId= new ArrayList<>();
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT application_id FROM fundingapplications WHERE club = ?");
+            stmt.setInt(1, clubId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                applicationsId.add(rs.getInt("application_id"));
+            }
+            return applicationsId;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+
+        }
+    }
+    public List<FundingApplication> findFundingApplicationsByIds(List<Integer> applicationIds) throws SQLException {
+        // 如果 applicationIds 列表为空，则返回空列表
+        if (applicationIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 构建 SQL 查询，使用 IN 子句来查询多个申请记录
+        String query = "SELECT * FROM fundingapplications WHERE application_id IN (" +
+                applicationIds.stream().map(String::valueOf).collect(Collectors.joining(",")) + ")";
+
+        var connection = databaseConnectionManager.nextConnection();
+        List<FundingApplication> fundingApplications = new ArrayList<>();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            // 遍历结果集，将每个 FundingApplication 实例化并加入列表
+            while (rs.next()) {
+                // 获取 fundingApplication 的状态
+                String statusString = rs.getString("status");
+                fundingApplicationStatus status = fundingApplicationStatus.fromString(statusString);
+
+                // 根据需要加载关联的 Events 数据
+                // List<Event> events = getRelatedEvents(rs.getInt("id"));
+
+                FundingApplication fundingApplication = new FundingApplication(
+                        rs.getInt("application_id"),
+                        rs.getString("description"),
+                        rs.getBigDecimal("amount"),
+                        rs.getInt("semester"),
+                        rs.getInt("club"),
+                        status,
+                        rs.getDate("date"),
+                        rs.getInt("reviewer")
+                );
+
+                fundingApplications.add(fundingApplication);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching funding applications by IDs", e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+
+        return fundingApplications;
     }
 }

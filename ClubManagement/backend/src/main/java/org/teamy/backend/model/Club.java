@@ -11,16 +11,13 @@ public class Club extends DomainObject {
     private List<Integer> eventsId;
     private List<Event> events;
     private List<FundingApplication> FundingApplications;
+    private List<Integer> FundingApplicationsId;
+
 
     public Club(Integer id,String name, String description) {
         this.setId(id);  // Inherited from DomainObject
         this.name = name;
         this.description = description;
-        this.studentId=new ArrayList<>();
-        this.events = new ArrayList<>();
-        this.FundingApplications = new ArrayList<>();
-        this.students = new ArrayList<>();
-        this.eventsId = new ArrayList<>();
     }
 
     public Club() {
@@ -92,4 +89,11 @@ public class Club extends DomainObject {
         this.FundingApplications = FundingApplications;
     }
 
+    public List<Integer> getFundingApplicationsId() {
+        return FundingApplicationsId;
+    }
+
+    public void setFundingApplicationsId(List<Integer> fundingApplicationsId) {
+        FundingApplicationsId = fundingApplicationsId;
+    }
 }

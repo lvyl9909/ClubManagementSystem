@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TicketDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
@@ -37,7 +38,42 @@ public class TicketDataMapper {
         }
         return null;
     }
+    public List<Ticket> findTicketsByIds(List<Integer> ticketIds) throws SQLException {
+        // 如果 ticketIds 列表为空，则返回空列表
+        if (ticketIds.isEmpty()) {
+            return new ArrayList<>();
+        }
 
+        // 构建 SQL 查询，使用 IN 子句来查询多个 ticket_id
+        String query = "SELECT * FROM tickets WHERE ticket_id IN (" +
+                ticketIds.stream().map(String::valueOf).collect(Collectors.joining(",")) + ")";
+
+        var connection = databaseConnectionManager.nextConnection();
+        List<Ticket> tickets = new ArrayList<>();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            // 遍历结果集，将每个 Ticket 实例化并加入列表
+            while (rs.next()) {
+                Ticket ticket = new Ticket(
+                        rs.getInt("ticket_id"),
+                        rs.getInt("student_id"),
+                        rs.getInt("rsvp"),
+                        TicketStatus.valueOf(rs.getString("status")),  // 假设 status 是字符串并且能转换为枚举
+                        rs.getInt("event_id")
+                );
+                tickets.add(ticket);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching tickets by IDs", e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+
+        return tickets;
+    }
     public void saveTicket(Ticket ticket) throws SQLException {
         var connection = databaseConnectionManager.nextConnection();
         try {
@@ -103,22 +139,22 @@ public class TicketDataMapper {
         return tickets;
     }
 
-    public List<Ticket> getTicketsFromStudent(Integer studentId) throws SQLException {
+    public List<Integer> getTicketsIdFromStudent(Integer studentId) {
         var connection = databaseConnectionManager.nextConnection();
-        List<Ticket> tickets = new ArrayList<>();
+        List<Integer> tickets = new ArrayList<>();
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM tickets WHERE student_id = ?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT ticket_id FROM tickets WHERE student_id = ?");
             stmt.setInt(1, studentId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Ticket ticket = new Ticket( rs.getInt("ticket_id"), rs.getInt("student_id"),rs.getInt("rsvp"), TicketStatus.valueOf(rs.getString("status")) ,rs.getInt("event_id"));
-                tickets.add(ticket);
+                tickets.add(rs.getInt("ticket_id"));
             }
-        } finally {
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
             databaseConnectionManager.releaseConnection(connection);
         }
-
         return tickets;
     }
 }

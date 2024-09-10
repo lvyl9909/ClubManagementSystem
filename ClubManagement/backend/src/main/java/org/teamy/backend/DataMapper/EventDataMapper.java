@@ -12,13 +12,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EventDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
     public EventDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
-    public Event findEventById(int Id) throws Exception {
+    public Event findEventById(int Id) {
         var connection = databaseConnectionManager.nextConnection();
 
         try {
@@ -45,6 +46,47 @@ public class EventDataMapper {
             databaseConnectionManager.releaseConnection(connection);
         }
         return null;
+    }
+    public List<Event> findEventsByIds(List<Integer> eventIds) throws SQLException {
+        // 如果 eventIds 列表为空，则返回空列表
+        if (eventIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 构建 SQL 查询，使用 IN 子句来查询多个事件
+        String query = "SELECT * FROM events WHERE event_id IN (" +
+                eventIds.stream().map(String::valueOf).collect(Collectors.joining(",")) + ")";
+
+        var connection = databaseConnectionManager.nextConnection();
+        List<Event> events = new ArrayList<>();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            // 遍历结果集，将每个 Event 实例化并加入列表
+            while (rs.next()) {
+                Event event = new Event(
+                        rs.getInt("event_id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getDate("date"),
+                        rs.getTime("time"),
+                        rs.getInt("venue"),            // 假设 venue 是 ID，如果是字符串，修改为 rs.getString("venue")
+                        rs.getBigDecimal("cost"),
+                        rs.getInt("club_id"),
+                        rs.getString("status"),       // 根据需要将字符串转换为 Enum
+                        rs.getInt("capacity")
+                );
+                events.add(event);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching events by IDs", e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+
+        return events;
     }
     public void deleteEvent(int eventId) throws Exception {
         var connection = databaseConnectionManager.nextConnection();
@@ -180,6 +222,25 @@ public class EventDataMapper {
         } finally {
             // 释放数据库连接
             databaseConnectionManager.releaseConnection(connection);
+        }
+    }
+
+    public List<Integer> findEventIdByClubId(Integer clubId){
+        var connection = databaseConnectionManager.nextConnection();
+        List<Integer> eventsId= new ArrayList<>();
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT event_id FROM events WHERE club_id = ?");
+            stmt.setInt(1, clubId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                eventsId.add(rs.getInt("event_id"));
+            }
+            return eventsId;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+
         }
     }
 }

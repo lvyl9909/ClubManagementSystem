@@ -92,4 +92,5 @@ public class Ticket extends DomainObject {
     public void setStatus(TicketStatus status) {
         this.status = status;
     }
+
 }
