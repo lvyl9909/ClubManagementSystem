@@ -18,7 +18,6 @@ public class Person implements UserDetails {
     private String password;
     private boolean isActive;
     private Set<Role> roles = new HashSet<>();
-
     public Person() {
     }
 
@@ -57,7 +56,7 @@ public class Person implements UserDetails {
         this.phoneNumber = phoneNumber;
         this.password=password;
         this.username=username;
-        this.roles.add(Role.USER); // 默认添加 USER 角色
+        this.roles.add(new Role("USER")); // 默认添加 USER 角色
         this.isActive=true;
     }
     public Person(Long id,String name, String email, Long phoneNumber,String password,String username,boolean isActive) {
@@ -67,7 +66,7 @@ public class Person implements UserDetails {
         this.phoneNumber = phoneNumber;
         this.password=password;
         this.username=username;
-        this.roles.add(Role.USER); // 默认添加 USER 角色
+        this.roles.add(new Role("USER")); // 默认添加 USER 角色
         this.isActive=isActive;
     }
 
@@ -77,7 +76,7 @@ public class Person implements UserDetails {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.username=username;
-        this.roles.add(Role.USER); // 默认添加 USER 角色
+        this.roles.add(new Role("USER")); // 默认添加 USER 角色
         this.isActive=isActive;
     }
 
@@ -140,16 +139,14 @@ public class Person implements UserDetails {
         return roles;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new HashSet<>(roles);  // 直接返回 roles 作为权限
+    }
+
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(Role::toAuthority)
-                .collect(Collectors.toSet());
-    }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;

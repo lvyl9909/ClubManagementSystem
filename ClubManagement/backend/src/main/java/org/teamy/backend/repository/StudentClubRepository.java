@@ -21,6 +21,9 @@ public class StudentClubRepository {
     public List<Integer> findStudentIdByClubId(Integer clubId) throws SQLException {
         return studentClubDataMapper.findStudentIdByClubId(clubId);
     }
+    public List<Integer> findClubIdByStudentId(Integer studentId) throws SQLException {
+        return studentClubDataMapper.findClubIdByStudentId(studentId);
+    }
     public void addNewAdmin(Integer clubId,Integer studentId) throws SQLException {
         studentClubDataMapper.addNewAdmin(clubId,studentId);
     }

@@ -3,6 +3,7 @@ package org.teamy.backend.service;
 import org.teamy.backend.model.Venue;
 import org.teamy.backend.repository.VenueRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VenueService {
@@ -34,10 +35,10 @@ public class VenueService {
     }
 
 
-    public List<Venue> getAllVenue()throws Exception{
+    public List<Venue> getAllVenue() throws Exception {
         List<Venue> venues = null;
         try {
-            venues = (List<Venue>) venueRepository.getAllVenue().values();
+            venues = new ArrayList<>(venueRepository.getAllVenue().values());  // 转换 Collection<Venue> 为 List<Venue>
             return venues;
         } catch (Exception e) {
             throw new RuntimeException(e);

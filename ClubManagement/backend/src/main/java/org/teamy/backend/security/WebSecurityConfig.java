@@ -32,6 +32,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.teamy.backend.DataMapper.*;
 import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.config.DatabaseConnectionManager;
+import org.teamy.backend.repository.StudentClubRepository;
 import org.teamy.backend.repository.StudentRepository;
 import org.teamy.backend.security.model.Role;
 import org.teamy.backend.security.repository.TokenService;
@@ -64,7 +65,8 @@ public class WebSecurityConfig implements ServletContextAware {
         StudentClubDataMapper studentClubDataMapper = StudentClubDataMapper.getInstance(databaseConnectionManager);
 
         StudentRepository userRepository =  StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper);
-        return new CustomUserDetailsService(userRepository);
+        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
+        return new CustomUserDetailsService(userRepository,studentClubRepository);
     }
     //未认证的入口
     @Bean
@@ -94,10 +96,10 @@ public class WebSecurityConfig implements ServletContextAware {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/token").permitAll()
                         .requestMatchers(ADMIN_PROTECTED_URLS)
-                        .hasRole(Role.ADMIN.name())
+                        .hasAuthority("ROLE_ADMIN")
                         .requestMatchers(STUDENT_PROTECTED_URLS)
 //                        .permitAll()
-                        .hasRole(Role.USER.name())
+                        .hasAuthority("ROLE_USER")
                         .anyRequest()
                         .permitAll())
                 .authenticationManager(authenticationManager)
@@ -153,16 +155,16 @@ public class WebSecurityConfig implements ServletContextAware {
         filter.setAuthenticationSuccessHandler(simpleUrlAuthenticationSuccessHandler);
         return filter;
     }
-    private UserDetails adminUser(PasswordEncoder passwordEncoder) {
-        return new User(System.getProperty(PROPERTY_ADMIN_USERNAME),
-                passwordEncoder.encode(System.getProperty(PROPERTY_ADMIN_PASSWORD)),
-                Collections.singleton(Role.ADMIN.toAuthority()));
-    }
-    private UserDetails nonAdminUser(PasswordEncoder passwordEncoder) {
-        return new User("user",
-                passwordEncoder.encode("user"),
-                Collections.singleton(Role.USER.toAuthority()));
-    }
+//    private UserDetails adminUser(PasswordEncoder passwordEncoder) {
+//        return new User(System.getProperty(PROPERTY_ADMIN_USERNAME),
+//                passwordEncoder.encode(System.getProperty(PROPERTY_ADMIN_PASSWORD)),
+//                Collections.singleton(Role.ADMIN.toAuthority()));
+//    }
+//    private UserDetails nonAdminUser(PasswordEncoder passwordEncoder) {
+//        return new User("user",
+//                passwordEncoder.encode("user"),
+//                Collections.singleton(Role.USER.toAuthority()));
+//    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         var passwordEncoder = new BCryptPasswordEncoder();

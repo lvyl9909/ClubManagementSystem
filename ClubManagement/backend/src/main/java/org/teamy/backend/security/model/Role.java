@@ -3,11 +3,17 @@ package org.teamy.backend.security.model;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-public enum Role {
-    ADMIN,
-    USER;
+public class Role implements GrantedAuthority {
+    private String roleName;
 
-    public GrantedAuthority toAuthority() {
-        return new SimpleGrantedAuthority(String.format("ROLE_%s", name()));
+    public Role(String roleName) {
+        this.roleName = roleName;
     }
+
+    @Override
+    public String getAuthority() {
+        return String.format("ROLE_%s", roleName);
+    }
+
+    // Getter 和 Setter 方法...
 }

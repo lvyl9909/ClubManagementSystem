@@ -1,48 +1,35 @@
 package org.teamy.backend.security;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.teamy.backend.DataMapper.StudentDataMapper;
 import org.teamy.backend.model.Person;
+import org.teamy.backend.repository.StudentClubRepository;
 import org.teamy.backend.repository.StudentRepository;
 import org.teamy.backend.security.model.Role;
+import org.teamy.backend.service.StudentClubService;
 import org.teamy.backend.service.StudentService;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final Map<String, Person> userDatabase = new HashMap<>();
     private final StudentRepository studentRepository;
+    private final StudentClubRepository studentClubRepository;
     private static CustomUserDetailsService instance;
-    public static synchronized CustomUserDetailsService getInstance(StudentRepository studentRepository) {
+    public static synchronized CustomUserDetailsService getInstance(StudentRepository studentRepository,StudentClubRepository studentClubRepository) {
         if (instance == null) {
-            instance = new CustomUserDetailsService(studentRepository);
+            instance = new CustomUserDetailsService(studentRepository,studentClubRepository);
         }
         return instance;
     }
-    public CustomUserDetailsService(StudentRepository studentRepository) {
+    public CustomUserDetailsService(StudentRepository studentRepository,StudentClubRepository studentClubRepository) {
         this.studentRepository = studentRepository;
-    }
-    public CustomUserDetailsService(PasswordEncoder passwordEncoder) {
-        this.studentRepository = null;
-        Person admin = new Person();
-        admin.setUsername("admin");
-        admin.setPassword(passwordEncoder.encode("adminPass"));
-        admin.setRoles(Set.of(Role.ADMIN));
-        admin.setActive(true);
-        userDatabase.put(admin.getUsername(), admin);
-
-        Person user = new Person();
-        user.setUsername("user");
-        user.setPassword(passwordEncoder.encode("userPass"));
-        user.setRoles(Set.of(Role.USER));
-        user.setActive(true);
-        userDatabase.put(user.getUsername(), user);
+        this.studentClubRepository = studentClubRepository;
     }
 
     @Override
@@ -55,7 +42,19 @@ public class CustomUserDetailsService implements UserDetailsService {
                 System.out.println("username not found");
                 throw new UsernameNotFoundException("User not found");
             }else {
-                System.out.println(user.getAuthorities());
+                // 添加基础角色
+                Set<Role> roles = new HashSet<>();
+                roles.add(new Role("USER"));  // 基础角色
+
+                // 加载 clubId 列表并动态添加角色
+                List<Integer> clubIds = studentClubRepository.findClubIdByStudentId(Math.toIntExact(user.getId()));
+                for (Integer clubId : clubIds) {
+                    roles.add(new Role("CLUB_" + clubId));  // 动态角色
+                }
+
+                // 将所有角色设置到用户对象
+                user.setRoles(roles);
+                System.out.println("yong hu quan xian :"+user.getAuthorities());
                 System.out.println(user.getPassword());
             }
             return user;
@@ -65,8 +64,4 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     // 你可以添加方法来动态添加或删除用户
-    public void createUser(Person person) {
-        userDatabase.put(person.getUsername(), person);
-    }
-
 }

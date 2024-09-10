@@ -62,7 +62,7 @@ public class ContextListener implements ServletContextListener {
         TicketDataMapper ticketDataMapper = TicketDataMapper.getInstance(databaseConnectionManager);
         VenueDataMapper venueDataMapper = VenueDataMapper.getInstance(databaseConnectionManager);
 
-        EventRepository eventRepository = EventRepository.getInstance(eventDataMapper,venueDataMapper);
+        EventRepository eventRepository = EventRepository.getInstance(eventDataMapper,venueDataMapper,clubDataMapper);
         FundingApplicationRepository fundingApplicationRepository = FundingApplicationRepository.getInstance(fundingApplicationMapper);
         RSVPRepository rsvpRepository = RSVPRepository.getInstance(rsvpDataMapper);
         StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
@@ -79,7 +79,7 @@ public class ContextListener implements ServletContextListener {
         StudentService studentService =StudentService.getInstance(studentRepository);
         VenueService venueService = VenueService.getInstance(venueRepository);
         TicketService ticketService = TicketService.getInstance(ticketRepository,studentRepository,eventDataMapper);
-        CustomUserDetailsService customUserDetailsService = CustomUserDetailsService.getInstance(studentRepository);
+        CustomUserDetailsService customUserDetailsService = CustomUserDetailsService.getInstance(studentRepository,studentClubRepository);
 
         sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager );
         sce.getServletContext().setAttribute(CLUB_SERVICE, clubService);

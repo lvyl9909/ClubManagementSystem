@@ -30,7 +30,7 @@ public class FacultyAdministratorMapper {
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
                 return new FacultyAdministrator(rs.getLong("id"), rs.getString("faculty_id"), rs.getString("name")
-                        ,rs.getString("email"),rs.getLong("phone_number"),"123", rs.getBoolean("isactive"), Collections.singleton(Role.ADMIN));
+                        ,rs.getString("email"),rs.getLong("phone_number"),"123", rs.getBoolean("isactive"), Collections.singleton(new Role("ADMIN")));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
