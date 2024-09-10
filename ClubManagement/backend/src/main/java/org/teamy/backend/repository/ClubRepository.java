@@ -5,10 +5,13 @@ import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
 import org.teamy.backend.model.FundingApplication;
 import org.teamy.backend.model.Student;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ClubRepository {
     private final ClubDataMapper clubDataMapper;
@@ -18,6 +21,8 @@ public class ClubRepository {
     private final StudentClubDataMapper studentsClubsDataMapper;
     private static ClubRepository instance;
 
+    private final Cache<Integer, Club> clubCache;
+
 
     private ClubRepository(ClubDataMapper clubDataMapper, EventDataMapper eventDataMapper, FundingApplicationMapper fundingApplicationMapper, StudentRepository studentRepository, StudentClubDataMapper studentsClubsDataMapper) {
         this.clubDataMapper = clubDataMapper;
@@ -25,6 +30,12 @@ public class ClubRepository {
         this.fundingApplicationMapper = fundingApplicationMapper;
         this.studentRepository = studentRepository;
         this.studentsClubsDataMapper = studentsClubsDataMapper;
+
+        // Initialize cache with max size and expiration time
+        this.clubCache = CacheBuilder.newBuilder()
+                .maximumSize(100) // Maximum 100 clubs in the cache
+                .expireAfterWrite(30, TimeUnit.MINUTES) // Expire entries after 10 minutes
+                .build();
     }
     public static synchronized ClubRepository getInstance(ClubDataMapper clubDataMapper, EventDataMapper eventDataMapper, FundingApplicationMapper fundingApplicationMapper, StudentRepository studentRepository, StudentClubDataMapper studentsClubsDataMapper) {
         if (instance == null) {
@@ -33,14 +44,32 @@ public class ClubRepository {
         return instance;
     }
     public Club findClubById(int id) throws SQLException {
-        Club club = clubDataMapper.findClubById(id);
-        club.setStudentId(studentsClubsDataMapper.findStudentIdByClubId(id));
-        club.setEventsId(eventDataMapper.findEventIdByClubId(id));
-        club.setFundingApplicationsId(fundingApplicationMapper.findApplicationIdByClubId(id));
+        // Check cache first
+        Club club = clubCache.getIfPresent(id);
+        if (club != null) {
+            return club; // Return cached club if available
+        }
+
+        // If not in cache, fetch from database and cache the result
+        club = clubDataMapper.findClubById(id);
+        if (club != null) {
+            club.setStudentId(studentsClubsDataMapper.findStudentIdByClubId(id));
+            club.setEventsId(eventDataMapper.findEventIdByClubId(id));
+            club.setFundingApplicationsId(fundingApplicationMapper.findApplicationIdByClubId(id));
+
+            // Store in cache
+            clubCache.put(id, club);
+        }
+
         return club;
     }
     public boolean saveClub(Club club) throws Exception {
-        return clubDataMapper.saveClub(club);
+        boolean result = clubDataMapper.saveClub(club);
+        if (result) {
+            // Update cache after saving
+            clubCache.put(club.getId(), club);
+        }
+        return result;
     }
     public List<Club> getAllClub() {
         return clubDataMapper.getAllClub();

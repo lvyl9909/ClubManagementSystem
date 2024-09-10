@@ -11,6 +11,8 @@ import org.teamy.backend.model.Ticket;
 import org.teamy.backend.repository.StudentClubRepository;
 import org.teamy.backend.repository.StudentRepository;
 
+import java.awt.desktop.SystemSleepEvent;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,11 +58,28 @@ public class StudentService {
         }
         return student;
     }
-    public List<Club> getClub(Student student){
-        System.out.println("current student club:"+student.getClubs());
-        if (student.getClubs()==null||student.getClubs().isEmpty()){
+    public List<Club> getClub(Integer studentId){
+        System.out.println("current studentId :" + studentId);
+        // 从缓存或数据库中查找该学生对象
+        Student student = null;
+        try {
+            // 先尝试从缓存或数据库中获取学生信息
+            student = studentRepository.findStudentById(studentId);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching student by ID", e);
+        }
+        System.out.println(student);
+        // 如果学生不存在，返回空列表或者抛出异常
+        if (student == null) {
+            throw new RuntimeException("Student not found with ID: " + studentId);
+        }
+        System.out.println(student.getClubs());
+        // 如果 student 的 clubs 列表为空或未初始化，懒加载俱乐部列表
+        if (student.getClubs() == null || student.getClubs().isEmpty()) {
             student = studentRepository.lazyLoadClub(student);
         }
+
+        // 返回学生的 club 列表
         return student.getClubs();
     }
     public List<Ticket> getTicket(Student student){

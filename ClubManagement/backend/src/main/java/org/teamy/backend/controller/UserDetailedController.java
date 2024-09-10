@@ -65,19 +65,18 @@ public class UserDetailedController extends HttpServlet {
 
     private ResponseEntity listClubs() {
 //        Integer currentStudent = studentService.getCurrentStudent();
-        List<Club> clubs = studentService.getClub(studentService.getCurrentStudent());
+        List<Club> clubs = studentService.getClub(Math.toIntExact(studentService.getCurrentStudent().getId()));
         return ResponseEntity.ok(clubs);
     }
-    private ResponseEntity listTickets()  {
-        Map<Ticket, Event> ticketInfo = null;
+    private ResponseEntity listTickets() {
+        Map<Ticket, Event> ticketInfo;
         try {
-            System.out.println("current student id:"+studentService.getCurrentStudent().getId());
+            System.out.println("current student id:" + studentService.getCurrentStudent().getId());
             ticketInfo = ticketService.getTicketInfo(studentService.getCurrentStudent());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-//        List<Ticket> tickets = studentService.getLazyLoadedTickets(studentService.getCurrentStudent());
-        return ResponseEntity.ok(convertMapToDTOList(ticketInfo));
+        return ResponseEntity.ok(convertMapToDTOList(ticketInfo)); // 转换为DTO后返回
     }
     public List<TicketEventDTO> convertMapToDTOList(Map<Ticket, Event> ticketInfo) {
         List<TicketEventDTO> dtoList = new ArrayList<>();
