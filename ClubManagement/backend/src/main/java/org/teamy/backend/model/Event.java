@@ -19,6 +19,8 @@ public class Event extends DomainObject {
     private Integer venueId;
     private BigDecimal cost;
     private Integer clubId;
+    private Club club;
+    private Venue venue;
     private Integer capacity;
     private Integer currentCapacity;
     private List<RSVP> rsvps;
@@ -180,6 +182,18 @@ public class Event extends DomainObject {
         this.currentCapacity = currentCapacity;
     }
 
+    public void setClub(Club club) {
+        this.club = club;
+    }
+
+    public Venue getVenue() {
+        return venue;
+    }
+
+    public void setVenue(Venue venue) {
+        this.venue = venue;
+    }
+
     public void addRSVP(RSVP rsvp){
         this.rsvps.add(rsvp);
     }
@@ -193,4 +207,17 @@ public class Event extends DomainObject {
             return false;
         }
     }
+    // 方法来处理与业务相关的逻辑
+    public void validateBudget() {
+        if (this.cost.compareTo(BigDecimal.valueOf(club.getBudget())) > 0) {
+            throw new RuntimeException("Budget not enough");
+        }
+    }
+
+    public void validateCapacity() {
+        if (this.capacity > venue.getCapacity()) {
+            throw new RuntimeException("Venue capacity not enough");
+        }
+    }
+
 }

@@ -63,12 +63,11 @@ public class EventService {
         }
         Venue venue = venueRepository.getVenueById(event.getVenueId());
         Club club = clubRepository.findClubById(event.getClubId());
-        if(event.getCost().compareTo(BigDecimal.valueOf(club.getBudget()))>0){
-            throw new RuntimeException("budget not enough");
-        }
-        if(event.getCapacity()>venue.getCapacity()){
-            throw new RuntimeException("venue capacity not enough");
-        }
+        event.setClub(club);
+        event.setVenue(venue);
+
+        event.validateBudget();
+        event.validateCapacity();
         // Recall methods in DAO layer
         return eventRepository.saveEvent(event);
     }
