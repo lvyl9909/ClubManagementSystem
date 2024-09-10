@@ -73,6 +73,7 @@ public class StudentRepository {
     public Student lazyLoadClub(Student student){
         try {
             List<Club> clubs = clubDataMapper.findClubsByIds(student.getClubId());
+            System.out.println("club list:"+clubs);
             student.setClubs(clubs);
         } catch (SQLException e) {
             throw new RuntimeException("Error loading students for club", e);

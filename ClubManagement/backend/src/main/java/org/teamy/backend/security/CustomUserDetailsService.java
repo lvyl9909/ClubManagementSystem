@@ -50,6 +50,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Person user=null;
         try {
             user = studentDataMapper.findStudentByUsername(username);
+
             if (user == null) {
                 System.out.println("username not found");
                 throw new UsernameNotFoundException("User not found");

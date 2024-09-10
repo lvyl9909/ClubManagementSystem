@@ -57,8 +57,8 @@ public class StudentService {
         return student;
     }
     public List<Club> getClub(Student student){
-
-        if (student.getClubs()==null){
+        System.out.println("current student club:"+student.getClubs());
+        if (student.getClubs()==null||student.getClubs().isEmpty()){
             student = studentRepository.lazyLoadClub(student);
         }
         return student.getClubs();

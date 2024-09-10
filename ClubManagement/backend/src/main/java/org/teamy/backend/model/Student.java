@@ -28,9 +28,6 @@ public class Student extends Person{
 
     public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive) {
         super(id, name,email,  phoneNumber, password, username, isActive);
-        this.rsvpsId = new ArrayList<>();
-        this.clubId = new ArrayList<>();
-        this.ticketsId = new ArrayList<>();
     }
     public Student(Long id, String username, String name, String email, Long phoneNumber, boolean isActive) {
         super(id, name,email,  phoneNumber, username, isActive);
@@ -41,15 +38,9 @@ public class Student extends Person{
 
     public Student(String name, String email, Long phoneNumber) {
         super(name, email, phoneNumber);
-        this.rsvps = new ArrayList<>();
-        this.clubId = new ArrayList<>();
-        this.tickets = new ArrayList<>();
     }
     public Student(String name, String email, Long phoneNumber,String password,String username) {
         super(name, email, phoneNumber,password,username);
-        this.rsvps = new ArrayList<>();
-        this.clubId = new ArrayList<>();
-        this.tickets = new ArrayList<>();
     }
 
     public List<RSVP> getRsvps() {

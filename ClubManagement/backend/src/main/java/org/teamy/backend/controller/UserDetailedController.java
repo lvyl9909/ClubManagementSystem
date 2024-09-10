@@ -64,6 +64,7 @@ public class UserDetailedController extends HttpServlet {
     }
 
     private ResponseEntity listClubs() {
+//        Integer currentStudent = studentService.getCurrentStudent();
         List<Club> clubs = studentService.getClub(studentService.getCurrentStudent());
         return ResponseEntity.ok(clubs);
     }
