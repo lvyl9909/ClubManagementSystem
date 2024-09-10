@@ -26,4 +26,18 @@ public class FacultyAdministrator extends Person{
     public void setFundingApplications(List<FundingApplication> FundingApplications) {
         this.FundingApplications = FundingApplications;
     }
+
+    public void addFundingApplication(FundingApplication fundingApplication){
+        this.FundingApplications.add(fundingApplication);
+    }
+
+    public boolean deleteFundingApplication(FundingApplication fundingApplication){
+        if(this.FundingApplications.contains(fundingApplication)){
+            this.FundingApplications.remove(fundingApplication);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }

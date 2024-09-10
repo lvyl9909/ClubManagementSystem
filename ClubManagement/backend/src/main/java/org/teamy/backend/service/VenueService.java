@@ -1,14 +1,13 @@
 package org.teamy.backend.service;
 
-import org.teamy.backend.DataMapper.VenueDataMapper;
-import org.teamy.backend.model.Ticket;
 import org.teamy.backend.model.Venue;
+import org.teamy.backend.repository.VenueRepository;
 
 import java.util.List;
 
 public class VenueService {
-    private final VenueDataMapper venueDataMapper;
-
+    private final VenueRepository venueRepository;
+    private static VenueService instance;
 //    private static VenueService instance;
 //    private final VenueDataMapper venueDataMapper;
 //
@@ -24,27 +23,21 @@ public class VenueService {
 //        }
 //        return instance;
 //    }
-    public VenueService(VenueDataMapper venueDataMapper) {
-        this.venueDataMapper = venueDataMapper;
+    private VenueService(VenueRepository venueRepository) {
+        this.venueRepository = venueRepository;
     }
-    public Venue getVenueById(int id) throws Exception {
-        if (id <= 0) {
-            throw new IllegalArgumentException("Club ID must be positive");
+    public static synchronized VenueService getInstance(VenueRepository venueRepository){
+        if(instance == null){
+            instance = new VenueService(venueRepository);
         }
+        return instance;
+    }
 
-        Venue venue = null;
-        try {
-            venue = venueDataMapper.findVenueById(id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return venue;
-    }
 
     public List<Venue> getAllVenue()throws Exception{
         List<Venue> venues = null;
         try {
-            venues = venueDataMapper.getAllVenue();
+            venues = venueRepository.getAllVenue();
             return venues;
         } catch (Exception e) {
             throw new RuntimeException(e);

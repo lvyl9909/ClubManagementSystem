@@ -16,14 +16,21 @@ public class ClubRepository {
     private final FundingApplicationMapper fundingApplicationMapper;
     private final StudentRepository studentRepository;
     private final StudentClubDataMapper studentsClubsDataMapper;
+    private static ClubRepository instance;
 
 
-    public ClubRepository(ClubDataMapper clubDataMapper, EventDataMapper eventDataMapper, FundingApplicationMapper fundingApplicationMapper, StudentRepository studentRepository, StudentClubDataMapper studentsClubsDataMapper) {
+    private ClubRepository(ClubDataMapper clubDataMapper, EventDataMapper eventDataMapper, FundingApplicationMapper fundingApplicationMapper, StudentRepository studentRepository, StudentClubDataMapper studentsClubsDataMapper) {
         this.clubDataMapper = clubDataMapper;
         this.eventDataMapper = eventDataMapper;
         this.fundingApplicationMapper = fundingApplicationMapper;
         this.studentRepository = studentRepository;
         this.studentsClubsDataMapper = studentsClubsDataMapper;
+    }
+    public static synchronized ClubRepository getInstance(ClubDataMapper clubDataMapper, EventDataMapper eventDataMapper, FundingApplicationMapper fundingApplicationMapper, StudentRepository studentRepository, StudentClubDataMapper studentsClubsDataMapper) {
+        if (instance == null) {
+            instance = new ClubRepository(clubDataMapper,eventDataMapper,fundingApplicationMapper,studentRepository,studentsClubsDataMapper);
+        }
+        return instance;
     }
     public Club findClubById(int id) throws SQLException {
         Club club = clubDataMapper.findClubById(id);

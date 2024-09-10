@@ -11,7 +11,14 @@ import java.util.Collections;
 
 public class FacultyAdministratorMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-    public FacultyAdministratorMapper(DatabaseConnectionManager databaseConnectionManager){
+    private static FacultyAdministratorMapper instance;
+    public static synchronized FacultyAdministratorMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new FacultyAdministratorMapper(dbManager);
+        }
+        return instance;
+    }
+    private FacultyAdministratorMapper(DatabaseConnectionManager databaseConnectionManager){
         this.databaseConnectionManager = databaseConnectionManager;
     }
     public FacultyAdministrator findFacultyAdministratorById(int Id) {

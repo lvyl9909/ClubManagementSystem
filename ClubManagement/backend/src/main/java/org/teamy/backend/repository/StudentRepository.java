@@ -12,13 +12,28 @@ public class StudentRepository {
     private final TicketDataMapper ticketDataMapper;
     private final StudentDataMapper studentDataMapper;
     private final StudentClubDataMapper studentsClubsDataMapper;
+    private static StudentRepository instance;
 
-    public StudentRepository(ClubDataMapper clubDataMapper, RSVPDataMapper rsvpDataMapper, TicketDataMapper ticketDataMapper, StudentDataMapper studentDataMapper, StudentClubDataMapper studentsClubsDataMapper) {
+    private StudentRepository(ClubDataMapper clubDataMapper,
+                             RSVPDataMapper rsvpDataMapper,
+                             TicketDataMapper ticketDataMapper,
+                             StudentDataMapper studentDataMapper,
+                             StudentClubDataMapper studentsClubsDataMapper) {
         this.clubDataMapper = clubDataMapper;
         this.rsvpDataMapper = rsvpDataMapper;
         this.ticketDataMapper = ticketDataMapper;
         this.studentDataMapper = studentDataMapper;
         this.studentsClubsDataMapper = studentsClubsDataMapper;
+    }
+    public static synchronized StudentRepository getInstance(ClubDataMapper clubDataMapper,
+                                                             RSVPDataMapper rsvpDataMapper,
+                                                             TicketDataMapper ticketDataMapper,
+                                                             StudentDataMapper studentDataMapper,
+                                                             StudentClubDataMapper studentsClubsDataMapper){
+        if(instance == null){
+            instance = new StudentRepository(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentsClubsDataMapper);
+        }
+        return instance;
     }
     public Student findStudentById(int id) throws SQLException {
         Student student = studentDataMapper.findStudentById(id);

@@ -14,8 +14,14 @@ import java.util.stream.Collectors;
 
 public class StudentDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-
-    public StudentDataMapper(DatabaseConnectionManager databaseConnectionManager) {
+    private static StudentDataMapper instance;
+    public static synchronized StudentDataMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new StudentDataMapper(dbManager);
+        }
+        return instance;
+    }
+    private StudentDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
     public Student findStudentById(int Id) {

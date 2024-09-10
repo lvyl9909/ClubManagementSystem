@@ -5,7 +5,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.teamy.backend.DataMapper.StudentDataMapper;
 import org.teamy.backend.model.Person;
+import org.teamy.backend.repository.StudentRepository;
 import org.teamy.backend.security.model.Role;
+import org.teamy.backend.service.StudentService;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +18,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final Map<String, Person> userDatabase = new HashMap<>();
     private final StudentDataMapper studentDataMapper;
-
+    private static CustomUserDetailsService instance;
+    public static synchronized CustomUserDetailsService getInstance(StudentDataMapper studentDataMapper) {
+        if (instance == null) {
+            instance = new CustomUserDetailsService(studentDataMapper);
+        }
+        return instance;
+    }
     public CustomUserDetailsService(StudentDataMapper studentDataMapper) {
         this.studentDataMapper = studentDataMapper;
     }

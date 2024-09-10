@@ -11,8 +11,14 @@ import java.util.stream.Collectors;
 
 public class RSVPDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-
-    public RSVPDataMapper(DatabaseConnectionManager databaseConnectionManager) {
+    private static RSVPDataMapper instance;
+    public static synchronized RSVPDataMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new RSVPDataMapper(dbManager);
+        }
+        return instance;
+    }
+    private RSVPDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
     public RSVP findRSVPById(int Id) throws Exception {

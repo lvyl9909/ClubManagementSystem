@@ -55,10 +55,10 @@ public class StudentController  extends HttpServlet {
         MarshallingRequestHandler.of(mapper, resp, handler).handle();
     }
 
-    private ResponseEntity listClubs() {
-        List<Club> clubs = studentService.getLazyLoadedClubs(studentService.getCurrentStudent());
-        return ResponseEntity.ok(clubs);
-    }
+//    private ResponseEntity listClubs() {
+//        List<Club> clubs = studentService.getLazyLoadedClubs(studentService.getCurrentStudent());
+//        return ResponseEntity.ok(clubs);
+//    }
 
     private void viewStudent(HttpServletRequest req, HttpServletResponse resp, String studentId) throws IOException {
         resp.getWriter().write("Viewing student with ID: " + studentId);

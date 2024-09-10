@@ -16,7 +16,14 @@ import java.util.stream.Collectors;
 
 public class EventDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-    public EventDataMapper(DatabaseConnectionManager databaseConnectionManager) {
+    private static EventDataMapper instance;
+    public static synchronized EventDataMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new EventDataMapper(dbManager);
+        }
+        return instance;
+    }
+    private EventDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
     public Event findEventById(int Id) {
@@ -88,7 +95,7 @@ public class EventDataMapper {
 
         return events;
     }
-    public void deleteEvent(int eventId) throws Exception {
+    public void deleteEvent(int eventId) {
         var connection = databaseConnectionManager.nextConnection();
 
         try {
@@ -163,7 +170,7 @@ public class EventDataMapper {
         }
     }
 
-    public List<Event> getAllEvent() throws Exception {
+    public List<Event> getAllEvent() {
         var connection = databaseConnectionManager.nextConnection();
 
         List<Event> events = new ArrayList<>();

@@ -15,10 +15,17 @@ import java.util.stream.Collectors;
 
 public class ClubDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-
-    public ClubDataMapper(DatabaseConnectionManager databaseConnectionManager) {
+    private static ClubDataMapper instance;
+    public static synchronized ClubDataMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new ClubDataMapper(dbManager);
+        }
+        return instance;
+    }
+    private ClubDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
+
     public Club findClubById(int Id){
         var connection = databaseConnectionManager.nextConnection();
 
@@ -93,10 +100,11 @@ public class ClubDataMapper {
     public boolean saveClub(Club club) throws Exception {
         var connection = databaseConnectionManager.nextConnection();
 
-        String query = "INSERT INTO clubs (name, description) VALUES (?,?)";
+        String query = "INSERT INTO clubs (name, description, budget) VALUES (?,?,?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, club.getName());
             stmt.setString(2, club.getDescription());
+            stmt.setInt(3,0);
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;  // If insert successful, return true
         } catch (SQLException e) {

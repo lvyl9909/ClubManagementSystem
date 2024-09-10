@@ -179,4 +179,18 @@ public class Event extends DomainObject {
     public void setCurrentCapacity(Integer currentCapacity) {
         this.currentCapacity = currentCapacity;
     }
+
+    public void addRSVP(RSVP rsvp){
+        this.rsvps.add(rsvp);
+    }
+
+    public boolean deleteRSVP(RSVP rsvp){
+        if(this.rsvps.contains(rsvp)){
+            this.rsvps.remove(rsvp);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }

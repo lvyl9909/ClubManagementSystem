@@ -109,4 +109,48 @@ public class Student extends Person{
     public void setTicketsId(List<Integer> ticketsId) {
         this.ticketsId = ticketsId;
     }
+
+    public void addRSVP(int rsvpID, RSVP rsvp){
+        this.rsvpsId.add(rsvpID);
+        this.rsvps.add(rsvp);
+    }
+
+    public boolean deleteRSVP(int rsvpID, RSVP rsvp){
+        if(this.rsvps.contains(rsvp)&&this.rsvpsId.contains(rsvpID)){
+            this.rsvps.remove(rsvp);
+            this.rsvpsId.remove(rsvpID);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public void addClub(int clubID, Club club){
+        this.clubs.add(club);
+        this.clubId.add(clubID);
+    }
+
+    public boolean deleteClub(int clubID, Club club){
+        if(this.clubs.contains(club)&&this.clubId.contains(clubID)){
+            this.clubs.remove(club);
+            this.clubId.remove(clubID);
+            return true;
+        }
+        return false;
+    }
+
+    public void addTicket(int ticketID, Ticket ticket){
+        this.tickets.add(ticket);
+        this.ticketsId.add(ticketID);
+    }
+
+    public boolean deleteTicket(int ticketID, Ticket ticket){
+        if(this.tickets.contains(ticket)&&this.ticketsId.contains(ticketID)){
+            this.tickets.remove(ticket);
+            this.ticketsId.remove(ticketID);
+            return true;
+        }
+        return false;
+    }
 }

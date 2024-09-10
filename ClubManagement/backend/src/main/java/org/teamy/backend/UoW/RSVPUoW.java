@@ -5,19 +5,21 @@ import org.teamy.backend.DataMapper.RSVPDataMapper;
 import org.teamy.backend.DataMapper.TicketDataMapper;
 import org.teamy.backend.model.RSVP;
 import org.teamy.backend.model.Ticket;
+import org.teamy.backend.repository.RSVPRepository;
+import org.teamy.backend.repository.TicketRepository;
 import org.teamy.backend.service.StudentService;
 
 import java.util.ArrayList;
 import java.util.List;
 public class RSVPUoW implements UnitOfWork{
-    private final RSVPDataMapper rsvpDataMapper;
-    private final TicketDataMapper ticketDataMapper;
+    private final RSVPRepository rsvpRepository;
+    private final TicketRepository ticketRepository;
     private List<RSVP> newRsvps = new ArrayList<>();
     private List<Ticket> newTickets = new ArrayList<>();
 
-    public RSVPUoW(RSVPDataMapper rsvpDataMapper, TicketDataMapper ticketDataMapper) {
-        this.rsvpDataMapper = rsvpDataMapper;
-        this.ticketDataMapper = ticketDataMapper;
+    public RSVPUoW(RSVPRepository rsvpRepository, TicketRepository ticketRepository) {
+        this.rsvpRepository = rsvpRepository;
+        this.ticketRepository = ticketRepository;
     }
     public void registerNewRSVP(RSVP rsvp) {
         newRsvps.add(rsvp);
@@ -33,7 +35,7 @@ public class RSVPUoW implements UnitOfWork{
         try {
             // 先保存 RSVP 并获取自增 ID
             for (RSVP rsvp : newRsvps) {
-                rsvpDataMapper.saveRSVP(rsvp);  // 保存 RSVP，生成自增 ID
+                rsvpRepository.saveRSVP(rsvp);  // 保存 RSVP，生成自增 ID
                 System.out.println("rsvpID:"+rsvp.getId());
             }
 
@@ -49,7 +51,7 @@ public class RSVPUoW implements UnitOfWork{
                     }
                 }
                 System.out.println(ticket.toString());
-                ticketDataMapper.saveTicket(ticket);  // 保存 Ticket
+                ticketRepository.saveTicket(ticket);  // 保存 Ticket
             }
         } catch (Exception e) {
             throw new RuntimeException("Error committing UoW: " + e.getMessage());

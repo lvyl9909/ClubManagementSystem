@@ -56,7 +56,7 @@ public class WebSecurityConfig implements ServletContextAware {
     //定义表单登陆的方法
     @Bean
     public UserDetailsService userDetailsService() {
-        StudentDataMapper userRepository = new StudentDataMapper(databaseConnectionManager);
+        StudentDataMapper userRepository =  StudentDataMapper.getInstance(databaseConnectionManager);
         return new CustomUserDetailsService(userRepository);
     }
     //未认证的入口

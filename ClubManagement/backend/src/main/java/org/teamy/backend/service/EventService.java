@@ -7,26 +7,36 @@ import org.teamy.backend.UoW.EventDeleteUoW;
 import org.teamy.backend.UoW.RSVPUoW;
 import org.teamy.backend.model.*;
 import org.teamy.backend.model.exception.NotFoundException;
+import org.teamy.backend.repository.ClubRepository;
+import org.teamy.backend.repository.EventRepository;
+import org.teamy.backend.repository.RSVPRepository;
+import org.teamy.backend.repository.TicketRepository;
 
 import java.util.Collections;
 import java.util.List;
 
 public class EventService {
-    EventDataMapper eventDataMapper;
-    RSVPDataMapper rsvpDataMapper;
-    TicketDataMapper ticketDataMapper;
-
-    public EventService(EventDataMapper eventDataMapper,RSVPDataMapper rsvpDataMapper,TicketDataMapper ticketDataMapper) {
-        this.eventDataMapper = eventDataMapper;
-        this.rsvpDataMapper = rsvpDataMapper;
-        this.ticketDataMapper = ticketDataMapper;
+    EventRepository eventRepository;
+    RSVPRepository rsvpRepository;
+    TicketRepository ticketRepository;
+    private static EventService instance;
+    public static synchronized EventService getInstance(EventRepository eventRepository, RSVPRepository rsvpRepository,TicketRepository ticketRepository) {
+        if (instance == null) {
+            instance = new EventService(eventRepository,rsvpRepository,ticketRepository);
+        }
+        return instance;
+    }
+    private EventService(EventRepository eventRepository,RSVPRepository rsvpRepository,TicketRepository ticketRepository) {
+        this.eventRepository = eventRepository;
+        this.rsvpRepository = rsvpRepository;
+        this.ticketRepository = ticketRepository;
     }
     public Event getEventById(Integer id) throws Exception {
         if (id <= 0) {
             throw new IllegalArgumentException("Club ID must be positive");
         }
 
-        Event event = eventDataMapper.findEventById(id);
+        Event event = eventRepository.findEventById(id);
         if (event == null) {
             throw new RuntimeException("event with id '" + id + "' not found");
         }
@@ -36,7 +46,7 @@ public class EventService {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be null or empty.");
         }
-        List<Event>events=  eventDataMapper.findEventsByTitle(title);
+        List<Event>events=  eventRepository.findEventsByTitle(title);
         for(Event event:events){
             Integer currentCapacity = getCurrentCapacity(event);
             event.setCurrentCapacity(currentCapacity);
@@ -49,14 +59,13 @@ public class EventService {
         if (event ==null||event.getTitle() == null || event.getTitle().isEmpty()) {
             throw new IllegalArgumentException("Club cannot be empty");
         }
-
         // Recall methods in DAO layer
-        return eventDataMapper.saveEvent(event);
+        return eventRepository.saveEvent(event);
     }
 
     public List<Event> getAllEvents() {
         try {
-            List<Event>events =  eventDataMapper.getAllEvent();
+            List<Event>events =  eventRepository.getAllEvent();
             for(Event event:events){
                 Integer currentCapacity = getCurrentCapacity(event);
                 event.setCurrentCapacity(currentCapacity);
@@ -72,19 +81,19 @@ public class EventService {
     public boolean updateEvent(Event event) throws Exception {
         try {
             // 检查事件是否存在
-            Event existingEvent = eventDataMapper.findEventById(event.getId());
+            Event existingEvent = eventRepository.findEventById(event.getId());
             if (existingEvent == null) {
                 throw new Exception("Event not found with ID: " + event.getId());
             }
             // 调用 DataMapper 更新事件
-            return eventDataMapper.updateEvent(event);
+            return eventRepository.updateEvent(event);
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Error updating event: " + e.getMessage());
         }
     }
     public void applyForRSVP(int eventId, int studentId, int numTickets,List<Integer> participates_id) throws Exception {
-        RSVPUoW unitOfWork = new RSVPUoW(rsvpDataMapper, ticketDataMapper);
+        RSVPUoW unitOfWork = new RSVPUoW(rsvpRepository, ticketRepository);
 
         // 创建 RSVP 记录
         RSVP rsvp = new RSVP( studentId,eventId,numTickets,participates_id);
@@ -99,7 +108,7 @@ public class EventService {
         unitOfWork.commit();
     }
     public void deleteEvent(List<Integer> eventsId)throws Exception{
-        EventDeleteUoW eventDeleteUoW = new EventDeleteUoW(eventDataMapper,ticketDataMapper);
+        EventDeleteUoW eventDeleteUoW = new EventDeleteUoW(eventRepository,ticketRepository);
         for (Integer eventId : eventsId){
             eventDeleteUoW.addDeleteEvents(eventId);
         }
@@ -108,7 +117,7 @@ public class EventService {
     }
 
     public Integer getCurrentCapacity(Event event)throws Exception{
-        List<Ticket> tickets = ticketDataMapper.getTicketsFromEvent(event.getId());
+        List<Ticket> tickets = ticketRepository.getTicketsFromEvent(event.getId());
         int count=0;
         for(Ticket ticket:tickets){
             if(ticket.getStatus().equals(TicketStatus.Issued))count++;

@@ -13,8 +13,14 @@ import java.util.List;
 
 public class VenueDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-
-    public VenueDataMapper(DatabaseConnectionManager databaseConnectionManager) {
+    private static VenueDataMapper instance;
+    public static synchronized VenueDataMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new VenueDataMapper(dbManager);
+        }
+        return instance;
+    }
+    private VenueDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
     public Venue findVenueById(Integer Id){

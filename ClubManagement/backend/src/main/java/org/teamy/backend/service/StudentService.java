@@ -8,6 +8,8 @@ import org.teamy.backend.model.Club;
 import org.teamy.backend.model.RSVP;
 import org.teamy.backend.model.Student;
 import org.teamy.backend.model.Ticket;
+import org.teamy.backend.repository.StudentClubRepository;
+import org.teamy.backend.repository.StudentRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,15 +17,17 @@ import java.util.List;
 import java.util.Map;
 
 public class StudentService {
-    private StudentDataMapper studentDataMapper;
-    private final ClubService clubService;
-    private final RSVPService rsvpService;
-    private final TicketService ticketService;
-    public StudentService(StudentDataMapper studentDataMapper, ClubService clubService, RSVPService rsvpService, TicketService ticketService) {
-        this.studentDataMapper = studentDataMapper;
-        this.clubService = clubService;
-        this.rsvpService = rsvpService;
-        this.ticketService = ticketService;
+    private StudentRepository studentRepository;
+    private static StudentService instance;
+    public static synchronized StudentService getInstance(StudentRepository studentRepository) {
+        if (instance == null) {
+            instance = new StudentService(studentRepository);
+        }
+        return instance;
+    }
+    private StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+
     }
     public UserDetails getCurrentUserDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -46,63 +50,34 @@ public class StudentService {
 
         Student student = null;
         try {
-            student = studentDataMapper.findStudentById(id);
+            student = studentRepository.findStudentById(id);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return student;
     }
+    public List<Club> getClub(Student student){
 
-    public List<Club> getLazyLoadedClubs(Student student) {
-        if (student.getClubs() == null || student.getClubs().isEmpty()) {
-            List<Club> clubs = new ArrayList<>();
-            for (Integer clubId : student.getClubId()) {
-                try {
-                    Club club = clubService.getClubById(clubId);
-                    clubs.add(club);
-                } catch (Exception e) {
-                    throw new RuntimeException("Error loading clubs for student", e);
-                }
-            }
-            student.setClubs(clubs);
+        if (student.getClubs()==null){
+            student = studentRepository.lazyLoadClub(student);
         }
         return student.getClubs();
     }
-
-    public List<Ticket> getLazyLoadedTickets(Student student) {
-        if (student.getTickets() == null || student.getTickets().isEmpty()) {
-            List<Ticket> tickets = new ArrayList<>();
-            for (Integer ticketsId : student.getTicketsId()) {
-                try {
-                    Ticket ticket = ticketService.getTicketById(ticketsId);
-                    tickets.add(ticket);
-                } catch (Exception e) {
-                    throw new RuntimeException("Error loading clubs for student", e);
-                }
-            }
-            student.setTickets(tickets);
+    public List<Ticket> getTicket(Student student){
+        if (student.getClubs()==null){
+            student = studentRepository.lazyLoadTicket(student);
         }
         return student.getTickets();
     }
-
-    public List<RSVP> getLazyLoadedRSVP(Student student) {
-        if (student.getRsvps() == null || student.getRsvps().isEmpty()) {
-            List<RSVP> rsvps = new ArrayList<>();
-            for (Integer rsvpId : student.getRsvpsId()) {
-                try {
-                    RSVP rsvp = rsvpService.getRSVPById(rsvpId);
-                    rsvps.add(rsvp);
-                } catch (Exception e) {
-                    throw new RuntimeException("Error loading clubs for student", e);
-                }
-            }
-            student.setRsvps(rsvps);
+    public List<RSVP> getRSVP(Student student){
+        if (student.getClubs()==null){
+            student = studentRepository.lazyLoadRSVP(student);
         }
         return student.getRsvps();
     }
     public List<Student> getAllStudent(){
         try {
-            return studentDataMapper.getAllStudent();
+            return studentRepository.getAllStudent();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -114,13 +89,13 @@ public class StudentService {
 
         try {
             // 模糊搜索按名字
-            studentsByName = studentDataMapper.findStudentByName(parameters);
+            studentsByName = studentRepository.findStudentByName(parameters);
             for (Student student : studentsByName) {
                 studentsMap.put(student.getId(), student);  // 以学生 ID 为键，去重
             }
 
             // 模糊搜索按邮箱
-            studentsByEmail = studentDataMapper.findStudentByEmail(parameters);
+            studentsByEmail = studentRepository.findStudentByEmail(parameters);
             for (Student student : studentsByEmail) {
                 studentsMap.put(student.getId(), student);  // 再次按学生 ID 存入 Map，若有重复会自动覆盖
             }

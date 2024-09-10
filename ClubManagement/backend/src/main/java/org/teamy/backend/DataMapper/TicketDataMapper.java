@@ -15,11 +15,17 @@ import java.util.stream.Collectors;
 
 public class TicketDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-
-    public TicketDataMapper(DatabaseConnectionManager databaseConnectionManager) {
+    private static TicketDataMapper instance;
+    public static synchronized TicketDataMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new TicketDataMapper(dbManager);
+        }
+        return instance;
+    }
+    private TicketDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
-    public Ticket findTicketById(int Id) throws Exception {
+    public Ticket findTicketById(int Id) {
         var connection = databaseConnectionManager.nextConnection();
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM tickets WHERE ticket_id = ?");
@@ -74,7 +80,7 @@ public class TicketDataMapper {
 
         return tickets;
     }
-    public void saveTicket(Ticket ticket) throws SQLException {
+    public void saveTicket(Ticket ticket) {
         var connection = databaseConnectionManager.nextConnection();
         try {
             PreparedStatement stmt = connection.prepareStatement(

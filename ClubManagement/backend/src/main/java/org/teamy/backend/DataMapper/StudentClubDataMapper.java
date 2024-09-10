@@ -13,8 +13,14 @@ import java.util.List;
 
 public class StudentClubDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-
-    public StudentClubDataMapper(DatabaseConnectionManager databaseConnectionManager) {
+    private static StudentClubDataMapper instance;
+    public static synchronized StudentClubDataMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new StudentClubDataMapper(dbManager);
+        }
+        return instance;
+    }
+    private StudentClubDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
     public List<Integer> findClubIdByStudentId(Integer studentId) throws SQLException {

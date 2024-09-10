@@ -110,4 +110,9 @@ public class RSVP extends DomainObject {
     public void setNumber(Integer number) {
         this.number = number;
     }
+
+    public void addParticipant(int studentID, Student student){
+        this.participantIds.add(studentID);
+        this.participants.add(student);
+    }
 }

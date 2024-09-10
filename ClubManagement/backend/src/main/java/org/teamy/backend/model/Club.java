@@ -1,5 +1,6 @@
 package org.teamy.backend.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,8 @@ public class Club extends DomainObject {
     private List<Event> events;
     private List<FundingApplication> FundingApplications;
     private List<Integer> FundingApplicationsId;
+
+    float budget;
 
 
     public Club(Integer id,String name, String description) {
@@ -95,5 +98,42 @@ public class Club extends DomainObject {
 
     public void setFundingApplicationsId(List<Integer> fundingApplicationsId) {
         FundingApplicationsId = fundingApplicationsId;
+    }
+
+    public float getBudget(){
+        return this.budget;
+    }
+
+    public void setBudget(float budget){
+        this.budget = budget;
+    }
+    public boolean addEvent(Event event){
+        if(event.getCost().compareTo(BigDecimal.valueOf(this.budget))!=1){
+            setBudget(this.budget-event.getCost().floatValue());
+            this.events.add(event);
+            return true;
+        }
+        return false;
+    }
+
+    public void deleteEvent(Event event){
+        this.events.remove(event);
+        setBudget(this.budget+event.getCost().floatValue());
+    }
+
+    private void addStudent(int studentID, Student student){
+        this.studentId.add(studentID);
+        this.students.add(student);
+    }
+
+    private void deleteStudent(int studentID, Student student){
+        this.studentId.remove(studentID);
+        this.students.remove(student);
+    }
+
+    private void addFundingApplication(int fundingApplicationID, FundingApplication fundingApplication){
+        this.FundingApplications.add(fundingApplication);
+        this.FundingApplicationsId.add(fundingApplicationID);
+        this.budget += fundingApplication.getAmount().floatValue();
     }
 }

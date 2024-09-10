@@ -12,11 +12,17 @@ import java.util.stream.Collectors;
 
 public class FundingApplicationMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-
-    public FundingApplicationMapper(DatabaseConnectionManager databaseConnectionManager) {
+    private static FundingApplicationMapper instance;
+    public static synchronized FundingApplicationMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new FundingApplicationMapper(dbManager);
+        }
+        return instance;
+    }
+    private FundingApplicationMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
-    public FundingApplication findfundingApplicationById(int Id) throws Exception {
+    public FundingApplication findfundingApplicationById(int Id) {
         var connection = databaseConnectionManager.nextConnection();
         List<Event> events;
 

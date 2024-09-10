@@ -64,14 +64,14 @@ public class UserDetailedController extends HttpServlet {
     }
 
     private ResponseEntity listClubs() {
-        List<Club> clubs = studentService.getLazyLoadedClubs(studentService.getCurrentStudent());
+        List<Club> clubs = studentService.getClub(studentService.getCurrentStudent());
         return ResponseEntity.ok(clubs);
     }
     private ResponseEntity listTickets()  {
         Map<Ticket, Event> ticketInfo = null;
         try {
             System.out.println("current student id:"+studentService.getCurrentStudent().getId());
-            ticketInfo = ticketService.getTicketInfo(studentService.getCurrentStudent().getId());
+            ticketInfo = ticketService.getTicketInfo(studentService.getCurrentStudent());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -89,7 +89,7 @@ public class UserDetailedController extends HttpServlet {
         return dtoList;
     }
     private ResponseEntity listRSVP() {
-        List<RSVP> rsvps = studentService.getLazyLoadedRSVP(studentService.getCurrentStudent());
+        List<RSVP> rsvps = studentService.getRSVP(studentService.getCurrentStudent());
         return ResponseEntity.ok(rsvps);
     }
     private ResponseEntity viewStudent() {

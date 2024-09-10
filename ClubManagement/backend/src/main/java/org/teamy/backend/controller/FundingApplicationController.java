@@ -7,12 +7,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.config.ContextListener;
+import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
 import org.teamy.backend.model.FundingApplication;
 import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.model.request.ResponseEntity;
+import org.teamy.backend.service.ClubService;
 import org.teamy.backend.service.EventService;
 import org.teamy.backend.service.FundingApplicationService;
 import org.teamy.backend.service.StudentService;
@@ -24,11 +26,13 @@ import java.util.Objects;
 @WebServlet("/student/fundingappliction/*")
 public class FundingApplicationController extends HttpServlet {
     FundingApplicationService fundingApplicationService;
+    ClubService clubService;
     private ObjectMapper mapper;
 
     @Override
     public void init() throws ServletException {
         fundingApplicationService = (FundingApplicationService) getServletContext().getAttribute(ContextListener.FUNDING_APPLICATION_SERVICE);
+        clubService = (ClubService) getServletContext().getAttribute(ContextListener.CLUB_SERVICE);
         mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
     }
     @Override
@@ -109,7 +113,8 @@ public class FundingApplicationController extends HttpServlet {
 
     private ResponseEntity viewAllApplication(Integer clubId) {
         try {
-            List<FundingApplication> fundingApplications = fundingApplicationService.getFundingApplicationByClubId(clubId);
+            Club club = clubService.getClubById(clubId);
+            List<FundingApplication> fundingApplications =clubService.getFundingApplication(club);
             return ResponseEntity.ok(fundingApplications);
         } catch (NumberFormatException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
