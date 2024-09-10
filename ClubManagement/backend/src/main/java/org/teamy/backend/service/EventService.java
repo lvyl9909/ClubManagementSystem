@@ -80,6 +80,7 @@ public class EventService {
     }
     public boolean updateEvent(Event event) throws Exception {
         try {
+            System.out.println("你好"+event);
             // 检查事件是否存在
             Event existingEvent = eventRepository.findEventById(event.getId());
             if (existingEvent == null) {

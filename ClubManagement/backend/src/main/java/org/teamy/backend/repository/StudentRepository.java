@@ -57,7 +57,11 @@ public class StudentRepository {
         return students;
     }
     public Student findStudentByUsername(String username) throws SQLException {
-        return studentDataMapper.findStudentByUsername(username);
+        Student student= studentDataMapper.findStudentByUsername(username);
+        student.setClubId(studentsClubsDataMapper.findClubIdByStudentId(Math.toIntExact(student.getId())));
+        student.setRsvpsId(rsvpDataMapper.findRSVPIdByStudentId(Math.toIntExact(student.getId())));
+        student.setTicketsId(ticketDataMapper.getTicketsIdFromStudent(Math.toIntExact(student.getId())));
+        return student;
     }
     public List<Student> getAllStudent() {
         return studentDataMapper.getAllStudent();

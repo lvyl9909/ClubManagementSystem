@@ -17,19 +17,19 @@ import java.util.Set;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final Map<String, Person> userDatabase = new HashMap<>();
-    private final StudentDataMapper studentDataMapper;
+    private final StudentRepository studentRepository;
     private static CustomUserDetailsService instance;
-    public static synchronized CustomUserDetailsService getInstance(StudentDataMapper studentDataMapper) {
+    public static synchronized CustomUserDetailsService getInstance(StudentRepository studentRepository) {
         if (instance == null) {
-            instance = new CustomUserDetailsService(studentDataMapper);
+            instance = new CustomUserDetailsService(studentRepository);
         }
         return instance;
     }
-    public CustomUserDetailsService(StudentDataMapper studentDataMapper) {
-        this.studentDataMapper = studentDataMapper;
+    public CustomUserDetailsService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
     }
     public CustomUserDetailsService(PasswordEncoder passwordEncoder) {
-        this.studentDataMapper = null;
+        this.studentRepository = null;
         Person admin = new Person();
         admin.setUsername("admin");
         admin.setPassword(passwordEncoder.encode("adminPass"));
@@ -49,7 +49,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public Person loadUserByUsername(String username) throws UsernameNotFoundException {
         Person user=null;
         try {
-            user = studentDataMapper.findStudentByUsername(username);
+            user = studentRepository.findStudentByUsername(username);
 
             if (user == null) {
                 System.out.println("username not found");

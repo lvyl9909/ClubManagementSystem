@@ -29,9 +29,10 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.teamy.backend.DataMapper.StudentDataMapper;
+import org.teamy.backend.DataMapper.*;
 import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.config.DatabaseConnectionManager;
+import org.teamy.backend.repository.StudentRepository;
 import org.teamy.backend.security.model.Role;
 import org.teamy.backend.security.repository.TokenService;
 
@@ -56,7 +57,13 @@ public class WebSecurityConfig implements ServletContextAware {
     //定义表单登陆的方法
     @Bean
     public UserDetailsService userDetailsService() {
-        StudentDataMapper userRepository =  StudentDataMapper.getInstance(databaseConnectionManager);
+        ClubDataMapper clubDataMapper = ClubDataMapper.getInstance(databaseConnectionManager);
+        RSVPDataMapper rsvpDataMapper = RSVPDataMapper.getInstance(databaseConnectionManager);
+        TicketDataMapper ticketDataMapper = TicketDataMapper.getInstance(databaseConnectionManager);
+        StudentDataMapper studentDataMapper = StudentDataMapper.getInstance(databaseConnectionManager);
+        StudentClubDataMapper studentClubDataMapper = StudentClubDataMapper.getInstance(databaseConnectionManager);
+
+        StudentRepository userRepository =  StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper);
         return new CustomUserDetailsService(userRepository);
     }
     //未认证的入口

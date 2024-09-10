@@ -25,7 +25,7 @@ public class EventRepository {
     }
     public Event findEventById(int Id) {
         Event event =  eventDataMapper.findEventById(Id);
-        event.setVenueName(venueDataMapper.findVenueById(Id).getName());
+        event.setVenueName(venueDataMapper.findVenueById(event.getVenueId()).getName());
         return event;
     }
     public void deleteEvent(int eventId) {

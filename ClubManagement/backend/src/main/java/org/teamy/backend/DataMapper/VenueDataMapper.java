@@ -29,7 +29,6 @@ public class VenueDataMapper {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM venues WHERE id = ?");
             stmt.setInt(1, Id);
             ResultSet rs = stmt.executeQuery();
-
             if (rs.next()) {
                 return new Venue( rs.getInt("id"),rs.getString("name"), rs.getString("description"),rs.getString("location"),  rs.getInt("capacity"));
             }
