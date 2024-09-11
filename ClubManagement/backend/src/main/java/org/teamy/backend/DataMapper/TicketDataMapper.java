@@ -9,6 +9,7 @@ import org.teamy.backend.model.TicketStatus;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,7 +85,9 @@ public class TicketDataMapper {
         var connection = databaseConnectionManager.nextConnection();
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO tickets (student_id, rsvp,status,event_id) VALUES (?, ?,?::ticket_status,?)"
+                    "INSERT INTO tickets (student_id, rsvp,status,event_id) VALUES (?, ?,?::ticket_status,?)",
+                    Statement.RETURN_GENERATED_KEYS // 添加这行
+
             );
             System.out.println("studentid:"+ticket.getStudentId()+"RsvpId:"+ticket.getRsvpId()+"status:"+ticket.getStatus().name()+"EventId:"+ticket.getEventId());
             stmt.setInt(1, ticket.getStudentId());
@@ -95,6 +98,14 @@ public class TicketDataMapper {
             System.out.println(rowsAffected);
             if (rowsAffected == 0) {
                 throw new SQLException("Inserting ticket failed, no rows affected.");
+            }
+            // 获取生成的主键
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    ticket.setId(generatedKeys.getInt(1));  // 更新到 RSVP 对象中
+                } else {
+                    throw new SQLException("Creating Ticket failed, no ID obtained.");
+                }
             }
         } catch (SQLException e){
             e.printStackTrace();  // 打印异常信息
