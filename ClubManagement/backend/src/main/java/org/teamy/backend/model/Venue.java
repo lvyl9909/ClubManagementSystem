@@ -19,6 +19,9 @@ public class Venue extends DomainObject {
     }
 
     public void setName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Venue name cannot be empty");
+        }
         this.name = name;
     }
 
@@ -27,6 +30,9 @@ public class Venue extends DomainObject {
     }
 
     public void setLocation(String location) {
+        if (location == null || location.trim().isEmpty()) {
+            throw new IllegalArgumentException("Venue location cannot be empty");
+        }
         this.location = location;
     }
 
@@ -35,6 +41,9 @@ public class Venue extends DomainObject {
     }
 
     public void setCapacity(Integer capacity) {
+        if (capacity == null || capacity < 0) {
+            throw new IllegalArgumentException("Capacity must be a non-negative number");
+        }
         this.capacity = capacity;
     }
 

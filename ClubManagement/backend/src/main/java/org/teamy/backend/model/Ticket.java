@@ -15,12 +15,14 @@ public class Ticket extends DomainObject {
         this.rsvpId = rsvpId;
         this.status = status;
         this.eventId = eventId;
+        validateStatus();
     }
     public Ticket(Integer studentId, Integer rsvpId,Integer eventId, TicketStatus status) {
         this.studentId = studentId;
         this.rsvpId = rsvpId;
         this.eventId = eventId;
         this.status = status;
+        validateStatus();
     }
 
     @Override
@@ -93,4 +95,9 @@ public class Ticket extends DomainObject {
         this.status = status;
     }
 
+    private void validateStatus() {
+        if (this.status == null) {
+            throw new IllegalArgumentException("Ticket status cannot be null");
+        }
+    }
 }

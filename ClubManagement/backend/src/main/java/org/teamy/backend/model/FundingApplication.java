@@ -48,6 +48,9 @@ public class FundingApplication extends DomainObject {
     }
 
     public void setDescription(String description) {
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("Description cannot be null or empty.");
+        }
         this.description = description;
     }
 
@@ -56,6 +59,9 @@ public class FundingApplication extends DomainObject {
     }
 
     public void setAmount(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than zero.");
+        }
         this.amount = amount;
     }
 
@@ -72,6 +78,9 @@ public class FundingApplication extends DomainObject {
     }
 
     public void setClub(Club club) {
+        if (clubId == null || clubId <= 0) {
+            throw new IllegalArgumentException("Club ID must be a positive integer.");
+        }
         this.club = club;
     }
 

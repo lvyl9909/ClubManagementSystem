@@ -104,9 +104,16 @@ public class Club extends DomainObject {
         return this.budget;
     }
 
-    public void setBudget(float budget){
+//    public void setBudget(float budget){
+//        this.budget = budget;
+//    }
+    public void setBudget(float budget) {
+        if (budget < 0) {
+            throw new IllegalArgumentException("Budget cannot be negative");  // domain logic, no persistence dependency
+        }
         this.budget = budget;
     }
+
     public boolean addEvent(Event event){
         if(event.getCost().compareTo(BigDecimal.valueOf(this.budget))!=1){
             setBudget(this.budget-event.getCost().floatValue());
