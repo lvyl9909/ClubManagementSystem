@@ -115,4 +115,10 @@ public class RSVP extends DomainObject {
         this.participantIds.add(studentID);
         this.participants.add(student);
     }
+    public boolean haveMargin(){
+        if(event.getCurrentCapacity()<number){
+            return false;
+        }
+        return true;
+    }
 }

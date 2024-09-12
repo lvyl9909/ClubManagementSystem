@@ -49,18 +49,15 @@ public class ClubRepository {
         if (club != null) {
             return club; // Return cached club if available
         }
-
         // If not in cache, fetch from database and cache the result
         club = clubDataMapper.findClubById(id);
         if (club != null) {
             club.setStudentId(studentsClubsDataMapper.findStudentIdByClubId(id));
             club.setEventsId(eventDataMapper.findEventIdByClubId(id));
             club.setFundingApplicationsId(fundingApplicationMapper.findApplicationIdByClubId(id));
-
             // Store in cache
             clubCache.put(id, club);
         }
-
         return club;
     }
     public boolean saveClub(Club club) throws Exception {
@@ -89,6 +86,8 @@ public class ClubRepository {
         try {
             List<Event> events = eventDataMapper.findEventsByIds(club.getEventsId());
             club.setEvents(events);
+
+            clubCache.put(club.getId(),club);
         } catch (SQLException e) {
             throw new RuntimeException("Error loading students for club", e);
         }
@@ -96,10 +95,13 @@ public class ClubRepository {
     }
     public Club lazyLoadApplication(Club club){
         try {
-            List<FundingApplication> fundingApplications = fundingApplicationMapper.findFundingApplicationsByIds(club.getFundingApplicationsId());
+            List<FundingApplication> fundingApplications =
+                    fundingApplicationMapper.findFundingApplicationsByIds(club.getFundingApplicationsId());
             club.setFundingApplications(fundingApplications);
+
+            clubCache.put(club.getId(),club);
         } catch (SQLException e) {
-            throw new RuntimeException("Error loading students for club", e);
+            throw new RuntimeException("Error loading Application for club", e);
         }
         return club;
     }

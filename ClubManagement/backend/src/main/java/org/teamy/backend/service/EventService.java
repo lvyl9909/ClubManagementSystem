@@ -6,6 +6,7 @@ import org.teamy.backend.DataMapper.TicketDataMapper;
 import org.teamy.backend.UoW.EventDeleteUoW;
 import org.teamy.backend.UoW.RSVPUoW;
 import org.teamy.backend.model.*;
+import org.teamy.backend.model.exception.NotEnoughTicketsException;
 import org.teamy.backend.model.exception.NotFoundException;
 import org.teamy.backend.repository.*;
 
@@ -115,6 +116,11 @@ public class EventService {
 
         // 创建 RSVP 记录
         RSVP rsvp = new RSVP( studentId,eventId,numTickets,participates_id);
+        Event event = eventRepository.findEventById(rsvp.getEventId());
+        rsvp.setEvent(event);
+        if (!rsvp.haveMargin()){
+            throw new NotEnoughTicketsException("Not enough tickets available for this event.");
+        }
         unitOfWork.registerNewRSVP(rsvp);
 
         // 创建多个 Ticket 记录

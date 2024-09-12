@@ -38,30 +38,21 @@ public class StudentClubController extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String idParam = req.getParameter("id");
 
-        // 获取当前认证用户
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
-            // 获取用户的角色权限
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-            // 打印用户的权限
-            System.out.println("User Authorities: ");
-            authorities.forEach(auth -> System.out.println(auth.getAuthority()));
-
             RequestHandler handler = () -> {
                 if (idParam != null) {
                     try {
                         int id = Integer.parseInt(idParam);
 
-                        // 检查用户是否有访问该 id 的权限
                         if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_CLUB_" + id))) {
-                            // 用户有权限访问该学生，继续处理请求
                             return findAllStudent(id);
                         } else {
-                            // 用户没有访问该 id 的权限，返回 403 Forbidden
                             return ResponseEntity.of(HttpServletResponse.SC_FORBIDDEN,
                                     Error.builder()
                                             .status(HttpServletResponse.SC_FORBIDDEN)

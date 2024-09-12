@@ -67,7 +67,6 @@ public class TokenResource extends HttpServlet {
                 UserDetails userDetails = Optional.ofNullable(userDetailsService.loadUserByUsername(login.getUsername()))
                         .orElseThrow(ForbiddenException::new);
                 System.out.println(userDetails.getAuthorities()); // 打印用户的权限
-                // bu
 //                if (!passwordEncoder.matches(login.getPassword(), userDetails.getPassword())) {
 //                    throw new ForbiddenException();
 //                }

@@ -37,22 +37,17 @@ public class CustomUserDetailsService implements UserDetailsService {
         Person user=null;
         try {
             user = studentRepository.findStudentByUsername(username);
-
             if (user == null) {
                 System.out.println("username not found");
                 throw new UsernameNotFoundException("User not found");
             }else {
-                // 添加基础角色
                 Set<Role> roles = new HashSet<>();
-                roles.add(new Role("USER"));  // 基础角色
+                roles.add(new Role("USER"));
 
-                // 加载 clubId 列表并动态添加角色
                 List<Integer> clubIds = studentClubRepository.findClubIdByStudentId(Math.toIntExact(user.getId()));
                 for (Integer clubId : clubIds) {
-                    roles.add(new Role("CLUB_" + clubId));  // 动态角色
+                    roles.add(new Role("CLUB_" + clubId));
                 }
-
-                // 将所有角色设置到用户对象
                 user.setRoles(roles);
                 System.out.println("yong hu quan xian :"+user.getAuthorities());
                 System.out.println(user.getPassword());

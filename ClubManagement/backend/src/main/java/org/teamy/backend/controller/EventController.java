@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.model.Event;
+import org.teamy.backend.model.exception.NotEnoughTicketsException;
 import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
@@ -171,6 +172,13 @@ public class EventController extends HttpServlet {
             System.out.println("participant:"+participatesId);
             eventService.applyForRSVP(eventId, Math.toIntExact(studentService.getCurrentStudent().getId()), numTickets, participatesId);
             return ResponseEntity.ok(null); // 成功返回空响应
+        } catch (NotEnoughTicketsException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                            .message("Not enough tickets available.")
+                            .reason(e.getMessage())
+                            .build());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()

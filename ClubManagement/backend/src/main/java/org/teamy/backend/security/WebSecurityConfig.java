@@ -98,7 +98,6 @@ public class WebSecurityConfig implements ServletContextAware {
                         .requestMatchers(ADMIN_PROTECTED_URLS)
                         .hasAuthority("ROLE_ADMIN")
                         .requestMatchers(STUDENT_PROTECTED_URLS)
-//                        .permitAll()
                         .hasAuthority("ROLE_USER")
                         .anyRequest()
                         .permitAll())
