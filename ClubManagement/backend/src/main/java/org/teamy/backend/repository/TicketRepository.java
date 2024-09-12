@@ -6,7 +6,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class TicketRepository {
@@ -42,6 +44,18 @@ public class TicketRepository {
     public void saveTicket(Ticket ticket) {
         ticketDataMapper.saveTicket(ticket);
         ticketCache.put(ticket.getId(), ticket); // Update cache
+    }
+    public void saveTickets(List<Ticket> tickets) {
+        Map<Integer, Ticket> cacheUpdates = new HashMap<>();
+        for (Ticket ticket : tickets) {
+            cacheUpdates.put(ticket.getId(), ticket);
+        }
+        try {
+            ticketDataMapper.saveTickets(tickets);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        ticketCache.putAll(cacheUpdates);  // 批量更新缓存
     }
     public void deleteTicket(Integer ticketId)throws SQLException {
         ticketDataMapper.deleteTicket(ticketId);

@@ -114,6 +114,48 @@ public class TicketDataMapper {
             databaseConnectionManager.releaseConnection(connection);
         }
     }
+    public void saveTickets(List<Ticket> tickets) throws SQLException {
+        String query = "INSERT INTO tickets (student_id, rsvp, status, event_id) VALUES (?, ?, ?::ticket_status, ?)";
+        var connection = databaseConnectionManager.nextConnection();
+        try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            // 开始批量插入
+            for (Ticket ticket : tickets) {
+                stmt.setInt(1, ticket.getStudentId());
+                stmt.setInt(2, ticket.getRsvpId());
+                stmt.setString(3, ticket.getStatus().name());
+                stmt.setInt(4, ticket.getEventId());
+
+                // 将当前 Ticket 插入操作添加到批处理中
+                stmt.addBatch();
+            }
+
+            // 执行批量插入操作
+            int[] rowsAffected = stmt.executeBatch();
+
+            // 检查插入是否成功
+            for (int row : rowsAffected) {
+                if (row == 0) {
+                    throw new SQLException("Inserting ticket failed, no rows affected.");
+                }
+            }
+
+            // 获取生成的主键并更新到每个 Ticket 对象
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                int i = 0;
+                while (generatedKeys.next()) {
+                    // 获取生成的主键并设置到对应的 Ticket 对象中
+                    tickets.get(i).setId(generatedKeys.getInt(1));
+                    i++;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error inserting tickets: " + e.getMessage());
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+    }
     public void deleteTicket(Integer ticketId)throws SQLException{
         var connection = databaseConnectionManager.nextConnection();
         try {
