@@ -62,9 +62,9 @@ public class EventService {
         if (event ==null||event.getTitle() == null || event.getTitle().isEmpty()) {
             throw new IllegalArgumentException("Club cannot be empty");
         }
+
+        eventRepository.lazyLoadClub(event);
         Venue venue = venueRepository.getVenueById(event.getVenueId());
-        Club club = clubRepository.findClubById(event.getClubId());
-        event.setClub(club);
         event.setVenue(venue);
 
         event.validateBudget();

@@ -3,9 +3,11 @@ package org.teamy.backend.repository;
 import org.teamy.backend.DataMapper.ClubDataMapper;
 import org.teamy.backend.DataMapper.EventDataMapper;
 import org.teamy.backend.DataMapper.VenueDataMapper;
+import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.teamy.backend.model.FundingApplication;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -86,5 +88,14 @@ public class EventRepository {
             eventCache.put(event.getId(), event);
         }
         return result;
+    }
+
+    public Event lazyLoadClub(Event event){
+
+        Club club = clubDataMapper.findClubById(event.getClubId());
+        event.setClub(club);
+        eventCache.put(event.getId(),event);
+
+        return event;
     }
 }
