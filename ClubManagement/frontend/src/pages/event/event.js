@@ -44,13 +44,14 @@ function Event() {
     const [studentSearchResults, setStudentSearchResults] = useState([]);
     const [participants, setParticipants] = useState([{ email: '' }]);
     const [participantsIds, setParticipantsIds] = useState([]);
+    const [submitting, setSubmitting] = useState(false);
 
 
 
-    useEffect(() => {
-        const fetchAllEvent = async () => {
-            try {
-                const res = await doCall(`${path}/student/events/?id=-1`,'GET', );
+    // useEffect(() => {
+    const fetchAllEvent = async () => {
+        try {
+            const res = await doCall(`${path}/student/events/?id=-1`,'GET', );
 
                 // const response = await fetch(`${path}/student/events/?id=-1`, {
                 //     method: 'GET',
@@ -59,74 +60,86 @@ function Event() {
                 //         'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
                 //     }
                 // });
-                if (res.ok ) {
-                    const data = await res.json();
-                    setAllEvents(data);
-                    const uniqueClubIds = [...new Set(data.map(event => event.clubId))];
-                    fetchClubNames(uniqueClubIds);
+            if (res.ok ) {
+                const data = await res.json();
+                setAllEvents(data);
+                const uniqueClubIds = [...new Set(data.map(event => event.clubId))];
+                    // fetchClubNames(uniqueClubIds);
                     // console.log(data, 'data------');
-                } else {
-                    setError('Failed to load club information');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                setError('An error occurred while fetching the club information');
-            } finally {
-                setLoading(false);
+            } else {
+                setError('Failed to load club information');
             }
-        };
-
-            fetchAllEvent();
-        }, []);
-
-    const fetchClubNames = async (clubIds) => {
-        try {
-            const clubNamesPromises = clubIds.map(async (id) => {
-                const res = await doCall(`${path}/student/clubs/?id=${id}`, 'GET');
-                if (res.ok) {
-                    const data = await res.json();
-                    return { id, name: data.name };
-                }
-                return { id, name: `Club ${id}` }; // Fallback if name is not available
-            });
-
-            const clubs = await Promise.all(clubNamesPromises);
-            setClubOptions(clubs);
         } catch (error) {
-            console.error('Error fetching club names:', error);
+            console.error('Error:', error);
+            setError('An error occurred while fetching the club information');
+        } finally {
+            setLoading(false);
         }
     };
+
+    useEffect(() => {fetchAllEvent();
+        }, []);
+
+    // const fetchClubNames = async (clubIds) => {
+    //     try {
+    //         const clubNamesPromises = clubIds.map(async (id) => {
+    //             const res = await doCall(`${path}/student/clubs/?id=${id}`, 'GET');
+    //             if (res.ok) {
+    //                 const data = await res.json();
+    //                 return { id, name: data.name };
+    //             }
+    //             return { id, name: `Club ${id}` }; // Fallback if name is not available
+    //         });
+    //
+    //         const clubs = await Promise.all(clubNamesPromises);
+    //         setClubOptions(clubs);
+    //     } catch (error) {
+    //         console.error('Error fetching club names:', error);
+    //     }
+    // };
 
     const handleClubFilter = (clubId) => {
         setSelectedClubId(clubId);
     };
-
-
-
-
+    const getClubNameById = (clubId) => {
+        const club = clubs.find(club => club.id === clubId);
+        return club ? club.name : `Club ${clubId}`; // Fallback if club not found
+    };
 
     const filteredEvents = allEvents
         .filter(event => event.title.toLowerCase().includes(searchTerm))
         .filter(event => !selectedClubId || event.clubId === selectedClubId)
+        .map(event => ({
+            ...event,
+            clubName: getClubNameById(event.clubId), // Add club name to each event
+        }));
+
+
+
+
+    // const filteredEvents = allEvents
+    //     .filter(event => event.title.toLowerCase().includes(searchTerm))
+    //     .filter(event => !selectedClubId || event.clubId === selectedClubId)
 
 
     //
-    useEffect(() => {
-        const fetchRsvpedEvents = async () => {
-            try {
-                const res = await doCall(`${path}/student/userdetailed/tickets`, 'GET');
-                if (res.ok) {
-                    const data = await res.json();
-                    setRsvpedEvents(data);
-                }
-            } catch (error) {
-                console.error('Error fetching RSVPed events:', error);
-            } finally {
-                setLoading(false);
+    const fetchRsvpedEvents = async () => {
+        try {
+            const res = await doCall(`${path}/student/userdetailed/tickets`, 'GET');
+            if (res.ok) {
+                const data = await res.json();
+                const issuedEvents = data.filter(ticket => ticket.ticketStatus === 'Issued');
+                setRsvpedEvents(issuedEvents);
+                // setRsvpedEvents(data);
             }
-        };
+        } catch (error) {
+            console.error('Error fetching RSVPed events:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        fetchRsvpedEvents();
+    useEffect(() => {fetchRsvpedEvents();
     }, []);
 
     useEffect(() => {
@@ -134,8 +147,9 @@ function Event() {
             try {
                 const response = await doCall(`${path}/student/clubs/?id=-1`,'GET');
                 if (response.ok) {
-                    const data = await response.json();
+                    const data = await response.json()
                     setClubs(data);
+                    setClubOptions(data.map(club => ({ id: club.id, name: club.name })));
                 } else {
                     setError('Failed to load club information');
                 }
@@ -147,6 +161,8 @@ function Event() {
 
         fetchClubs();
     }, []);
+
+
     const getStatusTagColor = (status) => {
         if (status === 'Issued') return 'green';
         if (status === 'Cancelled') return 'red';
@@ -260,6 +276,7 @@ function Event() {
             message.error('Number of tickets must match the number of participants.');
             return;
         }
+        setSubmitting(true);
         try {
             //const submitterId = values.submitterId;
             const res = await doCall(`${path}/student/events/applyRSVP`, 'POST', {
@@ -272,9 +289,6 @@ function Event() {
             if (res.ok) {
                 const updatedEvent = allEvents.find(event => event.id === selectedEvent);
                 setRsvpedEvents([...rsvpedEvents, updatedEvent]);
-                handleCloseModal();
-                form.resetFields();
-                setParticipantsIds([]);
                 setAllEvents(prevEvents =>
                     prevEvents.map(event =>
                         event.id === selectedEvent
@@ -282,6 +296,11 @@ function Event() {
                             : event
                     )
                 );
+                await fetchAllEvent();
+                await fetchRsvpedEvents();
+                handleCloseModal();
+                form.resetFields();
+                setParticipantsIds([]);
             } else {
                 console.error('Error applying for RSVP:', res.statusText);
             }
@@ -301,6 +320,11 @@ function Event() {
     const handleSelectStudent = (value, index) => {
         const selectedStudent = studentSearchResults.find(student => student.email === value);
         if (selectedStudent) {
+            const isAlreadySelected = participantsIds.includes(selectedStudent.id);
+            if (isAlreadySelected) {
+                message.error('This participant has already been added. Please select a different participant.');
+                return;
+            }
             const participants = form.getFieldValue('participants') || [];
             participants[index] = { ...participants[index], email: selectedStudent.email };
             form.setFieldsValue({ participants });
@@ -391,6 +415,7 @@ function Event() {
                     </Col>
                 </Row>
                 <Table dataSource={filteredEvents} rowKey="id">
+                    <Column title="Hosted by" dataIndex="clubName" key="clubName" />
                     <Column title="Title" dataIndex="title" key="title" />
                     <Column title="Description" dataIndex="description" key="description" />
                     <Column title="Date" dataIndex="date" key="date" />
@@ -455,7 +480,8 @@ function Event() {
                                                         onSelect={(value) => handleSelectStudent(value, index)}
                                                         options={studentSearchResults.map(student => ({
                                                             label: `${student.name} (${student.email})`,
-                                                            value: student.email
+                                                            value: student.email,
+                                                            disabled: participantsIds.includes(student.id)
                                                         }))}
                                                     />
                                                 </Form.Item>
@@ -485,8 +511,8 @@ function Event() {
 
                         <Form.Item>
                             <Row justify="center">
-                                <Button type="primary" htmlType="submit">
-                                    Submit RSVP
+                                <Button type="primary" htmlType="submit" disabled={submitting}>
+                                    {submitting ? 'Submitting...' : 'Submit RSVP'}
                                 </Button>
                             </Row>
                         </Form.Item>
