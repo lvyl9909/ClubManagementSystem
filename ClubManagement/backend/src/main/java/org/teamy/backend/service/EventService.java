@@ -117,6 +117,7 @@ public class EventService {
         // 创建 RSVP 记录
         RSVP rsvp = new RSVP( studentId,eventId,numTickets,participates_id);
         Event event = eventRepository.findEventById(rsvp.getEventId());
+        event.setCurrentCapacity(getCurrentCapacity(event));
         rsvp.setEvent(event);
         if (!rsvp.haveMargin()){
             throw new NotEnoughTicketsException("Not enough tickets available for this event.");
