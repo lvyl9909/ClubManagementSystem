@@ -296,11 +296,13 @@ function Event() {
                             : event
                     )
                 );
+
                 await fetchAllEvent();
                 await fetchRsvpedEvents();
                 handleCloseModal();
                 form.resetFields();
                 setParticipantsIds([]);
+                setSubmitting(false);
             } else {
                 console.error('Error applying for RSVP:', res.statusText);
             }
