@@ -318,6 +318,11 @@ function Event() {
             setStudentSearchResults(studentsData);
         }
     };
+
+    const handleClearSearch = () => {
+        setSearchTerm(''); // Clear the search term
+        fetchAllEvent();   // Re-fetch all events to reset the list
+    };
 // Handle selection of a student from the AutoComplete dropdown
     const handleSelectStudent = (value, index) => {
         const selectedStudent = studentSearchResults.find(student => student.email === value);
@@ -349,9 +354,7 @@ function Event() {
         });
     };
 
-    const isEventRsvped = (eventId) => {
-        return rsvpedEvents.some(event => event.eventId === eventId);
-    };
+
 
 
 
@@ -406,7 +409,11 @@ function Event() {
             <TabPane tab="All Events" key="2">
                 <Row gutter={[16, 16]} justify="left" style={{ marginBottom: 16 }}>
                     <Col>
-                        <Search placeholder="Search events" onSearch={handleSearch} enterButton />
+                        <Search placeholder="Search events" onSearch={handleSearch} enterButton
+                                onChange={e => setSearchTerm(e.target.value)}
+                                allowClear
+                                onClear={handleClearSearch}
+                        />
                     </Col>
                     <Col>
                         <Select placeholder="Filter by Club" onChange={handleClubFilter} allowClear>
