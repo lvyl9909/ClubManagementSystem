@@ -166,12 +166,8 @@ public class Event extends DomainObject {
         this.rsvps = rsvps;
     }
 
-    public Integer getClub() {
-        return clubId;
-    }
-
-    public void setClub(Integer clubId) {
-        this.clubId = clubId;
+    public Club getClub() {
+        return club;
     }
 
     public Integer getCurrentCapacity() {

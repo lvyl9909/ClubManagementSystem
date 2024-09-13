@@ -18,6 +18,9 @@ public class Club extends DomainObject {
 
 
     public Club(Integer id,String name, String description) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Club ID must be positive");
+        }
         this.setId(id);  // Inherited from DomainObject
         this.name = name;
         this.description = description;
@@ -39,6 +42,9 @@ public class Club extends DomainObject {
     }
 
     public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Club name cannot be empty");
+        }
         this.name = name;
     }
 
@@ -104,9 +110,16 @@ public class Club extends DomainObject {
         return this.budget;
     }
 
-    public void setBudget(float budget){
+//    public void setBudget(float budget){
+//        this.budget = budget;
+//    }
+    public void setBudget(float budget) {
+        if (budget < 0) {
+            throw new IllegalArgumentException("Budget cannot be negative");  // domain logic, no persistence dependency
+        }
         this.budget = budget;
     }
+
     public boolean addEvent(Event event){
         if(event.getCost().compareTo(BigDecimal.valueOf(this.budget))!=1){
             setBudget(this.budget-event.getCost().floatValue());
@@ -135,5 +148,8 @@ public class Club extends DomainObject {
         this.FundingApplications.add(fundingApplication);
         this.FundingApplicationsId.add(fundingApplicationID);
         this.budget += fundingApplication.getAmount().floatValue();
+    }
+    public boolean isNameEmpty(){
+        return this.name.isEmpty();
     }
 }

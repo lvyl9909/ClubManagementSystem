@@ -70,7 +70,16 @@ public class EventService {
         event.validateBudget();
         event.validateCapacity();
         // Recall methods in DAO layer
-        return eventRepository.saveEvent(event);
+        try {
+            boolean isSuccess =  eventRepository.saveEvent(event);
+            List<Ticket> tickets = ticketRepository.getTicketsFromEvent(event.getId());
+
+            ticketRepository.invalidateTicketCaches(tickets);
+            clubRepository.invalidateClubCache(event.getClubId());
+            return isSuccess;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Event> getAllEvents() {
@@ -105,7 +114,16 @@ public class EventService {
                 throw new RuntimeException("venue capacity not enough");
             }
             // 调用 DataMapper 更新事件
-            return eventRepository.updateEvent(event);
+            try {
+                boolean isSuccess =  eventRepository.saveEvent(event);
+                List<Ticket> tickets = ticketRepository.getTicketsFromEvent(event.getId());
+
+                ticketRepository.invalidateTicketCaches(tickets);
+                clubRepository.invalidateClubCache(event.getClubId());
+                return isSuccess;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Error updating event: " + e.getMessage());
@@ -131,6 +149,7 @@ public class EventService {
         }
         // 提交事务
         unitOfWork.commit();
+        clubRepository.invalidateClubCache(event.getClubId());
     }
     public void deleteEvent(List<Integer> eventsId)throws Exception{
         EventDeleteUoW eventDeleteUoW = new EventDeleteUoW(eventRepository,ticketRepository);

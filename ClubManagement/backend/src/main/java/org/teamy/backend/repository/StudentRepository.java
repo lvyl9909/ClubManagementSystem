@@ -144,4 +144,13 @@ public class StudentRepository {
         }
         return student;
     }
+
+    public void invalidateStudentCache(Integer studentId) {
+        studentCache.invalidate(studentId);
+    }
+    public void invalidateStudentCaches(List<Integer> studentsId) {
+        for (Integer studentId:studentsId){
+            studentCache.invalidate(studentId);
+        }
+    }
 }

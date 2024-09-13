@@ -29,7 +29,7 @@ public class EventVenueDTO {
         this.time = event.getSqlTime().toString();
         this.venueId = event.getVenueId();
         this.cost = event.getCost();
-        this.clubId = event.getClub();
+        this.clubId = event.getClubId();
     }
 
     public String getVenueName() {

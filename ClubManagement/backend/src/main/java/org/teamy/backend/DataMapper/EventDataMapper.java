@@ -158,7 +158,7 @@ public class EventDataMapper {
             stmt.setTime(4,event.getSqlTime());
             stmt.setInt(5,event.getVenueId());
             stmt.setBigDecimal(6,event.getCost());
-            stmt.setInt(7,event.getClub());
+            stmt.setInt(7,event.getClubId());
             stmt.setString(8, EventStatus.Ongoing.name());
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -215,7 +215,7 @@ public class EventDataMapper {
             stmt.setTime(4, event.getSqlTime());
             stmt.setInt(5, event.getVenueId());
             stmt.setBigDecimal(6, event.getCost());
-            stmt.setInt(7, event.getClub());
+            stmt.setInt(7, event.getClubId());
             stmt.setString(8, event.getStatus().name());  // 假设状态是枚举类型
             stmt.setInt(9,event.getCapacity());
             stmt.setInt(10, event.getId());  // 使用 eventId 作为更新条件
