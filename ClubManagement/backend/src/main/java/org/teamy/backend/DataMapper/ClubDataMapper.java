@@ -34,7 +34,7 @@ public class ClubDataMapper {
             stmt.setInt(1, Id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Club(rs.getInt("club_id"),rs.getString("name"),rs.getString("description"));
+                return new Club(rs.getInt("club_id"),rs.getString("name"),rs.getString("description"),rs.getFloat("budget"));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -66,7 +66,8 @@ public class ClubDataMapper {
                 Club club = new Club(
                         rs.getInt("club_id"),
                         rs.getString("name"),
-                        rs.getString("description")
+                        rs.getString("description"),
+                        rs.getFloat("budget")
                 );
                 clubs.add(club);
             }
@@ -87,7 +88,7 @@ public class ClubDataMapper {
             stmt.setString(1, name);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Club(rs.getInt("club_id"),rs.getString("name"),rs.getString("description"));
+                return new Club(rs.getInt("club_id"),rs.getString("name"),rs.getString("description"),rs.getFloat("budget"));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -128,7 +129,8 @@ public class ClubDataMapper {
                 Club club = new Club(
                         rs.getInt("club_id"),
                         rs.getString("name"),
-                        rs.getString("description")
+                        rs.getString("description"),
+                        rs.getFloat("budget")
                 );
                 clubs.add(club);
             }

@@ -14,16 +14,17 @@ public class Club extends DomainObject {
     private List<FundingApplication> FundingApplications;
     private List<Integer> FundingApplicationsId;
 
-    float budget;
+    private float budget;
 
 
-    public Club(Integer id,String name, String description) {
+    public Club(Integer id,String name, String description,float budget) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Club ID must be positive");
         }
         this.setId(id);  // Inherited from DomainObject
         this.name = name;
         this.description = description;
+        this.budget = budget;
     }
 
     public Club() {
