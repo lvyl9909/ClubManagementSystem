@@ -16,7 +16,7 @@ import {
     message, InputNumber, TimePicker, Select
 } from 'antd';
 import "./club.css";
-import {useParams} from "react-router";
+import {useLocation, useParams,useNavigate} from "react-router";
 import {doCall} from "../../router/api";
 import moment from "moment";
 // import { handleSearchStudent, handleSelectStudent } from '../event/event';
@@ -28,12 +28,15 @@ const { Option } = Select;
 
 
 function ManageClub() {
+    const navigate = useNavigate();
     const path = process.env.REACT_APP_API_BASE_URL
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
 
     const id = useParams().id;
+    const [userManagedClubs, setUserManagedClubs] = useState([]);
+    const { state } = useLocation();
     const [clubDetails, setClubDetails] = useState(null);
     const [adminData, setAdminData] = useState([]);
 
@@ -62,11 +65,19 @@ function ManageClub() {
     const [createFundingModalVisible, setCreateFundingModalVisible] = useState(false); // Modal for creating new funding
 
 
-
-
+    const checkAuthorization = () => {
+        if (state && state.isAuthorized) {
+            return true;
+        } else {
+            message.error("You do not have permission to manage this club.");
+            navigate('/club');
+            return false;
+        }
+    };
 
 
     const fetchStudents = async () => {
+        if (checkAuthorization()) {
             try {
                 const response = await doCall(`${path}/student/admin/?id=${id}`, 'GET');
                 const data = await response.json();
@@ -76,7 +87,8 @@ function ManageClub() {
                 setError('Failed to fetch student data');
                 setLoading(false);
             }
-        };
+        }
+    };
     useEffect(() => {
         fetchStudents();
     }, [id]);

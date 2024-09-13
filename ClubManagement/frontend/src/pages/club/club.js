@@ -1,6 +1,6 @@
 import React,{ useState, useEffect }  from "react";
 import {useParams} from "react-router";
-import {Table, Tag, Space, Button, Col, Row, Input, Form, Modal, Typography, Divider} from 'antd';
+import {Table, Tag, Space, Button, Col, Row, Input, Form, Modal, Typography, Divider, message} from 'antd';
 import {Link} from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import {doCall} from "../../router/api";
@@ -24,6 +24,7 @@ function Club() {
                 if (res.ok === true) {
                     const data = await res.json();
                     setClubs(data);
+
                 } else {
                     setError('Failed to load club information');
                 }
@@ -37,28 +38,13 @@ function Club() {
         fetchClub();
     }, []);
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
 
-    const handleCreate = async (values) => {
-        try {
-            const newClub = {
-                name: values.name,
-                description: values.description,
-            };
-            const res = await doCall(`${path}/student/clubs/save`, 'POST', { newClub });
-
-            if (res.ok) {
-                const createdClub = await res.json();
-                setClubs([...clubs, createdClub]);
-                setIsModalVisible(false);
-                form.resetFields();
-            } else {
-                console.error('Failed to create club');
-            }
-        } catch (error) {
-            console.error('Error creating club:', error);
+    const handleManageClick = (clubId) => {
+        const isUserManagingClub = clubs.some(club => String(club.id) === String(clubId));
+        if (isUserManagingClub) {
+            navigate(`/club/manage/${clubId}`, { state: { isAuthorized: true } });
+        } else {
+            navigate(`/club/manage/${clubId}`, { state: { isAuthorized: false } });
         }
     };
 
@@ -69,6 +55,39 @@ function Club() {
     if (error) {
         return <p style={{ color: 'red' }}>{error}</p>;
     }
+
+    // const handleCancel = () => {
+    //     setIsModalVisible(false);
+    // };
+    //
+    // const handleCreate = async (values) => {
+    //     try {
+    //         const newClub = {
+    //             name: values.name,
+    //             description: values.description,
+    //         };
+    //         const res = await doCall(`${path}/student/clubs/save`, 'POST', { newClub });
+    //
+    //         if (res.ok) {
+    //             const createdClub = await res.json();
+    //             setClubs([...clubs, createdClub]);
+    //             setIsModalVisible(false);
+    //             form.resetFields();
+    //         } else {
+    //             console.error('Failed to create club');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error creating club:', error);
+    //     }
+    // };
+    //
+    // if (loading) {
+    //     return <p>Loading club information...</p>;
+    // }
+    //
+    // if (error) {
+    //     return <p style={{ color: 'red' }}>{error}</p>;
+    // }
 
     return (
         <>
@@ -86,7 +105,7 @@ function Club() {
                     render={(text, record) => (
                         <Button type="primary" ghost
                             onClick={() =>
-                                navigate(`/club/manage/${record.id}`)}>
+                                handleManageClick(record.id)}>
                             Manage
                         </Button>
                     )}
