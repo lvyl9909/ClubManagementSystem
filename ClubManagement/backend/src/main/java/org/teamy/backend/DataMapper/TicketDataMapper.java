@@ -6,10 +6,7 @@ import org.teamy.backend.model.Student;
 import org.teamy.backend.model.Ticket;
 import org.teamy.backend.model.TicketStatus;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,8 +78,7 @@ public class TicketDataMapper {
 
         return tickets;
     }
-    public void saveTicket(Ticket ticket) {
-        var connection = databaseConnectionManager.nextConnection();
+    public void saveTicket(Connection connection,Ticket ticket) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
                     "INSERT INTO tickets (student_id, rsvp,status,event_id) VALUES (?, ?,?::ticket_status,?)",
@@ -111,7 +107,6 @@ public class TicketDataMapper {
             e.printStackTrace();  // 打印异常信息
             throw new RuntimeException("Error inserting ticket: " + e.getMessage());
         } finally{
-            databaseConnectionManager.releaseConnection(connection);
         }
     }
     public void saveTickets(List<Ticket> tickets) throws SQLException {
@@ -177,7 +172,24 @@ public class TicketDataMapper {
             databaseConnectionManager.releaseConnection(connection);
         }
     }
+    public void deleteTicket(Connection connection,Integer ticketId)throws SQLException{
+        try {
+            System.out.println("start delete");
+            // 更新事件状态为 "Cancelled"
+            PreparedStatement stmt = connection.prepareStatement("UPDATE tickets SET status = ?::ticket_status WHERE ticket_id = ?");
+            stmt.setString(1, TicketStatus.Cancelled.name());
+            stmt.setInt(2, ticketId);
 
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("influence row:"+rowsAffected);
+            if (rowsAffected == 0) {
+                throw new RuntimeException("No ticket found with id: " + ticketId);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
     public List<Ticket> getTicketsFromEvent(Integer eventId) throws SQLException {
         var connection = databaseConnectionManager.nextConnection();
         List<Ticket> tickets = new ArrayList<>();
@@ -193,6 +205,24 @@ public class TicketDataMapper {
             }
         } finally {
             databaseConnectionManager.releaseConnection(connection);
+        }
+
+        return tickets;
+    }
+
+    public List<Ticket> getTicketsFromEvent(Connection connection,Integer eventId) throws SQLException {
+        List<Ticket> tickets = new ArrayList<>();
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM tickets WHERE event_id = ?");
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Ticket ticket = new Ticket( rs.getInt("ticket_id"), rs.getInt("student_id"),rs.getInt("rsvp"), TicketStatus.valueOf(rs.getString("status")) ,rs.getInt("event_id")
+                );
+                tickets.add(ticket);
+            }
+        } finally {
         }
 
         return tickets;

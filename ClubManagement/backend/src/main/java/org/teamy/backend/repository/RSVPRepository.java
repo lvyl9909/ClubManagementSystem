@@ -3,6 +3,7 @@ package org.teamy.backend.repository;
 import org.teamy.backend.DataMapper.RSVPDataMapper;
 import org.teamy.backend.model.RSVP;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 public class RSVPRepository {
@@ -21,7 +22,7 @@ public class RSVPRepository {
     public RSVP findRSVPById(int Id) throws Exception {
         return rsvpDataMapper.findRSVPById(Id);
     }
-    public void saveRSVP(RSVP rsvp) throws SQLException {
-        rsvpDataMapper.saveRSVP(rsvp);
+    public void saveRSVP(Connection connection,RSVP rsvp) throws SQLException {
+        rsvpDataMapper.saveRSVP(connection,rsvp);
     }
 }

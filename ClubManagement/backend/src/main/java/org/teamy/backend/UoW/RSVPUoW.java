@@ -3,23 +3,29 @@ package org.teamy.backend.UoW;
 import org.teamy.backend.DataMapper.EventDataMapper;
 import org.teamy.backend.DataMapper.RSVPDataMapper;
 import org.teamy.backend.DataMapper.TicketDataMapper;
+import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.RSVP;
 import org.teamy.backend.model.Ticket;
 import org.teamy.backend.repository.RSVPRepository;
 import org.teamy.backend.repository.TicketRepository;
 import org.teamy.backend.service.StudentService;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 public class RSVPUoW implements UnitOfWork{
     private final RSVPRepository rsvpRepository;
     private final TicketRepository ticketRepository;
+    private final DatabaseConnectionManager connectionManager;
+
     private List<RSVP> newRsvps = new ArrayList<>();
     private List<Ticket> newTickets = new ArrayList<>();
 
-    public RSVPUoW(RSVPRepository rsvpRepository, TicketRepository ticketRepository) {
+    public RSVPUoW(RSVPRepository rsvpRepository, TicketRepository ticketRepository, DatabaseConnectionManager connectionManager) {
         this.rsvpRepository = rsvpRepository;
         this.ticketRepository = ticketRepository;
+        this.connectionManager = connectionManager;
     }
     public void registerNewRSVP(RSVP rsvp) {
         newRsvps.add(rsvp);
@@ -32,10 +38,15 @@ public class RSVPUoW implements UnitOfWork{
     }
     @Override
     public void commit() throws Exception {
+        Connection connection = null;
+
         try {
+            connection = connectionManager.nextConnection();
+            connection.setAutoCommit(false); // 关闭自动提交，手动管理事务
+
             // 先保存 RSVP 并获取自增 ID
             for (RSVP rsvp : newRsvps) {
-                rsvpRepository.saveRSVP(rsvp);  // 保存 RSVP，生成自增 ID
+                rsvpRepository.saveRSVP(connection,rsvp);  // 保存 RSVP，生成自增 ID
                 System.out.println("rsvpID:"+rsvp.getId());
             }
 
@@ -51,11 +62,27 @@ public class RSVPUoW implements UnitOfWork{
                     }
                 }
                 System.out.println(ticket.toString());
-                ticketRepository.saveTicket(ticket);  // 保存 Ticket
+                ticketRepository.saveTicket(connection,ticket);  // 保存 Ticket
             }
+            connection.commit();
         } catch (Exception e) {
+            if (connection != null) {
+                try {
+                    connection.rollback(); // 如果出错，回滚事务
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
             throw new RuntimeException("Error committing UoW: " + e.getMessage());
         } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true); // 恢复自动提交模式
+                    connectionManager.releaseConnection(connection); // 释放连接
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
             clear();
         }
     }

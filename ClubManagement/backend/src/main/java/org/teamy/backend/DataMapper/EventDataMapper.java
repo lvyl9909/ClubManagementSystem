@@ -95,9 +95,7 @@ public class EventDataMapper {
 
         return events;
     }
-    public void deleteEvent(int eventId) {
-        var connection = databaseConnectionManager.nextConnection();
-
+    public void deleteEvent(Connection connection, int eventId) {
         try {
             // 更新事件状态为 "Cancelled"
             PreparedStatement stmt = connection.prepareStatement("UPDATE events SET status = ?::event_status WHERE event_id = ?");
@@ -111,8 +109,6 @@ public class EventDataMapper {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             throw new RuntimeException(e);
-        } finally {
-            databaseConnectionManager.releaseConnection(connection);
         }
     }
 

@@ -9,6 +9,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.teamy.backend.model.FundingApplication;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -60,8 +61,8 @@ public class EventRepository {
         return event;
     }
     // 删除事件并从缓存中移除
-    public void deleteEvent(int eventId) {
-        eventDataMapper.deleteEvent(eventId);
+    public void deleteEvent(Connection connection,int eventId) {
+        eventDataMapper.deleteEvent(connection,eventId);
         // 从缓存中移除对应的事件
         eventCache.invalidate(eventId);
     }    public List<Event> findEventsByTitle(String title) throws SQLException {

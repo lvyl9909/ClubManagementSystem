@@ -1,13 +1,10 @@
 package org.teamy.backend.service;
 
-import org.teamy.backend.DataMapper.EventDataMapper;
-import org.teamy.backend.DataMapper.RSVPDataMapper;
-import org.teamy.backend.DataMapper.TicketDataMapper;
 import org.teamy.backend.UoW.EventDeleteUoW;
 import org.teamy.backend.UoW.RSVPUoW;
+import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.*;
 import org.teamy.backend.model.exception.NotEnoughTicketsException;
-import org.teamy.backend.model.exception.NotFoundException;
 import org.teamy.backend.repository.*;
 
 import java.math.BigDecimal;
@@ -20,19 +17,21 @@ public class EventService {
     TicketRepository ticketRepository;
     VenueRepository venueRepository;
     ClubRepository clubRepository;
+    private final DatabaseConnectionManager databaseConnectionManager;
     private static EventService instance;
-    public static synchronized EventService getInstance(EventRepository eventRepository, RSVPRepository rsvpRepository,TicketRepository ticketRepository,VenueRepository venueRepository,ClubRepository clubRepository) {
+    public static synchronized EventService getInstance(EventRepository eventRepository, RSVPRepository rsvpRepository,TicketRepository ticketRepository,VenueRepository venueRepository,ClubRepository clubRepository,DatabaseConnectionManager databaseConnectionManager) {
         if (instance == null) {
-            instance = new EventService(eventRepository,rsvpRepository,ticketRepository, venueRepository, clubRepository);
+            instance = new EventService(eventRepository,rsvpRepository,ticketRepository, venueRepository, clubRepository, databaseConnectionManager);
         }
         return instance;
     }
-    private EventService(EventRepository eventRepository,RSVPRepository rsvpRepository,TicketRepository ticketRepository,VenueRepository venueRepository,ClubRepository clubRepository) {
+    private EventService(EventRepository eventRepository, RSVPRepository rsvpRepository, TicketRepository ticketRepository, VenueRepository venueRepository, ClubRepository clubRepository, DatabaseConnectionManager databaseConnectionManager) {
         this.eventRepository = eventRepository;
         this.rsvpRepository = rsvpRepository;
         this.ticketRepository = ticketRepository;
         this.clubRepository=clubRepository;
         this.venueRepository = venueRepository;
+        this.databaseConnectionManager = databaseConnectionManager;
     }
     public Event getEventById(Integer id) throws Exception {
         if (id <= 0) {
@@ -132,7 +131,7 @@ public class EventService {
         }
     }
     public void applyForRSVP(int eventId, int studentId, int numTickets,List<Integer> participates_id) throws Exception {
-        RSVPUoW unitOfWork = new RSVPUoW(rsvpRepository, ticketRepository);
+        RSVPUoW unitOfWork = new RSVPUoW(rsvpRepository, ticketRepository,databaseConnectionManager);
 
         // 创建 RSVP 记录
         RSVP rsvp = new RSVP( studentId,eventId,numTickets,participates_id);
@@ -154,7 +153,7 @@ public class EventService {
         clubRepository.invalidateClubCache(event.getClubId());
     }
     public void deleteEvent(List<Integer> eventsId)throws Exception{
-        EventDeleteUoW eventDeleteUoW = new EventDeleteUoW(eventRepository,ticketRepository);
+        EventDeleteUoW eventDeleteUoW = new EventDeleteUoW(eventRepository,ticketRepository,databaseConnectionManager);
         for (Integer eventId : eventsId){
             eventDeleteUoW.addDeleteEvents(eventId);
         }

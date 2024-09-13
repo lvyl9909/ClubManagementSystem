@@ -86,8 +86,7 @@ public class RSVPDataMapper {
 
         return rsvps;
     }
-    public void saveRSVP(RSVP rsvp) throws SQLException {
-        var connection = databaseConnectionManager.nextConnection();
+    public void saveRSVP(Connection connection,RSVP rsvp) throws SQLException {
         try {
             PreparedStatement stmt = connection.prepareStatement(
                     "INSERT INTO rsvps (student_id, event, number, participates_id) VALUES (?, ?, ?, ?)",
@@ -120,7 +119,6 @@ public class RSVPDataMapper {
                 }
             }
         } finally {
-            databaseConnectionManager.releaseConnection(connection);
         }
     }
     public List<Integer> findRSVPIdByStudentId(Integer studentId){

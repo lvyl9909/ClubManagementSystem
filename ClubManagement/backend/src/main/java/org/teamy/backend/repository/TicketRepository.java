@@ -5,6 +5,7 @@ import org.teamy.backend.model.Ticket;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -41,9 +42,13 @@ public class TicketRepository {
         }
         return ticket;
     }
-    public void saveTicket(Ticket ticket) {
-        ticketDataMapper.saveTicket(ticket);
-        ticketCache.put(ticket.getId(), ticket); // Update cache
+    public void saveTicket(Connection connection,Ticket ticket) {
+        try {
+            ticketDataMapper.saveTicket(connection,ticket);
+            ticketCache.put(ticket.getId(), ticket); // Update cache
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     public void saveTickets(List<Ticket> tickets) {
         Map<Integer, Ticket> cacheUpdates = new HashMap<>();
@@ -61,9 +66,19 @@ public class TicketRepository {
         ticketDataMapper.deleteTicket(ticketId);
         ticketCache.invalidate(ticketId); // Remove from cache
     }
+    public void deleteTicket(Connection connection,Integer ticketId)throws SQLException {
+        ticketDataMapper.deleteTicket(connection,ticketId);
+        ticketCache.invalidate(ticketId); // Remove from cache
+    }
+
     public List<Ticket> getTicketsFromEvent(Integer eventId) throws SQLException {
         return ticketDataMapper.getTicketsFromEvent(eventId);
     }
+
+    public List<Ticket> getTicketsFromEvent(Connection connection,Integer eventId) throws SQLException {
+        return ticketDataMapper.getTicketsFromEvent(connection,eventId);
+    }
+
 
     public void invalidateTicketCache(Integer ticketId) {
         ticketCache.invalidate(ticketId);
