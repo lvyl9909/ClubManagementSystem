@@ -26,9 +26,6 @@ public class ClubService {
     }
 
     public Club getClubById(int id) throws Exception {
-        if (id <= 0) {
-            throw new IllegalArgumentException("Club ID must be positive");
-        }
         Club club = clubRepository.findClubById(id);
         return club;
     }
@@ -44,10 +41,6 @@ public class ClubService {
     }
 
     public void saveClub(Club club) throws Exception {
-        // You can add additional business logic here, such as data validation
-        if (club ==null||club.getName() == null || club.isNameEmpty()) {
-            throw new IllegalArgumentException("Club cannot be empty");
-        }
         if (!clubRepository.saveClub(club)) {
             studentRepository.invalidateStudentCaches(club.getStudentId());
             throw new RuntimeException("Failed to save the club.");

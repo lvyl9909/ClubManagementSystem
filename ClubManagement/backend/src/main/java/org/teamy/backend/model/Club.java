@@ -18,6 +18,9 @@ public class Club extends DomainObject {
 
 
     public Club(Integer id,String name, String description) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Club ID must be positive");
+        }
         this.setId(id);  // Inherited from DomainObject
         this.name = name;
         this.description = description;
@@ -39,6 +42,9 @@ public class Club extends DomainObject {
     }
 
     public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Club name cannot be empty");
+        }
         this.name = name;
     }
 
