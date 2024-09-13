@@ -89,7 +89,7 @@ public class StudentService {
         return student.getTickets();
     }
     public List<RSVP> getRSVP(Student student){
-        if (student.getClubs()==null){
+        if (student.getRsvps()==null){
             student = studentRepository.lazyLoadRSVP(student);
         }
         return student.getRsvps();

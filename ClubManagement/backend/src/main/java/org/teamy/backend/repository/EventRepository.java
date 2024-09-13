@@ -98,4 +98,7 @@ public class EventRepository {
 
         return event;
     }
+    public void invalidateEventCache(Integer eventId) {
+        eventCache.invalidate(eventId);
+    }
 }

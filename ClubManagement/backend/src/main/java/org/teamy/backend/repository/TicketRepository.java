@@ -64,4 +64,14 @@ public class TicketRepository {
     public List<Ticket> getTicketsFromEvent(Integer eventId) throws SQLException {
         return ticketDataMapper.getTicketsFromEvent(eventId);
     }
+
+    public void invalidateTicketCache(Integer ticketId) {
+        ticketCache.invalidate(ticketId);
+    }
+    public void invalidateTicketCaches(List<Ticket> tickets) {
+        for (Ticket ticket:tickets){
+            ticketCache.invalidate(ticket.getId());
+        }
+    }
+
 }
