@@ -41,6 +41,7 @@ public class Event extends DomainObject {
                 ", date='" + date + '\'' +
                 ", time='" + time + '\'' +
                 ", venueName='" + venueName + '\'' +
+                ", venueID ="+venueId+
                 ", cost=" + cost +
                 ", capacity=" + capacity +
                 ", rsvps=" + rsvps +

@@ -63,18 +63,20 @@ public class EventService {
             throw new IllegalArgumentException("Club cannot be empty");
         }
 
-        eventRepository.lazyLoadClub(event);
+        event = eventRepository.lazyLoadClub(event);
+        System.out.println("load club");
         Venue venue = venueRepository.getVenueById(event.getVenueId());
         event.setVenue(venue);
+        System.out.println("set venue");
 
         event.validateBudget();
         event.validateCapacity();
+        System.out.println("pass test");
+
         // Recall methods in DAO layer
         try {
             boolean isSuccess =  eventRepository.saveEvent(event);
-            List<Ticket> tickets = ticketRepository.getTicketsFromEvent(event.getId());
-
-            ticketRepository.invalidateTicketCaches(tickets);
+            System.out.println("save");
             clubRepository.invalidateClubCache(event.getClubId());
             return isSuccess;
         } catch (Exception e) {
@@ -115,7 +117,7 @@ public class EventService {
             }
             // 调用 DataMapper 更新事件
             try {
-                boolean isSuccess =  eventRepository.saveEvent(event);
+                boolean isSuccess =  eventRepository.updateEvent(event);
                 List<Ticket> tickets = ticketRepository.getTicketsFromEvent(event.getId());
 
                 ticketRepository.invalidateTicketCaches(tickets);

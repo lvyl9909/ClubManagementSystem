@@ -72,7 +72,7 @@ public class EventRepository {
         boolean result = eventDataMapper.saveEvent(event);
         if (result) {
             // 更新缓存
-            eventCache.put(event.getId(), event);
+//            eventCache.put(event.getId(), event);
         }
         return result;
     }
@@ -92,11 +92,15 @@ public class EventRepository {
 
     public Event lazyLoadClub(Event event){
 
-        Club club = clubDataMapper.findClubById(event.getClubId());
-        event.setClub(club);
-        eventCache.put(event.getId(),event);
-
-        return event;
+        try {
+            Club club = clubDataMapper.findClubById(event.getClubId());
+            System.out.println(club);
+            event.setClub(club);
+//            eventCache.put(event.getId(),event);
+            return event;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     public void invalidateEventCache(Integer eventId) {
         eventCache.invalidate(eventId);

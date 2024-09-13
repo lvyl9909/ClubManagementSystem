@@ -73,7 +73,7 @@ public class ContextListener implements ServletContextListener {
 
         ClubService clubService = ClubService.getInstance(clubRepository,studentRepository);
         EventService eventService = EventService.getInstance(eventRepository,rsvpRepository,ticketRepository,venueRepository,clubRepository);
-        FundingApplicationService fundingApplicationService =FundingApplicationService.getInstance(fundingApplicationRepository);
+        FundingApplicationService fundingApplicationService =FundingApplicationService.getInstance(fundingApplicationRepository,clubRepository);
         RSVPService rsvpService = RSVPService.getInstance(rsvpRepository);
         StudentClubService studentClubService = StudentClubService.getInstance(studentClubRepository);
         StudentService studentService =StudentService.getInstance(studentRepository);
