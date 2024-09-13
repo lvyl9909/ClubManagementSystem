@@ -83,12 +83,20 @@ public class StudentRepository {
         }
         return students;
     }
-    public Student findStudentByUsername(String username) throws SQLException {
-        Student student= studentDataMapper.findStudentByUsername(username);
-        student.setClubId(studentsClubsDataMapper.findClubIdByStudentId(Math.toIntExact(student.getId())));
-        student.setRsvpsId(rsvpDataMapper.findRSVPIdByStudentId(Math.toIntExact(student.getId())));
-        student.setTicketsId(ticketDataMapper.getTicketsIdFromStudent(Math.toIntExact(student.getId())));
-        return student;
+    public Person findUserByUsername(String username) throws SQLException {
+        Person person= studentDataMapper.findUserByUsername(username);
+        if (person instanceof Student) {
+            // 如果 person 是 Student 类型
+            Student student = (Student) person;
+            student.setClubId(studentsClubsDataMapper.findClubIdByStudentId(Math.toIntExact(student.getId())));
+            student.setRsvpsId(rsvpDataMapper.findRSVPIdByStudentId(Math.toIntExact(student.getId())));
+            student.setTicketsId(ticketDataMapper.getTicketsIdFromStudent(Math.toIntExact(student.getId())));
+            return student;
+            // 进行与 student 相关的操作
+        }else {
+            return person;
+        }
+
     }
     public List<Student> getAllStudent() {
         return studentDataMapper.getAllStudent();

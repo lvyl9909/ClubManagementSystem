@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.teamy.backend.DataMapper.StudentDataMapper;
 import org.teamy.backend.model.Person;
+import org.teamy.backend.model.Student;
 import org.teamy.backend.repository.StudentClubRepository;
 import org.teamy.backend.repository.StudentRepository;
 import org.teamy.backend.security.model.Role;
@@ -36,14 +37,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     public Person loadUserByUsername(String username) throws UsernameNotFoundException {
         Person user=null;
         try {
-            user = studentRepository.findStudentByUsername(username);
+            user = studentRepository.findUserByUsername(username);
             if (user == null) {
                 System.out.println("username not found");
                 throw new UsernameNotFoundException("User not found");
             }else {
                 Set<Role> roles = new HashSet<>();
-                roles.add(new Role("USER"));
+                if (user instanceof Student) {
+                    roles.add(new Role("USER"));
+                }else{
 
+                }
                 List<Integer> clubIds = studentClubRepository.findClubIdByStudentId(Math.toIntExact(user.getId()));
                 for (Integer clubId : clubIds) {
                     roles.add(new Role("CLUB_" + clubId));
