@@ -364,11 +364,15 @@ function ManageClub() {
                 setCreateModalVisible(false); // Close the modal
                 fetchClubEvents(); // Refresh the events list
             } else {
-                message.error('Failed to create event');
+                throw new Error('Failed to create event');
             }
         } catch (error) {
-            console.error('Error creating event:', error);
-            message.error('An error occurred while creating the event');
+            const errorData = await error.response.json();
+            if (errorData.reason && errorData.reason === 'Budget not enough') {
+                message.error('The event cost exceeds the club budget.');
+            } else {
+                message.error(errorData.message || 'An error occurred while creating the event');
+            }
         }
     };
 
@@ -482,7 +486,7 @@ function ManageClub() {
                                     disabled={!hasSelected}
                                     loading={bulkLoading}
                                 >
-                                    {bulkLoading ? 'Deleting...' : 'Delete Selected'}
+                                    {bulkLoading ? 'Deleting...' : 'Cancel Selected'}
                                 </Button>
                                 {hasSelected ? ` Selected ${selectedRowKeys.length} ${selectedRowKeys.length === 1 ? 'item' : 'items'}` : ''}
                                 <Button type="primary" style={{ marginLeft: '20px' }} onClick={handleCreateNewEvent}>

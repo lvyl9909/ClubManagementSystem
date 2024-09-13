@@ -42,7 +42,7 @@ function Club() {
     const handleManageClick = (clubId) => {
         const isUserManagingClub = clubs.some(club => String(club.id) === String(clubId));
         if (isUserManagingClub) {
-            navigate(`/club/manage/${clubId}`, { state: { isAuthorized: true } });
+            navigate(`/club/manage/${clubId}`, { state: { isAuthorized: true} });
         } else {
             navigate(`/club/manage/${clubId}`, { state: { isAuthorized: false } });
         }

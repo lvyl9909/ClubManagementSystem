@@ -63,7 +63,9 @@ export async function doCall(path, method, data) {
     }
 
     if (res.status > 299) {
-        throw new Error(`Error: ${res.status} ${res.statusText}`);
+        const error = new Error(`Error: ${res.status} ${res.statusText}`);
+        error.response = res; // Attach the full response to the error
+        throw error;
     }
 
     return res;
