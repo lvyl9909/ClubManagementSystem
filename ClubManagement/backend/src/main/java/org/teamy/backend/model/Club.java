@@ -136,4 +136,7 @@ public class Club extends DomainObject {
         this.FundingApplicationsId.add(fundingApplicationID);
         this.budget += fundingApplication.getAmount().floatValue();
     }
+    public boolean isNameEmpty(){
+        return this.name.isEmpty();
+    }
 }

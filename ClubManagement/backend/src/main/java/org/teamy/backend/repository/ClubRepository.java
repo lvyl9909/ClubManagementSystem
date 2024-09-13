@@ -105,4 +105,8 @@ public class ClubRepository {
         }
         return club;
     }
+    // 失效Club缓存的操作
+    public void invalidateClubCache(Integer clubId) {
+        clubCache.invalidate(clubId);
+    }
 }
