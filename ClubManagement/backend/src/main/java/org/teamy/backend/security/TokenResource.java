@@ -78,7 +78,9 @@ public class TokenResource extends HttpServlet {
                 System.out.println("password correct");
                 var token = jwtTokenService.createToken(userDetails);
                 System.out.println("token created");
-                resp.addCookie(refreshCookie(token.getRefreshTokenId(), req.getContextPath()));
+                Cookie refreshCookie = refreshCookie(token.getRefreshTokenId(), req.getContextPath());
+                addSameSiteCookie(resp, refreshCookie, "None");
+//                resp.addCookie(refreshCookie);
                 System.out.println("Cookie added");
                 return tokenResponse(token.getAccessToken());
             }catch (UsernameNotFoundException e) {
@@ -123,7 +125,9 @@ public class TokenResource extends HttpServlet {
                 var token = jwtTokenService.refresh(refreshRequest.getAccessToken(), refreshToken);
                 System.out.println("3");
 
-                resp.addCookie(refreshCookie(token.getRefreshTokenId(), req.getContextPath()));
+                Cookie refreshCookie = refreshCookie(token.getRefreshTokenId(), req.getContextPath());
+                addSameSiteCookie(resp, refreshCookie, "None");
+
                 System.out.println("4");
 
                 return tokenResponse(token.getAccessToken());
@@ -141,6 +145,27 @@ public class TokenResource extends HttpServlet {
         cookie.setDomain(domain);
         cookie.setPath(contextPath + PATH_AUTH_TOKEN);
         return cookie;
+    }
+
+    private void addSameSiteCookie(HttpServletResponse resp, Cookie cookie, String sameSite) {
+        StringBuilder cookieBuilder = new StringBuilder();
+        cookieBuilder.append(cookie.getName()).append("=").append(cookie.getValue()).append(";");
+        cookieBuilder.append(" Path=").append(cookie.getPath()).append(";");
+        if (cookie.getDomain() != null) {
+            cookieBuilder.append(" Domain=").append(cookie.getDomain()).append(";");
+        }
+        if (cookie.getMaxAge() > 0) {
+            cookieBuilder.append(" Max-Age=").append(cookie.getMaxAge()).append(";");
+        }
+        if (cookie.getSecure()) {
+            cookieBuilder.append(" Secure;");
+        }
+        if (cookie.isHttpOnly()) {
+            cookieBuilder.append(" HttpOnly;");
+        }
+        cookieBuilder.append(" SameSite=").append(sameSite).append(";");
+
+        resp.addHeader("Set-Cookie", cookieBuilder.toString());
     }
 
     private ResponseEntity tokenResponse(String accessToken) {
