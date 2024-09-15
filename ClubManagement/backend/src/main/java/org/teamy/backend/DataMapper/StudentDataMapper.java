@@ -2,6 +2,7 @@ package org.teamy.backend.DataMapper;
 
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.Club;
+import org.teamy.backend.model.Person;
 import org.teamy.backend.model.Student;
 
 import java.sql.Connection;
@@ -10,22 +11,32 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class StudentDataMapper {
     private final DatabaseConnectionManager databaseConnectionManager;
-
-    public StudentDataMapper(DatabaseConnectionManager databaseConnectionManager) {
+    private static StudentDataMapper instance;
+    public static synchronized StudentDataMapper getInstance(DatabaseConnectionManager dbManager) {
+        if (instance == null) {
+            instance = new StudentDataMapper(dbManager);
+        }
+        return instance;
+    }
+    private StudentDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
-    public Student findStudentById(int Id) throws Exception {
+    public Student findStudentById(int Id) {
         var connection = databaseConnectionManager.nextConnection();
+        Student student = null;
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students WHERE id = ?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users WHERE id = ? AND role = 'student'");
             stmt.setInt(1, Id);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
-                return new Student( rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("student_id"));
+                return new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -34,41 +45,100 @@ public class StudentDataMapper {
         }
         return null;
     }
-    public Student findStudentByStudentId(String studentId) throws Exception {
+    public List<Student> findStudentsByIds(List<Integer> studentIds) throws SQLException {
+        // 如果 studentIds 列表为空，则返回空列表
+        if (studentIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String query = "SELECT * FROM students WHERE id IN (" +
+                studentIds.stream().map(String::valueOf).collect(Collectors.joining(",")) +
+                ") AND role = 'student'";
+
         var connection = databaseConnectionManager.nextConnection();
+        List<Student> students = new ArrayList<>();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students WHERE studentid = ?");
-            stmt.setString(1, studentId);
+            PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Student( rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("student_id"));
+
+            // 遍历结果集，将每个学生实例化并加入列表
+            while (rs.next()) {
+                Student student = new Student(rs.getLong("id"),
+                        rs.getString("username"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getLong("phone_number"),
+                        rs.getString("pwd"),
+                        rs.getBoolean("isactive"));
+                students.add(student);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching students by IDs", e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+
+        return students;
+    }
+    public Person findUserByUsername(String username) throws SQLException {
+        var connection = databaseConnectionManager.nextConnection();
+        Person user = null;
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users WHERE username = ?");
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            System.out.println("Finish search");
+            if (rs.next()) {
+                if (Objects.equals(rs.getString("role"), "student")){
+                    user = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
+                }else {
+
+                }
+                return user;
+            }
+        }catch (SQLException e){
+            throw new SQLException(e.getMessage());
+        } finally{
+            databaseConnectionManager.releaseConnection(connection);
+        }
+        return null;
+    }
+
+    public List<Student> getAllStudent(){
+        var connection = databaseConnectionManager.nextConnection();
+        List<Student> students = new ArrayList<>();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users where role== 'student'");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
+                students.add(student);
+            }
+            return students;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             databaseConnectionManager.releaseConnection(connection);
         }
-        return null;
     }
-    public List<Student> findStudentByName(String name) throws Exception {
+    public List<Student> findStudentByName(String name) {
         var connection = databaseConnectionManager.nextConnection();
 
         List<Student> students = null;
         try {
             students = new ArrayList<>();
 
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students WHERE name = ?");
-            stmt.setString(1, name);
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users WHERE LOWER(name) LIKE LOWER(?) AND role = 'student'");
+            stmt.setString(1, "%" + name + "%"); // Assuming you're setting the name for the LIKE clause
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Student student = new Student(
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getLong("phone_number"),
-                        rs.getString("student_id")
-                );
+                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getBoolean("isactive"));
+
                 students.add(student);
             }
         } catch (SQLException e) {
@@ -79,55 +149,28 @@ public class StudentDataMapper {
 
         return students;
     }
-
-    public void saveStudent(Student student) throws Exception {
+    public List<Student> findStudentByEmail(String email) {
         var connection = databaseConnectionManager.nextConnection();
 
+        List<Student> students = null;
         try {
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO students (studentid, name, email,phone_number) VALUES (?, ?, ?,?)");
-            stmt.setString(1, student.getStudentId());
-            stmt.setString(2, student.getName());
-            stmt.setString(3, student.getEmail());
-            stmt.setLong(4, student.getPhoneNumber());
-            stmt.executeUpdate();
+            students = new ArrayList<>();
+
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users WHERE LOWER(email) LIKE LOWER(?) AND role = 'student'");
+            stmt.setString(1, "%" + email + "%"); // Assuming you're setting the name for the LIKE clause
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getBoolean("isactive"));
+
+                students.add(student);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             databaseConnectionManager.releaseConnection(connection);
         }
+
+        return students;
     }
-
-    public boolean updateStudent(Student student) throws Exception {
-        var connection = databaseConnectionManager.nextConnection();
-
-        // SQL update
-        String sql = "UPDATE students SET name = ?, email = ?, phone_number = ? WHERE studentid = ?";
-        int rowsAffected = 0;
-
-        try {
-            // Precompiled SQL statements
-            PreparedStatement stmt = connection.prepareStatement(sql);
-
-            // Set update argument
-            stmt.setString(1, student.getName());
-            stmt.setString(2, student.getEmail());
-            stmt.setLong(3, student.getPhoneNumber());
-            stmt.setString(4, student.getStudentId());
-
-            // Execution update
-            rowsAffected = stmt.executeUpdate();
-
-            // Close resource
-            stmt.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            databaseConnectionManager.releaseConnection(connection);
-
-        }
-
-        // If the number of affected rows is greater than 0, the update is successful
-        return rowsAffected > 0;
-    }
-
 }

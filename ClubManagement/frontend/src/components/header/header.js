@@ -15,17 +15,17 @@ const UpperHeader =() => {
                 </a>
             ),
         },
-        {
-            key: '2',
-            label: (
-                <a onClick={() => logout} target="_blank" rel="noopener noreferrer" >
-                    Logout
-                </a>
-            ),
-        }
+        // {
+        //     key: '2',
+        //     label: (
+        //         <a onClick={() => logout} target="_blank" rel="noopener noreferrer" >
+        //             Logout
+        //         </a>
+        //     ),
+        //}
     ]
     const logout = () => {
-        localStorage.removeItem('token')
+        //localStorage.removeItem('token')
         //navigate('/login')
     }
     return (
@@ -44,7 +44,7 @@ const UpperHeader =() => {
                 menu={{items}}
             >
                 <a onClick={(e) => e.preventDefault()}>
-                    <Avatar size={36} src={<img src={require("../../assets/images/user.png")}/> }/>
+                    <Avatar size={36} src={<img src={require("../../assets/images/user.jpeg")}/> }/>
                 </a>
             </Dropdown>
         </Header>

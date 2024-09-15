@@ -1,48 +1,34 @@
 package org.teamy.backend.model;
 
-import org.teamy.backend.service.EventService;
-import org.teamy.backend.service.StudentService;
-
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Club {
+public class Club extends DomainObject {
     private String name;
     private String description;
     private List<Integer> studentId;
     private List<Student> students;
     private List<Integer> eventsId;
     private List<Event> events;
-    private List<fundingApplication> fundingApplications;
-    private final StudentService studentService;
-    private final EventService eventService;
+    private List<FundingApplication> FundingApplications;
+    private List<Integer> FundingApplicationsId;
 
-    public Club(String name, String description) {
+    private float budget;
+
+
+    public Club(Integer id,String name, String description,float budget) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Club ID must be positive");
+        }
+        this.setId(id);  // Inherited from DomainObject
         this.name = name;
         this.description = description;
-        this.studentId=new ArrayList<>();
-        this.events = new ArrayList<>();
-        this.fundingApplications = new ArrayList<>();
-        this.students = new ArrayList<>();
-        this.eventsId = new ArrayList<>();
-
-        this.studentService=null;
-        this.eventService =null;
+        this.budget = budget;
     }
 
-    public Club(String name, String description, StudentService studentService, EventService eventService) {
-        this.name = name;
-        this.description = description;
-        this.studentId=new ArrayList<>();
-        this.events = new ArrayList<>();
-        this.fundingApplications = new ArrayList<>();
-        this.students = new ArrayList<>();
-        this.eventsId = new ArrayList<>();
-
-        this.studentService= studentService;
-        this.eventService = eventService;
+    public Club() {
     }
-
 
     @Override
     public String toString() {
@@ -57,6 +43,9 @@ public class Club {
     }
 
     public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Club name cannot be empty");
+        }
         this.name = name;
     }
 
@@ -76,19 +65,6 @@ public class Club {
         this.studentId = studentId;
     }
 
-    public List<Student> getStudents() {
-        if(students.isEmpty()){
-            for (Integer id:studentId){
-                try {
-                    Student student = studentService.getStudentById(id);
-                    students.add(student);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        return students;
-    }
 
     public void setStudents(List<Student> students) {
         this.students = students;
@@ -102,17 +78,11 @@ public class Club {
         this.eventsId = eventsId;
     }
 
+    public List<Student> getStudents() {
+        return students;
+    }
+
     public List<Event> getEvents() {
-        if(events.isEmpty()){
-            for (Integer id:eventsId){
-                try {
-                    Event event = eventService.getEventById(id);
-                    events.add(event);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
         return events;
     }
 
@@ -121,11 +91,66 @@ public class Club {
     }
 
     //还需要加lazy load
-    public List<fundingApplication> getFundingApplications() {
-        return fundingApplications;
+    public List<FundingApplication> getFundingApplications() {
+        return FundingApplications;
     }
 
-    public void setFundingApplications(List<fundingApplication> fundingApplications) {
-        this.fundingApplications = fundingApplications;
+    public void setFundingApplications(List<FundingApplication> FundingApplications) {
+        this.FundingApplications = FundingApplications;
+    }
+
+    public List<Integer> getFundingApplicationsId() {
+        return FundingApplicationsId;
+    }
+
+    public void setFundingApplicationsId(List<Integer> fundingApplicationsId) {
+        FundingApplicationsId = fundingApplicationsId;
+    }
+
+    public float getBudget(){
+        return this.budget;
+    }
+
+//    public void setBudget(float budget){
+//        this.budget = budget;
+//    }
+    public void setBudget(float budget) {
+        if (budget < 0) {
+            throw new IllegalArgumentException("Budget cannot be negative");  // domain logic, no persistence dependency
+        }
+        this.budget = budget;
+    }
+
+    public boolean addEvent(Event event){
+        if(event.getCost().compareTo(BigDecimal.valueOf(this.budget))!=1){
+            setBudget(this.budget-event.getCost().floatValue());
+            this.events.add(event);
+            return true;
+        }
+        return false;
+    }
+
+    public void deleteEvent(Event event){
+        this.events.remove(event);
+        setBudget(this.budget+event.getCost().floatValue());
+    }
+
+    private void addStudent(int studentID, Student student){
+        this.studentId.add(studentID);
+        this.students.add(student);
+    }
+
+    private void deleteStudent(int studentID, Student student){
+        this.studentId.remove(studentID);
+        this.students.remove(student);
+    }
+
+    private void addFundingApplication(int fundingApplicationID, FundingApplication fundingApplication){
+        this.FundingApplications.add(fundingApplication);
+        this.FundingApplicationsId.add(fundingApplicationID);
+        this.budget += fundingApplication.getAmount().floatValue();
+    }
+    public boolean isNameEmpty(){
+        return this.name.isEmpty();
     }
 }

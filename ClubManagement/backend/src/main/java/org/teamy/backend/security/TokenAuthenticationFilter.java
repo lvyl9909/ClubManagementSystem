@@ -27,20 +27,29 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException{
         var authorizationHeader = Optional.ofNullable(request.getHeader(HEADER_AUTHORIZATION))
                 .orElseThrow(() -> new BadCredentialsException(String.format("%s header is required", HEADER_AUTHORIZATION)));
-
         var matcher = PATTERN_TOKEN.matcher(authorizationHeader);
         if (matcher.find()) {
             var token = matcher.group(1);
-            return getAuthenticationManager().authenticate(jwtTokenService.readToken(token));
+            var authentication = jwtTokenService.readToken(token);
+            try {
+                var result = getAuthenticationManager().authenticate(authentication); // 验证对象
+                return result;
+            } catch (AuthenticationException e) {
+                System.out.println("Authentication failed: " + e.getMessage());
+                throw e;
+            }
         }
         throw new BadCredentialsException(String.format("invalid %s header value", HEADER_AUTHORIZATION));
     }
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         super.successfulAuthentication(request, response, chain, authResult);
+
+        System.out.println("User authenticated: " + authResult.getName());
+        System.out.println("Authorities: " + authResult.getAuthorities());
         chain.doFilter(request, response);
     }
 }

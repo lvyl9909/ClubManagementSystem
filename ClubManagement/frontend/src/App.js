@@ -1,7 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
 import {RouterProvider} from 'react-router-dom'
-import router from "./router";
+import router from "./router/router";
+import { AuthProvider } from './router/auth';
 import React, { useState } from 'react';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -30,9 +31,12 @@ function App() {
   // };
 
   return (
-      <div className ="app">
-        <RouterProvider router={router}/>
-      </div>
+      <AuthProvider>
+          <div className="app">
+              <RouterProvider router={router} />
+          </div>
+      </AuthProvider>
+  );
       // <>
       //   {data && <p>{data}</p>}
       //   {loading && <p>loading...</p>}
@@ -44,7 +48,7 @@ function App() {
       //     Fetch data
       //   </button>
       // </>
-  );
+
 }
 
 export default App;

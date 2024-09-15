@@ -15,13 +15,15 @@
     margin-right: 40px;
 }
 .home .login-info p{
+    text-align: left;
+    margin-left: 20px;
     line-height: 28px;
     font-size: 14px;
     color: #999999;
 }
 .home .login-info p span{
     color: #666666;
-    margin-left: 60px;
+    margin-left: 120px;
 }
 .home .num {
     margin-left: 5px;

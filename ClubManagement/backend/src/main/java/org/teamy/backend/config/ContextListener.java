@@ -7,20 +7,26 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.teamy.backend.DataMapper.ClubDataMapper;
-import org.teamy.backend.DataMapper.EventDataMapper;
-import org.teamy.backend.DataMapper.StudentDataMapper;
+import org.teamy.backend.DataMapper.*;
+import org.teamy.backend.repository.*;
+import org.teamy.backend.security.CustomUserDetailsService;
 import org.teamy.backend.security.repository.JwtTokenServiceImpl;
 import org.teamy.backend.security.repository.PostgresRefreshTokenRepository;
-import org.teamy.backend.service.ClubService;
-import org.teamy.backend.service.EventService;
-import org.teamy.backend.service.StudentService;
+import org.teamy.backend.service.*;
 
 @WebListener
 public class ContextListener implements ServletContextListener {
     public static final String CLUB_SERVICE = "clubService";
     public static final String STUDENT_SERVICE = "studentService";
+    public static final String STUDENT_CLUB_SERVICE = "studentClubService";
     public static final String EVENT_SERVICE = "eventService";
+    public static final String RSVP_SERVICE = "rsvpService";
+    public static final String TICKET_SERVICE = "ticketService";
+    public static final String VENUE_SERVICE = "venueService";
+    public static final String FUNDING_APPLICATION_SERVICE = "fundingApplicationService";
+
+
+
     public static final String DATABASE_SERVICE = "databaseService";
     public static final String MAPPER = "mapper";
     public static final String TOKEN_SERVICE = "tokenService";
@@ -46,11 +52,46 @@ public class ContextListener implements ServletContextListener {
                 System.getProperty(PROPERTY_JDBC_USERNAME),
                 System.getProperty(PROPERTY_JDBC_PASSWORD));
         databaseConnectionManager.init();
+        ClubDataMapper clubDataMapper = ClubDataMapper.getInstance(databaseConnectionManager);
+        EventDataMapper eventDataMapper = EventDataMapper.getInstance(databaseConnectionManager);
+        FacultyAdministratorMapper facultyAdministratorMapper = FacultyAdministratorMapper.getInstance(databaseConnectionManager);
+        FundingApplicationMapper fundingApplicationMapper = FundingApplicationMapper.getInstance(databaseConnectionManager);
+        RSVPDataMapper rsvpDataMapper = RSVPDataMapper.getInstance(databaseConnectionManager);
+        StudentClubDataMapper studentClubDataMapper = StudentClubDataMapper.getInstance(databaseConnectionManager);
+        StudentDataMapper studentDataMapper = StudentDataMapper.getInstance(databaseConnectionManager);
+        TicketDataMapper ticketDataMapper = TicketDataMapper.getInstance(databaseConnectionManager);
+        VenueDataMapper venueDataMapper = VenueDataMapper.getInstance(databaseConnectionManager);
+
+        EventRepository eventRepository = EventRepository.getInstance(eventDataMapper,venueDataMapper,clubDataMapper);
+        FundingApplicationRepository fundingApplicationRepository = FundingApplicationRepository.getInstance(fundingApplicationMapper);
+        RSVPRepository rsvpRepository = RSVPRepository.getInstance(rsvpDataMapper);
+        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
+        StudentRepository studentRepository = StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper);
+        ClubRepository clubRepository = ClubRepository.getInstance(clubDataMapper,eventDataMapper,fundingApplicationMapper,studentRepository,studentClubDataMapper);
+        TicketRepository ticketRepository = TicketRepository.getInstance(ticketDataMapper);
+        VenueRepository venueRepository = VenueRepository.getInstance(venueDataMapper);
+
+        ClubService clubService = ClubService.getInstance(clubRepository,studentRepository);
+        EventService eventService = EventService.getInstance(eventRepository,rsvpRepository,ticketRepository,venueRepository,clubRepository,databaseConnectionManager);
+        FundingApplicationService fundingApplicationService =FundingApplicationService.getInstance(fundingApplicationRepository,clubRepository);
+        RSVPService rsvpService = RSVPService.getInstance(rsvpRepository);
+        StudentClubService studentClubService = StudentClubService.getInstance(studentClubRepository);
+        StudentService studentService =StudentService.getInstance(studentRepository);
+        VenueService venueService = VenueService.getInstance(venueRepository);
+        TicketService ticketService = TicketService.getInstance(ticketRepository,studentRepository,eventDataMapper);
+        CustomUserDetailsService customUserDetailsService = CustomUserDetailsService.getInstance(studentRepository,studentClubRepository);
 
         sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager );
-        sce.getServletContext().setAttribute(CLUB_SERVICE, new ClubService(new ClubDataMapper(databaseConnectionManager)));
-        sce.getServletContext().setAttribute(STUDENT_SERVICE, new StudentService(new StudentDataMapper(databaseConnectionManager)));
-        sce.getServletContext().setAttribute(EVENT_SERVICE, new EventService(new EventDataMapper(databaseConnectionManager)));
+        sce.getServletContext().setAttribute(CLUB_SERVICE, clubService);
+        sce.getServletContext().setAttribute(USER_DETAILS_SERVICE, customUserDetailsService);
+        sce.getServletContext().setAttribute(EVENT_SERVICE, eventService);
+        sce.getServletContext().setAttribute(RSVP_SERVICE, rsvpService);
+        sce.getServletContext().setAttribute(TICKET_SERVICE, ticketService);
+        sce.getServletContext().setAttribute(STUDENT_SERVICE, studentService);
+        sce.getServletContext().setAttribute(STUDENT_CLUB_SERVICE, studentClubService);
+        sce.getServletContext().setAttribute(VENUE_SERVICE, venueService);
+        sce.getServletContext().setAttribute(FUNDING_APPLICATION_SERVICE, fundingApplicationService);
+//        sce.getServletContext().setAttribute(VENUE_SERVICE, VenueService.getInstance(databaseConnectionManager));
 
         var mapper = Jackson2ObjectMapperBuilder.json()
                 .modules(new JavaTimeModule())

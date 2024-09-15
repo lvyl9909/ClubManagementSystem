@@ -1,5 +1,7 @@
 package org.teamy.backend.model;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
@@ -8,19 +10,21 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Event {
+public class Event extends DomainObject {
     private String title;
     private String description;
     private String date;
     private String time;
     private String venueName;
+    private Integer venueId;
     private BigDecimal cost;
     private Integer clubId;
+    private Club club;
+    private Venue venue;
     private Integer capacity;
+    private Integer currentCapacity;
     private List<RSVP> rsvps;
-    private final List<CapacityObserver> observers = new ArrayList<>();
-    private Waitlist waitlist;
-
+    private EventStatus status;
     public Integer getClubId() {
         return clubId;
     }
@@ -37,6 +41,7 @@ public class Event {
                 ", date='" + date + '\'' +
                 ", time='" + time + '\'' +
                 ", venueName='" + venueName + '\'' +
+                ", venueID ="+venueId+
                 ", cost=" + cost +
                 ", capacity=" + capacity +
                 ", rsvps=" + rsvps +
@@ -44,12 +49,21 @@ public class Event {
                 '}';
     }
 
-    public void setWaitlist(Waitlist waitlist) {
-        this.waitlist = waitlist;
+
+    public Event(Integer id,String title, String description, Date date, Time time, Integer venueId, BigDecimal cost, Integer clubId,String status,Integer capacity) {
+        this.setId(id);
+        this.clubId = clubId;
+        this.title = title;
+        this.description = description;
+        this.date = date.toString();
+        this.time = time.toString();
+        this.venueId = venueId;
+        this.cost = cost;
+        this.status = EventStatus.valueOf(status);
+        this.capacity = capacity;
+        this.currentCapacity = capacity;
     }
-
-
-    public Event(String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId) {
+    public Event(String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId,Integer capacity) {
         this.clubId = clubId;
         this.title = title;
         this.description = description;
@@ -57,30 +71,20 @@ public class Event {
         this.time = time.toString();
         this.venueName = venueName;
         this.cost = cost;
+        this.status = EventStatus.Ongoing;
+        this.capacity =capacity;
+        this.currentCapacity = capacity;
     }
 
     public Event() {
     }
 
-    public Event(String title, String description, String venueName, BigDecimal cost, Integer clubId) {
-        this.title = title;
-        this.description = description;
-        this.venueName = venueName;
-        this.cost = cost;
-        this.clubId = clubId;
+    public EventStatus getStatus() {
+        return status;
     }
 
-    public Event(String title, String description, String date, String time, String venueName, BigDecimal cost, Integer clubId, Integer capacity) {
-        this.title = title;
-        this.description = description;
-        this.date = date;
-        this.time = time;
-        this.venueName = venueName;
-        this.cost = cost;
-        this.clubId = clubId;
-        this.capacity = capacity;
-        this.waitlist = new Waitlist(this);
-        this.rsvps = new ArrayList<>();
+    public void setStatus(EventStatus status) {
+        this.status = status;
     }
 
     public String getTitle() {
@@ -108,7 +112,7 @@ public class Event {
     }
 
     public Date getSqlDate() {
-        return Date.valueOf(LocalDate.parse(date));  // 在这里手动转换为 java.sql.Date
+        return Date.valueOf(LocalDate.parse(date));
     }
 
     public String getTime() {
@@ -129,6 +133,14 @@ public class Event {
 
     public void setVenueName(String venueName) {
         this.venueName = venueName;
+    }
+
+    public Integer getVenueId() {
+        return venueId;
+    }
+
+    public void setVenueId(Integer venueId) {
+        this.venueId = venueId;
     }
 
     public BigDecimal getCost() {
@@ -155,29 +167,54 @@ public class Event {
         this.rsvps = rsvps;
     }
 
-    public Integer getClub() {
-        return clubId;
+    public Club getClub() {
+        return club;
     }
 
-    public void setClub(Integer clubId) {
-        this.clubId = clubId;
+    public Integer getCurrentCapacity() {
+        return currentCapacity;
     }
 
-    public void registerObserver(CapacityObserver observer) {
-        observers.add(observer);
+    public void setCurrentCapacity(Integer currentCapacity) {
+        this.currentCapacity = currentCapacity;
     }
 
-    public void notifyObservers() {
-        for (CapacityObserver observer : observers) {
-            observer.update(this);
+    public void setClub(Club club) {
+        this.club = club;
+    }
+
+    public Venue getVenue() {
+        return venue;
+    }
+
+    public void setVenue(Venue venue) {
+        this.venue = venue;
+    }
+
+    public void addRSVP(RSVP rsvp){
+        this.rsvps.add(rsvp);
+    }
+
+    public boolean deleteRSVP(RSVP rsvp){
+        if(this.rsvps.contains(rsvp)){
+            this.rsvps.remove(rsvp);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // 方法来处理与业务相关的逻辑
+    public void validateBudget() {
+        if (this.cost.compareTo(BigDecimal.valueOf(club.getBudget())) > 0) {
+            throw new RuntimeException("Budget not enough");
         }
     }
 
-    public void updateCapacity(int newCapacity) {
-        this.capacity = newCapacity;
-        notifyObservers(); // Notify all observers when capacity changes
+    public void validateCapacity() {
+        if (this.capacity > venue.getCapacity()) {
+            throw new RuntimeException("Venue capacity not enough");
+        }
     }
-    public Waitlist getWaitlist() {
-        return waitlist;
-    }
+
 }

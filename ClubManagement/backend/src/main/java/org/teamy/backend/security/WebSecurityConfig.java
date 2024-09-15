@@ -29,9 +29,11 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.teamy.backend.DataMapper.StudentDataMapper;
+import org.teamy.backend.DataMapper.*;
 import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.config.DatabaseConnectionManager;
+import org.teamy.backend.repository.StudentClubRepository;
+import org.teamy.backend.repository.StudentRepository;
 import org.teamy.backend.security.model.Role;
 import org.teamy.backend.security.repository.TokenService;
 
@@ -55,9 +57,16 @@ public class WebSecurityConfig implements ServletContextAware {
 
     //定义表单登陆的方法
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        StudentDataMapper userRepository = new StudentDataMapper(databaseConnectionManager);
-        return new CustomUserDetailsService(userRepository);
+    public UserDetailsService userDetailsService() {
+        ClubDataMapper clubDataMapper = ClubDataMapper.getInstance(databaseConnectionManager);
+        RSVPDataMapper rsvpDataMapper = RSVPDataMapper.getInstance(databaseConnectionManager);
+        TicketDataMapper ticketDataMapper = TicketDataMapper.getInstance(databaseConnectionManager);
+        StudentDataMapper studentDataMapper = StudentDataMapper.getInstance(databaseConnectionManager);
+        StudentClubDataMapper studentClubDataMapper = StudentClubDataMapper.getInstance(databaseConnectionManager);
+
+        StudentRepository userRepository =  StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper);
+        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
+        return new CustomUserDetailsService(userRepository,studentClubRepository);
     }
     //未认证的入口
     @Bean
@@ -85,11 +94,11 @@ public class WebSecurityConfig implements ServletContextAware {
                 .and()
                 .addFilterBefore(tokenAuthenticationFilter, AnonymousAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/auth/token").permitAll()
                         .requestMatchers(ADMIN_PROTECTED_URLS)
-                        .hasRole(Role.ADMIN.name())
+                        .hasAuthority("ROLE_ADMIN")
                         .requestMatchers(STUDENT_PROTECTED_URLS)
-                        .permitAll()
-//                        .hasRole(Role.USER.name())
+                        .hasAuthority("ROLE_USER")
                         .anyRequest()
                         .permitAll())
                 .authenticationManager(authenticationManager)
@@ -97,11 +106,6 @@ public class WebSecurityConfig implements ServletContextAware {
                 .csrf().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
-//                .formLogin(form -> form
-//                        .loginPage("/login")
-//                        .permitAll()
-//                        .successHandler(successHandler()) // 将自定义的successHandler添加到formLogin配置中
-//                        .failureUrl("/login?error=true"))
                 .logout().disable()
                 .build();
     }
@@ -117,7 +121,7 @@ public class WebSecurityConfig implements ServletContextAware {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(System.getProperty(PROPERTY_CORS_ORIGINS_UI)));
         configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT","DELETE"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -140,26 +144,26 @@ public class WebSecurityConfig implements ServletContextAware {
         if (request.isUserInRole("ADMIN")) {
             return "/admin/home";
         } else {
-            return "/user/home";
+            return "/student/home";
         }
     }
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter(AuthenticationManager authenticationManager, SimpleUrlAuthenticationSuccessHandler simpleUrlAuthenticationSuccessHandler) {
-        var filter = new TokenAuthenticationFilter(PROTECTED_URLS, jwtTokenService);
+        var filter = new TokenAuthenticationFilter(STUDENT_PROTECTED_URLS, jwtTokenService);
         filter.setAuthenticationManager(authenticationManager);
         filter.setAuthenticationSuccessHandler(simpleUrlAuthenticationSuccessHandler);
         return filter;
     }
-    private UserDetails adminUser(PasswordEncoder passwordEncoder) {
-        return new User(System.getProperty(PROPERTY_ADMIN_USERNAME),
-                passwordEncoder.encode(System.getProperty(PROPERTY_ADMIN_PASSWORD)),
-                Collections.singleton(Role.ADMIN.toAuthority()));
-    }
-    private UserDetails nonAdminUser(PasswordEncoder passwordEncoder) {
-        return new User("user",
-                passwordEncoder.encode("user"),
-                Collections.singleton(Role.USER.toAuthority()));
-    }
+//    private UserDetails adminUser(PasswordEncoder passwordEncoder) {
+//        return new User(System.getProperty(PROPERTY_ADMIN_USERNAME),
+//                passwordEncoder.encode(System.getProperty(PROPERTY_ADMIN_PASSWORD)),
+//                Collections.singleton(Role.ADMIN.toAuthority()));
+//    }
+//    private UserDetails nonAdminUser(PasswordEncoder passwordEncoder) {
+//        return new User("user",
+//                passwordEncoder.encode("user"),
+//                Collections.singleton(Role.USER.toAuthority()));
+//    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         var passwordEncoder = new BCryptPasswordEncoder();

@@ -38,5 +38,11 @@ export default  [
                 icon: 'SettingOutlined'
             }
         ]
+    },
+    {
+        path: 'logout',
+        name: 'logout',
+        label: 'Logout',
+        icon: 'LogoutOutlined'
     }
 ]

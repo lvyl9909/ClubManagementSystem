@@ -9,7 +9,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f10d4744-fe1d-464c-a9d9-f3e70bf382e8" name="更改" comment="" />
+    <list default="true" id="f10d4744-fe1d-464c-a9d9-f3e70bf382e8" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,7 +43,7 @@
     </favorite-branches>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$/.." value="emily-search-event" />
+        <entry key="$PROJECT_DIR$/.." value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -261,13 +264,13 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Docker.backend/Dockerfile: Compose 部署" />
-      <item itemvalue="JavaScript 调试.Debug Application" />
       <item itemvalue="Jest.renders learn react link" />
+      <item itemvalue="JavaScript 调试.Debug Application" />
       <item itemvalue="Node.js.App.js" />
       <item itemvalue="Node.js.index.js" />
-      <item itemvalue="npm.build" />
       <item itemvalue="Tomcat 服务器.Tomcat 10.1.26" />
+      <item itemvalue="Docker.backend/Dockerfile: Compose 部署" />
+      <item itemvalue="npm.build" />
     </list>
     <recent_temporary>
       <list>
@@ -312,7 +315,12 @@
       <workItem from="1724645419445" duration="5153000" />
       <workItem from="1724673993854" duration="249000" />
       <workItem from="1724674245701" duration="16734000" />
-      <workItem from="1724980177152" duration="2585000" />
+      <workItem from="1724980177152" duration="9710000" />
+      <workItem from="1725092522160" duration="9694000" />
+      <workItem from="1725108361643" duration="5845000" />
+      <workItem from="1725358381091" duration="4725000" />
+      <workItem from="1725370989849" duration="1324000" />
+      <workItem from="1725434071937" duration="3000" />
     </task>
     <servers />
   </component>
@@ -330,7 +338,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="main" />
+                        <option value="origin/emily-search-event" />
                       </list>
                     </value>
                   </entry>

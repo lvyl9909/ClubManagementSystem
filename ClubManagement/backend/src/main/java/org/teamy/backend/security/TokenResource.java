@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.teamy.backend.config.ContextListener;
+import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.exception.ErrorHandler;
 import org.teamy.backend.model.exception.ForbiddenException;
 import org.teamy.backend.model.exception.ValidationException;
@@ -21,7 +22,7 @@ import org.teamy.backend.model.request.RefreshRequest;
 import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.security.model.Token;
 import org.teamy.backend.security.repository.TokenService;
-
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -61,16 +62,39 @@ public class TokenResource extends HttpServlet {
                 var bodyBuffer = new StringWriter();
                 req.getReader().transferTo(bodyBuffer);
                 var login = mapper.readValue(bodyBuffer.toString(), LoginRequest.class);
+                System.out.println("doPost token start");
+                System.out.println(login.getUsername());
                 UserDetails userDetails = Optional.ofNullable(userDetailsService.loadUserByUsername(login.getUsername()))
                         .orElseThrow(ForbiddenException::new);
-                if (!passwordEncoder.matches(login.getPassword(), userDetails.getPassword())) {
+                System.out.println(userDetails.getAuthorities()); // 打印用户的权限
+//                if (!passwordEncoder.matches(login.getPassword(), userDetails.getPassword())) {
+//                    throw new ForbiddenException();
+//                }
+                System.out.println(login.getPassword());
+                System.out.println(userDetails.getPassword());
+                if (!login.getPassword().equals(userDetails.getPassword())) {
                     throw new ForbiddenException();
                 }
+                System.out.println("password correct");
                 var token = jwtTokenService.createToken(userDetails);
+                System.out.println("token created");
                 resp.addCookie(refreshCookie(token.getRefreshTokenId(), req.getContextPath()));
+                System.out.println("Cookie added");
                 return tokenResponse(token.getAccessToken());
-            } catch (IOException e) {
-                throw new ValidationException(String.format("invalid token body: %s", e.getMessage()));
+            }catch (UsernameNotFoundException e) {
+                return ResponseEntity.of(HttpServletResponse.SC_UNAUTHORIZED, Error.builder()
+                        .status(HttpServletResponse.SC_UNAUTHORIZED)
+                        .message("UsernameNotFound")
+                        .reason(e.getMessage())
+                        .build());
+            } catch (ForbiddenException e) {
+                return ResponseEntity.of(HttpServletResponse.SC_FORBIDDEN,Error.builder()
+                        .status(HttpServletResponse.SC_FORBIDDEN)
+                        .message("Forbidden")
+                        .reason(e.getMessage())
+                        .build());
+            } catch (Exception e) {
+                return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,e.getMessage());
             }
         })).handle();
     }
@@ -81,11 +105,27 @@ public class TokenResource extends HttpServlet {
             try {
                 var bodyBuffer = new StringWriter();
                 req.getReader().transferTo(bodyBuffer);
+                System.out.println("doPut Cookie start");
+
                 var refreshRequest = mapper.readValue(bodyBuffer.toString(), RefreshRequest.class);
+                Cookie[] cookies = req.getCookies();
+                if (cookies == null) {
+                    // 说明请求中没有任何 cookies
+                    System.out.println("No cookies in request");
+                } else {
+                    System.out.println("Cookies count: " + cookies.length);
+                    Arrays.stream(cookies).forEach(cookie ->
+                            System.out.println("Cookie Name: " + cookie.getName() + ", Cookie Value: " + cookie.getValue()));
+                }
 
                 var refreshToken = getRefreshCookie(req);
+                System.out.println(refreshToken);
                 var token = jwtTokenService.refresh(refreshRequest.getAccessToken(), refreshToken);
+                System.out.println("3");
+
                 resp.addCookie(refreshCookie(token.getRefreshTokenId(), req.getContextPath()));
+                System.out.println("4");
+
                 return tokenResponse(token.getAccessToken());
             } catch (IOException e) {
                 throw new ValidationException(String.format("invalid token body: %s", e.getMessage()));
@@ -111,6 +151,7 @@ public class TokenResource extends HttpServlet {
     }
 
     private String getRefreshCookie(HttpServletRequest req) {
+
         return Arrays.stream(Optional.ofNullable(req.getCookies()).orElse(new Cookie[]{}))
                 .filter(c -> c.getName().equals(COOKIE_NAME_REFRESH_TOKEN))
                 .findFirst()

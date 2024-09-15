@@ -7,23 +7,37 @@ import java.util.List;
 import java.util.Set;
 
 public class FacultyAdministrator extends Person{
-    private List<fundingApplication> fundingApplications;
+    private List<FundingApplication> FundingApplications;
 
-    public FacultyAdministrator(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive, Set<Role> roles, List<fundingApplication> fundingApplications) {
+    public FacultyAdministrator(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive, Set<Role> roles, List<FundingApplication> FundingApplications) {
         super(id, username, name, email, phoneNumber, password, isActive, roles);
-        this.fundingApplications = fundingApplications;
+        this.FundingApplications = FundingApplications;
     }
     public FacultyAdministrator(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive, Set<Role> roles ) {
         super(id, username, name, email, phoneNumber, password, isActive, roles);
-        this.fundingApplications = new ArrayList<>();
+        this.FundingApplications = new ArrayList<>();
     }
 
 
-    public List<fundingApplication> getFundingApplications() {
-        return fundingApplications;
+    public List<FundingApplication> getFundingApplications() {
+        return FundingApplications;
     }
 
-    public void setFundingApplications(List<fundingApplication> fundingApplications) {
-        this.fundingApplications = fundingApplications;
+    public void setFundingApplications(List<FundingApplication> FundingApplications) {
+        this.FundingApplications = FundingApplications;
+    }
+
+    public void addFundingApplication(FundingApplication fundingApplication){
+        this.FundingApplications.add(fundingApplication);
+    }
+
+    public boolean deleteFundingApplication(FundingApplication fundingApplication){
+        if(this.FundingApplications.contains(fundingApplication)){
+            this.FundingApplications.remove(fundingApplication);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

@@ -8,8 +8,8 @@ import {
     VideoCameraOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu, theme } from 'antd';
-import SideBar from "../components/sidebar";
-import UpperHeader from "../components/header";
+import SideBar from "../components/sidebar/sidebar";
+import UpperHeader from "../components/header/header";
 
 const { Header, Sider, Content } = Layout;
 
