@@ -97,7 +97,7 @@ function ManageClub() {
 
     const handleRemoveAdmin = async (studentId) => {
         try {
-            const response = await doCall(`${path}/student/admin/delete?clubId=${id}&studentId=${studentId}`, 'POST');
+            const response = await doCall(`${path}/student/admin/delete?clubId=${id}&studentId=${studentId}`, 'DELETE');
             const data = await response.json();
             setAdminData(data);
             setLoading(false);
