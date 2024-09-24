@@ -45,14 +45,12 @@ public class CustomUserDetailsService implements UserDetailsService {
                 Set<Role> roles = new HashSet<>();
                 if (user instanceof Student) {
                     roles.add(new Role("USER"));
-                }else{
-
+                    List<Integer> clubIds = studentClubRepository.findClubIdByStudentId(Math.toIntExact(user.getId()));
+                    for (Integer clubId : clubIds) {
+                        roles.add(new Role("CLUB_" + clubId));
+                    }
+                    user.setRoles(roles);
                 }
-                List<Integer> clubIds = studentClubRepository.findClubIdByStudentId(Math.toIntExact(user.getId()));
-                for (Integer clubId : clubIds) {
-                    roles.add(new Role("CLUB_" + clubId));
-                }
-                user.setRoles(roles);
                 System.out.println("yong hu quan xian :"+user.getAuthorities());
                 System.out.println(user.getPassword());
             }

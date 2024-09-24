@@ -66,7 +66,7 @@ public class ContextListener implements ServletContextListener {
         FundingApplicationRepository fundingApplicationRepository = FundingApplicationRepository.getInstance(fundingApplicationMapper);
         RSVPRepository rsvpRepository = RSVPRepository.getInstance(rsvpDataMapper);
         StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
-        StudentRepository studentRepository = StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper);
+        StudentRepository studentRepository = StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper,fundingApplicationMapper);
         ClubRepository clubRepository = ClubRepository.getInstance(clubDataMapper,eventDataMapper,fundingApplicationMapper,studentRepository,studentClubDataMapper);
         TicketRepository ticketRepository = TicketRepository.getInstance(ticketDataMapper);
         VenueRepository venueRepository = VenueRepository.getInstance(venueDataMapper);

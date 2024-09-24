@@ -23,7 +23,6 @@ public class ClubRepository {
 
     private final Cache<Integer, Club> clubCache;
 
-
     private ClubRepository(ClubDataMapper clubDataMapper, EventDataMapper eventDataMapper, FundingApplicationMapper fundingApplicationMapper, StudentRepository studentRepository, StudentClubDataMapper studentsClubsDataMapper) {
         this.clubDataMapper = clubDataMapper;
         this.eventDataMapper = eventDataMapper;
@@ -43,6 +42,7 @@ public class ClubRepository {
         }
         return instance;
     }
+
     public Club findClubById(int id) throws SQLException {
         // Check cache first
         Club club = clubCache.getIfPresent(id);

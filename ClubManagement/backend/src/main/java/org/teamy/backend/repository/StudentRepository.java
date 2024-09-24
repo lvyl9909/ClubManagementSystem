@@ -15,19 +15,21 @@ public class StudentRepository {
     private final TicketDataMapper ticketDataMapper;
     private final StudentDataMapper studentDataMapper;
     private final StudentClubDataMapper studentsClubsDataMapper;
+    private final FundingApplicationMapper fundingApplicationMapper;
     private static StudentRepository instance;
     private final Cache<Integer, Student> studentCache;
 
     private StudentRepository(ClubDataMapper clubDataMapper,
-                             RSVPDataMapper rsvpDataMapper,
-                             TicketDataMapper ticketDataMapper,
-                             StudentDataMapper studentDataMapper,
-                             StudentClubDataMapper studentsClubsDataMapper) {
+                              RSVPDataMapper rsvpDataMapper,
+                              TicketDataMapper ticketDataMapper,
+                              StudentDataMapper studentDataMapper,
+                              StudentClubDataMapper studentsClubsDataMapper, FundingApplicationMapper fundingApplicationMapper) {
         this.clubDataMapper = clubDataMapper;
         this.rsvpDataMapper = rsvpDataMapper;
         this.ticketDataMapper = ticketDataMapper;
         this.studentDataMapper = studentDataMapper;
         this.studentsClubsDataMapper = studentsClubsDataMapper;
+        this.fundingApplicationMapper = fundingApplicationMapper;
 
         // Initialize cache with max size and expiration time
         this.studentCache = CacheBuilder.newBuilder()
@@ -39,9 +41,9 @@ public class StudentRepository {
                                                              RSVPDataMapper rsvpDataMapper,
                                                              TicketDataMapper ticketDataMapper,
                                                              StudentDataMapper studentDataMapper,
-                                                             StudentClubDataMapper studentsClubsDataMapper){
+                                                             StudentClubDataMapper studentsClubsDataMapper, FundingApplicationMapper fundingApplicationMapper){
         if(instance == null){
-            instance = new StudentRepository(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentsClubsDataMapper);
+            instance = new StudentRepository(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentsClubsDataMapper,fundingApplicationMapper);
         }
         return instance;
     }
@@ -86,15 +88,16 @@ public class StudentRepository {
     public Person findUserByUsername(String username) throws SQLException {
         Person person= studentDataMapper.findUserByUsername(username);
         if (person instanceof Student) {
-            // 如果 person 是 Student 类型
             Student student = (Student) person;
             student.setClubId(studentsClubsDataMapper.findClubIdByStudentId(Math.toIntExact(student.getId())));
             student.setRsvpsId(rsvpDataMapper.findRSVPIdByStudentId(Math.toIntExact(student.getId())));
             student.setTicketsId(ticketDataMapper.getTicketsIdFromStudent(Math.toIntExact(student.getId())));
             return student;
-            // 进行与 student 相关的操作
         }else {
-            return person;
+            FacultyAdministrator admin = (FacultyAdministrator) person;
+            admin.setFundingApplicationIds(fundingApplicationMapper.findApplicationIdByReviewerId(Math.toIntExact(admin.getId())));
+            //读取application
+            return admin;
         }
 
     }

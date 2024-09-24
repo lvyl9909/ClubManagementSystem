@@ -63,8 +63,9 @@ public class WebSecurityConfig implements ServletContextAware {
         TicketDataMapper ticketDataMapper = TicketDataMapper.getInstance(databaseConnectionManager);
         StudentDataMapper studentDataMapper = StudentDataMapper.getInstance(databaseConnectionManager);
         StudentClubDataMapper studentClubDataMapper = StudentClubDataMapper.getInstance(databaseConnectionManager);
+        FundingApplicationMapper fundingApplicationMapper = FundingApplicationMapper.getInstance(databaseConnectionManager);
 
-        StudentRepository userRepository =  StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper);
+        StudentRepository userRepository =  StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper,fundingApplicationMapper);
         StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
         return new CustomUserDetailsService(userRepository,studentClubRepository);
     }

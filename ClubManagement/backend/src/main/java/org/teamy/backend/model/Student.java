@@ -26,8 +26,8 @@ public class Student extends Person{
         this.tickets = tickets;
     }
 
-    public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive) {
-        super(id, name,email,  phoneNumber, password, username, isActive);
+    public Student(Long id, String username, String name, String email, Long phoneNumber, String password, boolean isActive,String role) {
+        super(id, name,email,  phoneNumber, password, username, isActive,role);
     }
     public Student(Long id, String username, String name, String email, Long phoneNumber, boolean isActive) {
         super(id, name,email,  phoneNumber, username, isActive);

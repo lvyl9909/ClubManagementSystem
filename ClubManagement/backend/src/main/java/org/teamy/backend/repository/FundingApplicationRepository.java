@@ -4,6 +4,7 @@ import org.teamy.backend.DataMapper.FundingApplicationMapper;
 import org.teamy.backend.model.FundingApplication;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class FundingApplicationRepository {
     private final FundingApplicationMapper fundingApplicationMapper;

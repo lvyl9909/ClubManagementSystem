@@ -59,14 +59,14 @@ public class Person implements UserDetails {
         this.roles.add(new Role("USER")); // 默认添加 USER 角色
         this.isActive=true;
     }
-    public Person(Long id,String name, String email, Long phoneNumber,String password,String username,boolean isActive) {
+    public Person(Long id,String name, String email, Long phoneNumber,String password,String username,boolean isActive,String role) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.password=password;
         this.username=username;
-        this.roles.add(new Role("USER")); // 默认添加 USER 角色
+        this.roles.add(new Role(role)); // 默认添加 USER 角色
         this.isActive=isActive;
     }
 

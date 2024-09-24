@@ -49,7 +49,7 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         super.successfulAuthentication(request, response, chain, authResult);
 
         System.out.println("User authenticated: " + authResult.getName());
-        System.out.println("Authorities: " + authResult.getAuthorities());
+        System.out.println("Authorities: " + authResult.getAuthorities().toString());
         chain.doFilter(request, response);
     }
 }

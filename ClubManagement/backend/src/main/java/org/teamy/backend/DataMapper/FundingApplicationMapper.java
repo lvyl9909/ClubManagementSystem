@@ -119,6 +119,24 @@ public class FundingApplicationMapper {
 
         }
     }
+    public List<Integer> findApplicationIdByReviewerId(Integer reviewerId){
+        var connection = databaseConnectionManager.nextConnection();
+        List<Integer> applicationsId= new ArrayList<>();
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT application_id FROM fundingapplications WHERE reviewer = ?");
+            stmt.setInt(1, reviewerId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                applicationsId.add(rs.getInt("application_id"));
+            }
+            return applicationsId;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+
+        }
+    }
     public List<FundingApplication> findFundingApplicationsByIds(List<Integer> applicationIds) throws SQLException {
         // 如果 applicationIds 列表为空，则返回空列表
         if (applicationIds.isEmpty()) {
