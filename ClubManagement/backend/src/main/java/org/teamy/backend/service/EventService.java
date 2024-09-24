@@ -10,6 +10,9 @@ import org.teamy.backend.repository.*;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class EventService {
     EventRepository eventRepository;
@@ -19,6 +22,18 @@ public class EventService {
     ClubRepository clubRepository;
     private final DatabaseConnectionManager databaseConnectionManager;
     private static EventService instance;
+
+    private final ConcurrentHashMap<Integer, Lock> eventLocks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Lock> clubLocks = new ConcurrentHashMap<>();
+
+
+    private Lock getEventLock(int eventId) {
+        return eventLocks.computeIfAbsent(eventId, id -> new ReentrantLock());
+    }
+
+    private Lock getClubLock(int clubId) {
+        return clubLocks.computeIfAbsent(clubId, id -> new ReentrantLock());
+    }
     public static synchronized EventService getInstance(EventRepository eventRepository, RSVPRepository rsvpRepository,TicketRepository ticketRepository,VenueRepository venueRepository,ClubRepository clubRepository,DatabaseConnectionManager databaseConnectionManager) {
         if (instance == null) {
             instance = new EventService(eventRepository,rsvpRepository,ticketRepository, venueRepository, clubRepository, databaseConnectionManager);
@@ -64,22 +79,24 @@ public class EventService {
 
         event = eventRepository.lazyLoadClub(event);
         System.out.println("load club");
+
         Venue venue = venueRepository.getVenueById(event.getVenueId());
         event.setVenue(venue);
         System.out.println("set venue");
-
-        event.validateBudget();
-        event.validateCapacity();
-        System.out.println("pass test");
-
-        // Recall methods in DAO layer
+        Lock lock = getClubLock(event.getClubId());
+        lock.lock();
         try {
+            event.validateBudget();
+            event.validateCapacity();
+            System.out.println("pass test");
             boolean isSuccess =  eventRepository.saveEvent(event);
             System.out.println("save");
             clubRepository.invalidateClubCache(event.getClubId());
             return isSuccess;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -99,7 +116,6 @@ public class EventService {
         }
     }
     public boolean updateEvent(Event event) throws Exception {
-        try {
             System.out.println("你好"+event);
             // 检查事件是否存在
             Event existingEvent = eventRepository.findEventById(event.getId());
@@ -108,14 +124,16 @@ public class EventService {
             }
             Venue venue = venueRepository.getVenueById(event.getVenueId());
             Club club = clubRepository.findClubById(event.getClubId());
-            if(event.getCost().compareTo(BigDecimal.valueOf(club.getBudget()))>0){
-                throw new RuntimeException("budget not enough");
-            }
-            if(event.getCapacity()>venue.getCapacity()){
-                throw new RuntimeException("venue capacity not enough");
-            }
-            // 调用 DataMapper 更新事件
+            Lock lock = getClubLock(event.getClubId());
+            lock.lock();
             try {
+                if(event.getCost().compareTo(BigDecimal.valueOf(club.getBudget()))>0){
+                    throw new RuntimeException("budget not enough");
+                }
+                if(event.getCapacity()>venue.getCapacity()){
+                    throw new RuntimeException("venue capacity not enough");
+                }
+                // 调用 DataMapper 更新事件
                 boolean isSuccess =  eventRepository.updateEvent(event);
                 List<Ticket> tickets = ticketRepository.getTicketsFromEvent(event.getId());
 
@@ -124,35 +142,41 @@ public class EventService {
                 return isSuccess;
             } catch (Exception e) {
                 throw new RuntimeException(e);
+            }finally {
+                lock.unlock();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Error updating event: " + e.getMessage());
-        }
     }
     public void applyForRSVP(int eventId, int studentId, int numTickets,List<Integer> participates_id) throws Exception {
-        RSVPUoW unitOfWork = new RSVPUoW(rsvpRepository, ticketRepository,databaseConnectionManager);
+        Lock lock = getEventLock(eventId);  // 获取该 Event 对应的锁
+        lock.lock();  // 加锁
+        try {
+            RSVPUoW unitOfWork = new RSVPUoW(rsvpRepository, ticketRepository,databaseConnectionManager);
 
-        // 创建 RSVP 记录
-        RSVP rsvp = new RSVP( studentId,eventId,numTickets,participates_id);
-        Event event = eventRepository.findEventById(rsvp.getEventId());
-        event.setCurrentCapacity(getCurrentCapacity(event));
-        rsvp.setEvent(event);
-        if (!rsvp.haveMargin()){
-            throw new NotEnoughTicketsException("Not enough tickets available for this event.");
-        }
-        unitOfWork.registerNewRSVP(rsvp);
+            // 创建 RSVP 记录
+            RSVP rsvp = new RSVP( studentId,eventId,numTickets,participates_id);
+            Event event = eventRepository.findEventById(rsvp.getEventId());
+            event.setCurrentCapacity(getCurrentCapacity(event));
+            rsvp.setEvent(event);
+            if (!rsvp.haveMargin()){
+                throw new NotEnoughTicketsException("Not enough tickets available for this event.");
+            }
+            unitOfWork.registerNewRSVP(rsvp);
 
-        // 创建多个 Ticket 记录
-        for (int i = 0; i < numTickets; i++) {
-            Ticket ticket = new Ticket(participates_id.get(i),rsvp.getId(),eventId, TicketStatus.Issued);
-            unitOfWork.registerNewTicket(ticket);
+            // 创建多个 Ticket 记录
+            for (int i = 0; i < numTickets; i++) {
+                Ticket ticket = new Ticket(participates_id.get(i),rsvp.getId(),eventId, TicketStatus.Issued);
+                unitOfWork.registerNewTicket(ticket);
+            }
+            // 提交事务
+            unitOfWork.commit();
+            clubRepository.invalidateClubCache(event.getClubId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            lock.unlock();  // 确保锁被释放
         }
-        // 提交事务
-        unitOfWork.commit();
-        clubRepository.invalidateClubCache(event.getClubId());
     }
-    public void deleteEvent(List<Integer> eventsId)throws Exception{
+    public synchronized void deleteEvent(List<Integer> eventsId)throws Exception{
         EventDeleteUoW eventDeleteUoW = new EventDeleteUoW(eventRepository,ticketRepository,databaseConnectionManager);
         for (Integer eventId : eventsId){
             eventDeleteUoW.addDeleteEvents(eventId);

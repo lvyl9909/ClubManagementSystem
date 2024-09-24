@@ -11,7 +11,9 @@ import com.google.common.cache.CacheBuilder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ClubRepository {
     private final ClubDataMapper clubDataMapper;
@@ -22,6 +24,8 @@ public class ClubRepository {
     private static ClubRepository instance;
 
     private final Cache<Integer, Club> clubCache;
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
 
     private ClubRepository(ClubDataMapper clubDataMapper, EventDataMapper eventDataMapper, FundingApplicationMapper fundingApplicationMapper, StudentRepository studentRepository, StudentClubDataMapper studentsClubsDataMapper) {
         this.clubDataMapper = clubDataMapper;
@@ -44,21 +48,21 @@ public class ClubRepository {
     }
 
     public Club findClubById(int id) throws SQLException {
-        // Check cache first
-        Club club = clubCache.getIfPresent(id);
-        if (club != null) {
-            return club; // Return cached club if available
+        try {
+            // Guava Cache 的 get 方法，确保同一时间只有一个线程执行加载逻辑
+            return clubCache.get(id, () -> {
+                // 从数据库加载Club
+                Club club = clubDataMapper.findClubById(id);
+                if (club != null) {
+                    club.setStudentId(studentsClubsDataMapper.findStudentIdByClubId(id));
+                    club.setEventsId(eventDataMapper.findEventIdByClubId(id));
+                    club.setFundingApplicationsId(fundingApplicationMapper.findApplicationIdByClubId(id));
+                }
+                return club;
+            });
+        } catch (ExecutionException e) {
+            throw new SQLException("Error fetching club data", e);
         }
-        // If not in cache, fetch from database and cache the result
-        club = clubDataMapper.findClubById(id);
-        if (club != null) {
-            club.setStudentId(studentsClubsDataMapper.findStudentIdByClubId(id));
-            club.setEventsId(eventDataMapper.findEventIdByClubId(id));
-            club.setFundingApplicationsId(fundingApplicationMapper.findApplicationIdByClubId(id));
-            // Store in cache
-            clubCache.put(id, club);
-        }
-        return club;
     }
     public boolean saveClub(Club club) throws Exception {
         boolean result = clubDataMapper.saveClub(club);
