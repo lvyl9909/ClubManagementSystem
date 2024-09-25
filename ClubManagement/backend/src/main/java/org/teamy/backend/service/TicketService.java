@@ -77,7 +77,7 @@ public class TicketService {
         // 将 Ticket 和 Event 信息打包返回
         return result;
     }
-    public void deleteTicket(Integer id){
+    public synchronized void deleteTicket(Integer id){
         try {
             ticketRepository.deleteTicket(id);
         } catch (SQLException e) {

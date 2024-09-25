@@ -40,7 +40,7 @@ public class ClubService {
         }
     }
 
-    public void saveClub(Club club) throws Exception {
+    public synchronized void saveClub(Club club) throws Exception {
         if (!clubRepository.saveClub(club)) {
             studentRepository.invalidateStudentCaches(club.getStudentId());
             throw new RuntimeException("Failed to save the club.");

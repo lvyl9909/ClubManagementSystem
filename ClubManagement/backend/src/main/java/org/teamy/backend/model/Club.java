@@ -13,7 +13,6 @@ public class Club extends DomainObject {
     private List<Event> events;
     private List<FundingApplication> FundingApplications;
     private List<Integer> FundingApplicationsId;
-
     private float budget;
 
 
