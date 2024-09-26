@@ -1,4 +1,9 @@
-redirects:
-  - source: '/*'
-    destination: '/index.html'
-    status: 200
+static:
+  # Specify the base path to serve your static files from
+  publish: ./build
+
+  # Redirect all routes to index.html
+  redirects:
+    - source: '/*'
+      destination: '/index.html'
+      status: 200

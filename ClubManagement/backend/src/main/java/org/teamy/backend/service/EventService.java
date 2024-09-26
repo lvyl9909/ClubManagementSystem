@@ -26,7 +26,6 @@ public class EventService {
     private final ConcurrentHashMap<Integer, Lock> eventLocks = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, Lock> clubLocks = new ConcurrentHashMap<>();
 
-
     private Lock getEventLock(int eventId) {
         return eventLocks.computeIfAbsent(eventId, id -> new ReentrantLock());
     }
