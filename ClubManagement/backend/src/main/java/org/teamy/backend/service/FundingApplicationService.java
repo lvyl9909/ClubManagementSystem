@@ -37,6 +37,22 @@ public class FundingApplicationService {
             throw new RuntimeException(e);
         }
     }
+
+    public List<FundingApplication> getAllFundingApplication(){
+        try {
+            return fundingApplicationRepository.getAllFundingApplication();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void approveFundingApplication(int applicationId,int reviewerId){
+        fundingApplicationRepository.approveFundingApplication(reviewerId,applicationId);
+    }
+
+    public void rejectFundingApplication(int applicationId,int reviewerId){
+        fundingApplicationRepository.rejectFundingApplication(reviewerId,applicationId);
+    }
 //    public List<FundingApplication> getFundingApplicationByClubId(Integer clubId){
 //        try {
 //            return fundingApplicationRepository.findApplicationByClubId(clubId);

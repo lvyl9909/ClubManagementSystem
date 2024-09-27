@@ -3,6 +3,7 @@ package org.teamy.backend.DataMapper;
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.*;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -52,12 +53,11 @@ public class FundingApplicationMapper {
         }
         return null;
     }
-    public List<FundingApplication> findApplicationByClubId(Integer clubId)throws SQLException{
+    public List<FundingApplication> findAllApplication()throws SQLException{
         var connection = databaseConnectionManager.nextConnection();
         List<FundingApplication> fundingApplications = new ArrayList<>();
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM fundingapplications WHERE club = ?");
-            stmt.setInt(1, clubId);
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM fundingapplications");
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -183,5 +183,41 @@ public class FundingApplicationMapper {
         }
 
         return fundingApplications;
+    }
+
+    public boolean approveFundingApplication(int applicationId,int reviewerId) {
+        var connection = databaseConnectionManager.nextConnection();
+
+        try {
+            // 更新事件状态为 "Cancelled"
+            PreparedStatement stmt = connection.prepareStatement("UPDATE fundingapplications SET status = ?::funding_application_status, reviewer = ? WHERE application_id = ?");
+            stmt.setString(1, "Approved");
+            stmt.setInt(2, reviewerId);
+            stmt.setInt(3, applicationId);
+
+            int rowsAffected = stmt.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+    public boolean rejectFundingApplication(int applicationId,int reviewerId) {
+        var connection = databaseConnectionManager.nextConnection();
+
+        try {
+            // 更新事件状态为 "Cancelled"
+            PreparedStatement stmt = connection.prepareStatement("UPDATE fundingapplications SET status = ?::funding_application_status, reviewer = ? WHERE application_id = ?");
+            stmt.setString(1, "Rejected");
+            stmt.setInt(2, reviewerId);
+            stmt.setInt(3, applicationId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected>0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

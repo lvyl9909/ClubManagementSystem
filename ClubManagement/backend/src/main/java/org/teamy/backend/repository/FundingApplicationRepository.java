@@ -22,7 +22,21 @@ public class FundingApplicationRepository {
     public FundingApplication findfundingApplicationById(int Id) {
         return fundingApplicationMapper.findfundingApplicationById(Id);
     }
+    public List<FundingApplication> getAllFundingApplication() {
+        try {
+            return fundingApplicationMapper.findAllApplication();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public boolean saveFundingApplication(FundingApplication fundingApplication)throws SQLException {
         return fundingApplicationMapper.saveFundingApplication(fundingApplication);
+    }
+
+    public boolean approveFundingApplication(int reviewerId,int applicationId){
+        return fundingApplicationMapper.approveFundingApplication(applicationId,reviewerId);
+    }
+    public boolean rejectFundingApplication(int reviewerId,int applicationId){
+        return fundingApplicationMapper.rejectFundingApplication(applicationId,reviewerId);
     }
 }

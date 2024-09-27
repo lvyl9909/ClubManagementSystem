@@ -6,158 +6,137 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.model.Club;
-import org.teamy.backend.model.Event;
+import org.teamy.backend.model.FacultyAdministrator;
 import org.teamy.backend.model.FundingApplication;
+import org.teamy.backend.model.Student;
 import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.service.ClubService;
-import org.teamy.backend.service.EventService;
 import org.teamy.backend.service.FundingApplicationService;
-import org.teamy.backend.service.StudentService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
-@WebServlet("/student/fundingappliction/*")
-public class FundingApplicationController extends HttpServlet {
+@WebServlet("/admin/fundingappliction/*")
+public class AdminController extends HttpServlet {
     FundingApplicationService fundingApplicationService;
-    ClubService clubService;
     private ObjectMapper mapper;
-
     @Override
     public void init() throws ServletException {
         fundingApplicationService = (FundingApplicationService) getServletContext().getAttribute(ContextListener.FUNDING_APPLICATION_SERVICE);
-        clubService = (ClubService) getServletContext().getAttribute(ContextListener.CLUB_SERVICE);
         mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String idParam = req.getParameter("clubid"); // 获取查询字符串中的 "id" 参数
-        RequestHandler handler = () -> {
-
-            Integer clubId = Integer.valueOf(idParam);
-            return viewAllApplication(clubId);  // 根据 ID 获取事件
-
-        };
+        // 根据 ID 获取事件
+        RequestHandler handler = this::viewAllApplication;
         MarshallingRequestHandler.of(mapper, resp, handler).handle();
     }
-
-
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo(); // Gets the path info of the URL
-        if (pathInfo.equals("/save")) {
+        if (pathInfo.equals("/approve")) {
             MarshallingRequestHandler.of(
                     mapper, // 使用Jackson的ObjectMapper
                     resp,
-                    () -> saveApplication(req)
+                    () -> approveApplication(req)
             ).handle();
-        }else if(pathInfo.equals("/update")){
+        } else if (pathInfo.equals("/reject")) {
             MarshallingRequestHandler.of(
                     mapper, // 使用Jackson的ObjectMapper
                     resp,
-                    () -> updateApplication(req)
+                    () -> rejectApplication(req)
             ).handle();
         }
     }
-
-    private ResponseEntity saveApplication(HttpServletRequest req) {
+    private ResponseEntity approveApplication(HttpServletRequest req) {
         try {
-            // 解析请求体中的Club数据，假设请求体是JSON格式
-            FundingApplication fundingApplication = parseApplictionFromRequest(req);
-
-            // 调用Service层保存Club
-            boolean isSaved = fundingApplicationService.saveFundingApplication(fundingApplication);
-
-            if (isSaved) {
-                return ResponseEntity.ok(null);
-            } else {
-                return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
-                        Error.builder()
-                                .status(HttpServletResponse.SC_BAD_REQUEST)
-                                .message("Failed to save the event.")
-                                .reason("Failed to save the event.")
-                                .build()
-                );
+            String idParam = req.getParameter("id"); // 获取查询字符串中的 "id" 参数
+            System.out.println("approve:"+idParam);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = null;
+            if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+                userDetails = (UserDetails) authentication.getPrincipal();
             }
+            FacultyAdministrator facultyAdministrator=null;
+            if (userDetails instanceof FacultyAdministrator) {
+                facultyAdministrator =  (FacultyAdministrator) userDetails;
+            }
+            // 调用删除事件的方法
+            if (idParam == null) {
+                throw new IllegalArgumentException("Missing 'id' parameter.");
+            }
+
+            fundingApplicationService.approveFundingApplication(Integer.valueOf(idParam),Math.toIntExact(facultyAdministrator.getId()));
+            return ResponseEntity.ok(null);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()
                             .status(HttpServletResponse.SC_BAD_REQUEST)
-                            .message("Failed to save the event.")
+                            .message("Invalid request parameters.")
                             .reason(e.getMessage())
                             .build()
             );
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     Error.builder()
                             .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                            .message("An error occurred while saving the event.")
+                            .message("An error occurred while deleting events.")
                             .reason(e.getMessage())
                             .build()
             );
         }
     }
-
-    private ResponseEntity updateApplication(HttpServletRequest req) {
+    private ResponseEntity rejectApplication(HttpServletRequest req) {
         try {
-            // 解析请求体中的Club数据，假设请求体是JSON格式
-            FundingApplication fundingApplication = parseApplictionFromRequest(req);
-
-            // 调用Service层保存Club
-            boolean isSaved = fundingApplicationService.saveFundingApplication(fundingApplication);
-
-            if (isSaved) {
-                return ResponseEntity.ok(null);
-            } else {
-                return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
-                        Error.builder()
-                                .status(HttpServletResponse.SC_BAD_REQUEST)
-                                .message("Failed to save the event.")
-                                .reason("Failed to save the event.")
-                                .build()
-                );
+            String idParam = req.getParameter("id"); // 获取查询字符串中的 "id" 参数
+            System.out.println("approve:"+idParam);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = null;
+            if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+                userDetails = (UserDetails) authentication.getPrincipal();
             }
+            FacultyAdministrator facultyAdministrator=null;
+            if (userDetails instanceof FacultyAdministrator) {
+                facultyAdministrator =  (FacultyAdministrator) userDetails;
+            }
+            if (facultyAdministrator==null){
+                throw new IllegalArgumentException("Missing facultyAdministrator.");
+            }
+            // 调用删除事件的方法
+            if (idParam == null) {
+                throw new IllegalArgumentException("Missing 'id' parameter.");
+            }
+
+            fundingApplicationService.rejectFundingApplication(Integer.valueOf(idParam),Math.toIntExact(facultyAdministrator.getId()));
+            return ResponseEntity.ok(null);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()
                             .status(HttpServletResponse.SC_BAD_REQUEST)
-                            .message("Failed to save the event.")
+                            .message("Invalid request parameters.")
                             .reason(e.getMessage())
                             .build()
             );
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     Error.builder()
                             .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                            .message("An error occurred while saving the event.")
+                            .message("An error occurred while deleting events.")
                             .reason(e.getMessage())
                             .build()
             );
         }
     }
-
-    private FundingApplication parseApplictionFromRequest(HttpServletRequest req) throws IOException {
-        FundingApplication fundingApplication = mapper.readValue(req.getInputStream(), FundingApplication.class);
-
-        if ( fundingApplication == null ) {
-            throw new IllegalArgumentException("Event name cannot be empty");
-        }
-        System.out.println(fundingApplication.toString());
-
-        return fundingApplication;
-    }
-
-    private ResponseEntity viewAllApplication(Integer clubId) {
+    private ResponseEntity viewAllApplication() {
         try {
-            Club club = clubService.getClubById(clubId);
-            List<FundingApplication> fundingApplications =clubService.getFundingApplication(club);
+            List<FundingApplication> fundingApplications =fundingApplicationService.getAllFundingApplication();
             return ResponseEntity.ok(fundingApplications);
         } catch (NumberFormatException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
@@ -177,5 +156,4 @@ public class FundingApplicationController extends HttpServlet {
             );
         }
     }
-
 }
