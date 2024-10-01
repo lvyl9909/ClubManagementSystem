@@ -39,4 +39,7 @@ public class FundingApplicationRepository {
     public boolean rejectFundingApplication(int reviewerId,int applicationId){
         return fundingApplicationMapper.rejectFundingApplication(applicationId,reviewerId);
     }
+    public boolean updateFundingApplication(FundingApplication fundingApplication) throws Exception {
+        return fundingApplicationMapper.updateFundingApplication(fundingApplication);
+    }
 }

@@ -110,7 +110,7 @@ public class FundingApplicationController extends HttpServlet {
             FundingApplication fundingApplication = parseApplictionFromRequest(req);
 
             // 调用Service层保存Club
-            boolean isSaved = fundingApplicationService.saveFundingApplication(fundingApplication);
+            boolean isSaved = fundingApplicationService.updateFundingApplication(fundingApplication);
 
             if (isSaved) {
                 return ResponseEntity.ok(null);

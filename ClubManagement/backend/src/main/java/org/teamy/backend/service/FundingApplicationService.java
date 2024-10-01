@@ -53,6 +53,18 @@ public class FundingApplicationService {
     public void rejectFundingApplication(int applicationId,int reviewerId){
         fundingApplicationRepository.rejectFundingApplication(reviewerId,applicationId);
     }
+    public boolean updateFundingApplication(FundingApplication fundingApplication) throws Exception {
+        if (fundingApplication ==null) {
+            throw new IllegalArgumentException("Club cannot be empty");
+        }
+        try {
+            boolean isSuccess = fundingApplicationRepository.updateFundingApplication(fundingApplication);
+            clubRepository.invalidateClubCache(fundingApplication.getClubId());
+            return isSuccess;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 //    public List<FundingApplication> getFundingApplicationByClubId(Integer clubId){
 //        try {
 //            return fundingApplicationRepository.findApplicationByClubId(clubId);

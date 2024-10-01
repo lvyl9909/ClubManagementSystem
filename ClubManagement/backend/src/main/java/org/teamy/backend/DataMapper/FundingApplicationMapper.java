@@ -220,4 +220,24 @@ public class FundingApplicationMapper {
             throw new RuntimeException(e);
         }
     }
+    public boolean updateFundingApplication(FundingApplication fundingApplication) throws Exception {
+        var connection = databaseConnectionManager.nextConnection();
+        String query = "UPDATE fundingapplications SET description = ?, amount = ?, semester = ?, club = ?, date = ?, reviewer = ? WHERE application_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, fundingApplication.getDescription());
+            stmt.setBigDecimal(2, fundingApplication.getAmount());
+            stmt.setInt(3, fundingApplication.getSemester());
+            stmt.setInt(4, fundingApplication.getClub().getId());
+            stmt.setDate(5, java.sql.Date.valueOf(fundingApplication.getDate())); // Assuming getDate() returns a LocalDate
+            stmt.setLong(6, fundingApplication.getReviewer().getId());
+            stmt.setInt(7, fundingApplication.getId());
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }catch (SQLException e) {
+            e.printStackTrace();
+            throw new Exception("Error updating FundingApplication: " + e.getMessage());
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
+    }
 }
