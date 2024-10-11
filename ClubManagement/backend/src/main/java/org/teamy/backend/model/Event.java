@@ -25,6 +25,17 @@ public class Event extends DomainObject {
     private Integer currentCapacity;
     private List<RSVP> rsvps;
     private EventStatus status;
+
+    private Integer version;
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
     public Integer getClubId() {
         return clubId;
     }
@@ -50,7 +61,7 @@ public class Event extends DomainObject {
     }
 
 
-    public Event(Integer id,String title, String description, Date date, Time time, Integer venueId, BigDecimal cost, Integer clubId,String status,Integer capacity) {
+    public Event(Integer id,String title, String description, Date date, Time time, Integer venueId, BigDecimal cost, Integer clubId,String status,Integer capacity,Integer version) {
         this.setId(id);
         this.clubId = clubId;
         this.title = title;
@@ -62,6 +73,7 @@ public class Event extends DomainObject {
         this.status = EventStatus.valueOf(status);
         this.capacity = capacity;
         this.currentCapacity = capacity;
+        this.version = version;
     }
     public Event(String title, String description, Date date, Time time, String venueName, BigDecimal cost, Integer clubId,Integer capacity) {
         this.clubId = clubId;

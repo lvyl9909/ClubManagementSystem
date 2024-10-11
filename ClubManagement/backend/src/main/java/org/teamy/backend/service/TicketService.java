@@ -4,6 +4,7 @@ import org.teamy.backend.DataMapper.EventDataMapper;
 import org.teamy.backend.DataMapper.RSVPDataMapper;
 import org.teamy.backend.DataMapper.TicketDataMapper;
 import org.teamy.backend.IdentityMap.TicketInfoIdentityMap;
+import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.Event;
 import org.teamy.backend.model.RSVP;
 import org.teamy.backend.model.Student;
@@ -11,6 +12,7 @@ import org.teamy.backend.model.Ticket;
 import org.teamy.backend.repository.StudentRepository;
 import org.teamy.backend.repository.TicketRepository;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -21,15 +23,17 @@ public class TicketService {
     private final StudentRepository studentRepository;
     private final EventDataMapper eventDataMapper;
     private static TicketService instance;
+    private final DatabaseConnectionManager databaseConnectionManager;
 
-    private TicketService(TicketRepository ticketRepository, StudentRepository studentRepository, EventDataMapper eventDataMapper) {
+    private TicketService(TicketRepository ticketRepository, StudentRepository studentRepository, EventDataMapper eventDataMapper, DatabaseConnectionManager databaseConnectionManager) {
         this.ticketRepository = ticketRepository;
         this.studentRepository = studentRepository;
         this.eventDataMapper = eventDataMapper;
+        this.databaseConnectionManager = databaseConnectionManager;
     }
-    public static synchronized TicketService getInstance(TicketRepository ticketRepository, StudentRepository studentRepository, EventDataMapper eventDataMapper){
+    public static synchronized TicketService getInstance(TicketRepository ticketRepository, StudentRepository studentRepository, EventDataMapper eventDataMapper,DatabaseConnectionManager databaseConnectionManager){
         if(instance == null){
-            instance = new TicketService(ticketRepository,studentRepository,eventDataMapper);
+            instance = new TicketService(ticketRepository,studentRepository,eventDataMapper,databaseConnectionManager);
         }
         return instance;
     }
@@ -47,6 +51,7 @@ public class TicketService {
         return ticket;
     }
     public Map<Ticket, Event> getTicketInfo(Student student) throws Exception {
+        Connection connection = databaseConnectionManager.nextConnection();
         // 为当前请求创建一个 IdentityMapManager 实例
         TicketInfoIdentityMap identityMapManager = new TicketInfoIdentityMap();
         Map<Ticket, Event> result = new HashMap<>();
@@ -66,7 +71,7 @@ public class TicketService {
 
             // 如果 IdentityMap 中没有，则从数据库查询并更新 IdentityMap
             if (event == null) {
-                event = eventDataMapper.findEventById(ticket.getEventId());  // 查询数据库
+                event = eventDataMapper.findEventById(ticket.getEventId(),connection);  // 查询数据库
                 identityMapManager.addEvent(event); // 将 event 加入 IdentityMap
             }
 

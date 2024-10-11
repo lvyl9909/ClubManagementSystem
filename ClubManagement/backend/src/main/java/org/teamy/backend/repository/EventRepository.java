@@ -41,7 +41,7 @@ public class EventRepository {
         return instance;
     }
     // 查找事件时先检查缓存
-    public Event findEventById(int id) {
+    public Event findEventById(int id,Connection connection) {
         // 先从缓存中获取
         Event event = eventCache.getIfPresent(id);
         if (event != null) {
@@ -49,7 +49,7 @@ public class EventRepository {
         }
 
         // 如果缓存中没有，查询数据库
-        event = eventDataMapper.findEventById(id);
+        event = eventDataMapper.findEventById(id,connection);
         event.setVenue(venueDataMapper.findVenueById(event.getVenueId()));
         event.setClub(clubDataMapper.findClubById(event.getVenueId()));
         if (event != null) {
@@ -102,6 +102,11 @@ public class EventRepository {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean updateCapacity(Event event,Connection connection) throws Exception {
+        boolean result = eventDataMapper.updateEventCapacity(event,connection);
+        return result;
     }
     public void invalidateEventCache(Integer eventId) {
         eventCache.invalidate(eventId);

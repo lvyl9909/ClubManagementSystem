@@ -5,6 +5,7 @@ import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
 import org.teamy.backend.model.EventStatus;
 import org.teamy.backend.model.Student;
+import org.teamy.backend.model.exception.OptimisticLockingFailureException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,8 +27,7 @@ public class EventDataMapper {
     private EventDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
-    public Event findEventById(int Id) {
-        var connection = databaseConnectionManager.nextConnection();
+    public Event findEventById(int Id,Connection connection) {
 
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM events WHERE event_id = ?");
@@ -44,7 +44,8 @@ public class EventDataMapper {
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
-                        rs.getInt("capacity")
+                        rs.getInt("capacity"),
+                        rs.getInt("version")
                 );
             }
         } catch (SQLException e) {
@@ -83,7 +84,8 @@ public class EventDataMapper {
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
                         rs.getString("status"),       // 根据需要将字符串转换为 Enum
-                        rs.getInt("capacity")
+                        rs.getInt("capacity"),
+                        rs.getInt("version")
                 );
                 events.add(event);
             }
@@ -132,7 +134,8 @@ public class EventDataMapper {
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
-                        rs.getInt("capacity")
+                        rs.getInt("capacity"),
+                        rs.getInt("version")
                 );
                 events.add(event);
             }
@@ -186,7 +189,8 @@ public class EventDataMapper {
                         rs.getBigDecimal("cost"),
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
-                        rs.getInt("capacity")
+                        rs.getInt("capacity"),
+                        rs.getInt("version")
                 );
                 events.add(event);
             }
@@ -225,6 +229,30 @@ public class EventDataMapper {
         } finally {
             // 释放数据库连接
             databaseConnectionManager.releaseConnection(connection);
+        }
+    }
+
+    public boolean updateEventCapacity(Event event, Connection connection) throws Exception {
+        // SQL 更新语句，使用 version 进行乐观锁控制
+        String query = "UPDATE events SET capacity = ?, version = version + 1 WHERE event_id = ? AND version = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, event.getCapacity());       // 设置新的 capacity
+            stmt.setInt(2, event.getId());             // 使用 eventId 作为更新条件
+            stmt.setInt(3, event.getVersion());        // 使用当前的 version 作为乐观锁检查条件
+
+            // 执行更新操作
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                // 如果没有行被更新，说明 version 不匹配，抛出乐观锁异常
+                throw new OptimisticLockingFailureException("Event version mismatch, update failed.");
+            }
+
+            // 更新成功后，递增 event 的本地 version
+            event.setVersion(event.getVersion() + 1);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new Exception("Error updating event capacity: " + e.getMessage());
         }
     }
 

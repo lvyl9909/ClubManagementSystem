@@ -83,7 +83,6 @@ public class TicketDataMapper {
             PreparedStatement stmt = connection.prepareStatement(
                     "INSERT INTO tickets (student_id, rsvp,status,event_id) VALUES (?, ?,?::ticket_status,?)",
                     Statement.RETURN_GENERATED_KEYS // 添加这行
-
             );
             System.out.println("studentid:"+ticket.getStudentId()+"RsvpId:"+ticket.getRsvpId()+"status:"+ticket.getStatus().name()+"EventId:"+ticket.getEventId());
             stmt.setInt(1, ticket.getStudentId());
