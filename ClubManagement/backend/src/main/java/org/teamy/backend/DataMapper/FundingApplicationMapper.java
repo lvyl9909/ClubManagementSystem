@@ -59,7 +59,6 @@ public class FundingApplicationMapper {
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM fundingapplications");
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
                 String statusString = rs.getString("status");
                 fundingApplicationStatus status = fundingApplicationStatus.fromString(statusString);
@@ -180,7 +179,6 @@ public class FundingApplicationMapper {
 
     public boolean approveFundingApplication(int applicationId,int reviewerId) {
         var connection = databaseConnectionManager.nextConnection();
-
         try {
             // 更新事件状态为 "Cancelled"
             PreparedStatement stmt = connection.prepareStatement("UPDATE fundingapplications SET status = ?::funding_application_status, reviewer = ? WHERE application_id = ?");

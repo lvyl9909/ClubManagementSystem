@@ -1,11 +1,14 @@
 package org.teamy.backend.security;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.teamy.backend.DataMapper.StudentDataMapper;
+import org.teamy.backend.model.FacultyAdministrator;
 import org.teamy.backend.model.Person;
 import org.teamy.backend.model.Student;
 import org.teamy.backend.repository.StudentClubRepository;
@@ -50,7 +53,13 @@ public class CustomUserDetailsService implements UserDetailsService {
                         roles.add(new Role("CLUB_" + clubId));
                     }
                     user.setRoles(roles);
-                }
+                } else if (user instanceof FacultyAdministrator) {
+                    roles.add(new Role("ADMIN"));
+                    System.out.println("add role administrator:"+user.getAuthorities());
+                    user.setRoles(roles);
+
+
+               }
                 System.out.println("yong hu quan xian :"+user.getAuthorities());
                 System.out.println(user.getPassword());
             }

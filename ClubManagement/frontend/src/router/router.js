@@ -7,7 +7,8 @@ import Event from "../pages/event/event";
 import PageOne from "../pages/other/pageone";
 import PageTwo from "../pages/other/pagetwo";
 import Login from "../pages/login/login";
-import PrivateRoute from "./PrivateRoute"; // 引入 PrivateRoute 组件
+import PrivateRoute from "./PrivateRoute";
+import ViewFunding from "../pages/view_funding/view_funding";
 
 // 更新 routes 配置
 const routes = createBrowserRouter([
@@ -48,6 +49,14 @@ const routes = createBrowserRouter([
                 element: (
                     <PrivateRoute>
                         <Event />
+                    </PrivateRoute>
+                )
+            },
+            {
+                path: 'view_funding',
+                element: (
+                    <PrivateRoute>
+                        <ViewFunding />
                     </PrivateRoute>
                 )
             },

@@ -7,7 +7,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +32,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @WebServlet("/auth/token")
 public class TokenResource extends HttpServlet {
@@ -75,6 +82,11 @@ public class TokenResource extends HttpServlet {
                 if (!login.getPassword().equals(userDetails.getPassword())) {
                     throw new ForbiddenException();
                 }
+                // 校验密码成功后，创建 Authentication 对象并设置到 SecurityContextHolder 中
+                Authentication auth = new UsernamePasswordAuthenticationToken(
+                        userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
+
                 System.out.println("password correct");
                 var token = jwtTokenService.createToken(userDetails);
                 System.out.println("token created");
@@ -82,6 +94,9 @@ public class TokenResource extends HttpServlet {
                 addSameSiteCookie(resp, refreshCookie, "None");
 //                resp.addCookie(refreshCookie);
                 System.out.println("Cookie added");
+
+
+
                 return tokenResponse(token.getAccessToken());
             }catch (UsernameNotFoundException e) {
                 return ResponseEntity.of(HttpServletResponse.SC_UNAUTHORIZED, Error.builder()
@@ -120,6 +135,23 @@ public class TokenResource extends HttpServlet {
                             System.out.println("Cookie Name: " + cookie.getName() + ", Cookie Value: " + cookie.getValue()));
                 }
 
+
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
+                    System.out.println("当前用户：" + authentication.getName());
+                    System.out.println("权限列表：" + authentication.getAuthorities());
+
+                    System.out.println("用户的权限：");
+                    for (GrantedAuthority authority : authentication.getAuthorities()) {
+                        System.out.println(authority.getAuthority());
+                    }
+                } else {
+                    System.out.println("没有可用的身份验证信息");
+                    throw new ForbiddenException();
+                }
+
+
+
                 var refreshToken = getRefreshCookie(req);
                 System.out.println(refreshToken);
                 var token = jwtTokenService.refresh(refreshRequest.getAccessToken(), refreshToken);
@@ -136,6 +168,9 @@ public class TokenResource extends HttpServlet {
             }
         })).handle();
     }
+
+
+
 
     private Cookie refreshCookie(String refreshToken, String contextPath) {
         var cookie = new Cookie(COOKIE_NAME_REFRESH_TOKEN, refreshToken);

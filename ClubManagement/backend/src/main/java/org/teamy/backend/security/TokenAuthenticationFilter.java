@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.teamy.backend.security.repository.TokenService;
@@ -36,6 +37,7 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
             var authentication = jwtTokenService.readToken(token);
             try {
                 var result = getAuthenticationManager().authenticate(authentication); // 验证对象
+                SecurityContextHolder.getContext().setAuthentication(result);
                 return result;
             } catch (AuthenticationException e) {
                 System.out.println("Authentication failed: " + e.getMessage());

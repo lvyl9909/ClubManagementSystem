@@ -24,18 +24,21 @@ import org.teamy.backend.service.FundingApplicationService;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/admin/fundingappliction/*")
+@WebServlet("/admin/fundingapplication/*")
 public class AdminController extends HttpServlet {
     FundingApplicationService fundingApplicationService;
+    ClubService clubService;
     private ObjectMapper mapper;
     @Override
     public void init() throws ServletException {
         fundingApplicationService = (FundingApplicationService) getServletContext().getAttribute(ContextListener.FUNDING_APPLICATION_SERVICE);
+        clubService = (ClubService) getServletContext().getAttribute(ContextListener.CLUB_SERVICE);
         mapper = (ObjectMapper) getServletContext().getAttribute(ContextListener.MAPPER);
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 根据 ID 获取事件
+        System.out.println("get all application");
         RequestHandler handler = this::viewAllApplication;
         MarshallingRequestHandler.of(mapper, resp, handler).handle();
     }
@@ -65,9 +68,10 @@ public class AdminController extends HttpServlet {
                 userDetails = (UserDetails) authentication.getPrincipal();
             }
             FacultyAdministrator facultyAdministrator=null;
-            if (userDetails instanceof FacultyAdministrator) {
+            //if (userDetails instanceof FacultyAdministrator) {
                 facultyAdministrator =  (FacultyAdministrator) userDetails;
-            }
+            //}
+            System.out.println(authentication.getPrincipal());
             // 调用删除事件的方法
             if (idParam == null) {
                 throw new IllegalArgumentException("Missing 'id' parameter.");
@@ -137,6 +141,10 @@ public class AdminController extends HttpServlet {
     private ResponseEntity viewAllApplication() {
         try {
             List<FundingApplication> fundingApplications =fundingApplicationService.getAllFundingApplication();
+            for (FundingApplication fundingApplication : fundingApplications) {
+                fundingApplication.setClub(clubService.getClubById(fundingApplication.getClubId()));
+                System.out.println(fundingApplications);
+            }
             return ResponseEntity.ok(fundingApplications);
         } catch (NumberFormatException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,

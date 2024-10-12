@@ -93,13 +93,13 @@ public class StudentRepository {
             student.setRsvpsId(rsvpDataMapper.findRSVPIdByStudentId(Math.toIntExact(student.getId())));
             student.setTicketsId(ticketDataMapper.getTicketsIdFromStudent(Math.toIntExact(student.getId())));
             return student;
-        }else {
+        }else if(person instanceof FacultyAdministrator){
             FacultyAdministrator admin = (FacultyAdministrator) person;
-            admin.setFundingApplicationIds(fundingApplicationMapper.findApplicationIdByReviewerId(Math.toIntExact(admin.getId())));
+//            admin.setFundingApplicationIds(fundingApplicationMapper.findApplicationIdByReviewerId(Math.toIntExact(admin.getId())));
             //读取application
             return admin;
         }
-
+        return null;
     }
     public List<Student> getAllStudent() {
         return studentDataMapper.getAllStudent();
