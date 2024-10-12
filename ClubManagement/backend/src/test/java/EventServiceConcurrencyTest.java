@@ -3,21 +3,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.teamy.backend.DataMapper.*;
 import org.teamy.backend.config.DatabaseConnectionManager;
+import org.teamy.backend.model.Event;
 import org.teamy.backend.repository.*;
-import org.teamy.backend.security.CustomUserDetailsService;
-import org.teamy.backend.service.*;
+import org.teamy.backend.service.EventService;
 
-import java.sql.Connection;
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.*;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class RSVPConcurrencyTest {
+public class EventServiceConcurrencyTest {
 
     private EventService eventService;
     private EventRepository eventRepository;
@@ -96,30 +93,29 @@ public class RSVPConcurrencyTest {
     }
 
     @Test
-    public void testConcurrentRSVPApplications() throws InterruptedException {
-        int numberOfThreads = 10;  // 例如模拟 10 个用户并发申请
-        int eventId = 4;  // 测试的 eventId
-        int studentId = 7;  // 假设一个学生 ID
-        int numTickets = 2;  // 每个学生申请 2 张票
-        List<Integer> participates_id = Arrays.asList(7, 8);  // 参与者 ID 列表
+    public void testConcurrentEventUpdates() throws InterruptedException {
+        int numberOfThreads = 10;  // 模拟10个线程同时更新事件
+        int eventId = 47;  // 假设要更新的事件ID
+        int clubId =30;
+        int venueId =11;
+
 
         // 创建线程池
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        Random random = new Random();
 
         // 提交并发任务
         List<Future<Boolean>> futures = new ArrayList<>();
         for (int i = 0; i < numberOfThreads; i++) {
-            final int currentStudentId = studentId + i;  // 模拟不同的学生 ID
             Callable<Boolean> task = () -> {
                 try {
-                    Thread.sleep(random.nextInt(500));  // 0 到 500 毫秒的随机延迟
+                    // 模拟不同的更新操作
+                    Event event = eventService.getEventById(eventId);
+//                    event.setTitle("Updated Event Title " + Thread.currentThread().getId());
+                    event.setCapacity((int) (100 + Thread.currentThread().getId()));  // 每个线程试图设置不同的容量
 
-                    // 调用 applyForRSVP 方法
-                    eventService.applyForRSVP(eventId, currentStudentId, numTickets, participates_id,8);
-                    return true;  // 成功
+                    return eventService.updateEvent(event);  // 调用 updateEvent 方法
                 } catch (Exception e) {
-                    System.err.println("Error applying for RSVP: " + e.getMessage());
+                    System.err.println("Error updating event: " + e.getMessage());
                     return false;  // 失败
                 }
             };
@@ -149,8 +145,8 @@ public class RSVPConcurrencyTest {
         System.out.println("Success count: " + successCount);
         System.out.println("Failure count: " + failureCount);
 
-        // 可以进一步断言成功和失败次数是否符合预期，例如：
-        // assertTrue(successCount > 0);
-        // assertTrue(failureCount > 0);
+        // 可以进一步断言成功和失败次数是否符合预期
+        assertTrue(successCount > 0);  // 确保至少有一个成功
+        assertTrue(failureCount > 0);  // 确保至少有一个失败（可能是由于乐观锁冲突）
     }
 }

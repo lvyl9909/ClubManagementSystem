@@ -17,7 +17,9 @@ const ViewFunding = () => {
             setLoading(true);
             try {
                 // 调用后端 API 获取所有资金申请数据
-                const response = await doCall(`${path}/admin/fundingapplication`, 'GET');
+                const response = await doCall(`${path}/admin/fundingapplication`, 'GET',{
+                    credentials: 'include' // 确保发送 cookies
+                });
                 if (response.ok) {
                     const data = await response.json(); // 解析 JSON 数据
                     console.log(data);
@@ -39,7 +41,9 @@ const ViewFunding = () => {
     // Approve Funding Application
     const handleApprove = async (applicationId) => {
         try {
-            const response = await doCall(`${path}/admin/fundingapplication/approve?id=${applicationId}`, 'POST');
+            const response = await doCall(`${path}/admin/fundingapplication/approve?id=${applicationId}`, 'POST',{
+                credentials: 'include' // 确保发送 cookies
+            });
             if (response.ok) {
                 message.success('Funding application approved');
                 setFundingApplications(fundingApplications.filter(funding => funding.id !== applicationId)); // 更新UI
@@ -54,7 +58,9 @@ const ViewFunding = () => {
     // Reject Funding Application
     const handleReject = async (applicationId) => {
         try {
-            const response = await doCall(`${path}/admin/fundingapplication/reject?id=${applicationId}`, 'POST');
+            const response = await doCall(`${path}/admin/fundingapplication/reject?id=${applicationId}`, 'POST',{
+                credentials: 'include' // 确保发送 cookies
+            });
             if (response.ok) {
                 message.success('Funding application rejected');
                 setFundingApplications(fundingApplications.filter(funding => funding.id !== applicationId)); // 更新UI

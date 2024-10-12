@@ -6,6 +6,7 @@ import org.teamy.backend.model.Student;
 import org.teamy.backend.model.Ticket;
 import org.teamy.backend.model.TicketStatus;
 
+import java.awt.event.ContainerEvent;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,8 +190,7 @@ public class TicketDataMapper {
             throw new RuntimeException(e);
         }
     }
-    public List<Ticket> getTicketsFromEvent(Integer eventId) throws SQLException {
-        var connection = databaseConnectionManager.nextConnection();
+    public List<Ticket> getTicketsFromEvent(Integer eventId, Connection connection) throws SQLException {
         List<Ticket> tickets = new ArrayList<>();
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM tickets WHERE event_id = ?");

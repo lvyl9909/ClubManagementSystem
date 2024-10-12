@@ -69,22 +69,23 @@ public class EventService {
         }
         List<Event>events=  eventRepository.findEventsByTitle(title);
         for(Event event:events){
-            Integer currentCapacity = getCurrentCapacity(event);
+            Integer currentCapacity = event.getCapacity();
             event.setCurrentCapacity(currentCapacity);
         }
         return events;
     }
 
     public boolean saveEvent(Event event) throws Exception {
+        Connection connection = databaseConnectionManager.nextConnection();
         // You can add additional business logic here, such as data validation
         if (event ==null||event.getTitle() == null || event.getTitle().isEmpty()) {
             throw new IllegalArgumentException("Club cannot be empty");
         }
 
-        event = eventRepository.lazyLoadClub(event);
+        event = eventRepository.lazyLoadClub(event,connection);
         System.out.println("load club");
 
-        Venue venue = venueRepository.getVenueById(event.getVenueId());
+        Venue venue = venueRepository.getVenueById(event.getVenueId(),connection);
         event.setVenue(venue);
         System.out.println("set venue");
         try {
@@ -105,7 +106,7 @@ public class EventService {
         try {
             List<Event>events =  eventRepository.getAllEvent();
             for(Event event:events){
-                Integer currentCapacity = getCurrentCapacity(event);
+                Integer currentCapacity = event.getCapacity();
                 event.setCurrentCapacity(currentCapacity);
             }
             return events;
@@ -118,74 +119,107 @@ public class EventService {
     }
     public boolean updateEvent(Event event) throws Exception {
         Connection connection = databaseConnectionManager.nextConnection();
-            System.out.println("你好"+event);
+        try{
+            connection.setAutoCommit(false);  // 关闭自动提交，手动管理事务
             // 检查事件是否存在
             Event existingEvent = eventRepository.findEventById(event.getId(),connection);
             if (existingEvent == null) {
                 throw new Exception("Event not found with ID: " + event.getId());
             }
-            Venue venue = venueRepository.getVenueById(event.getVenueId());
-            Club club = clubRepository.findClubById(event.getClubId());
-            try {
-                if(event.getCost().compareTo(BigDecimal.valueOf(club.getBudget()))>0){
-                    throw new RuntimeException("budget not enough");
-                }
-                if(event.getCapacity()>venue.getCapacity()){
-                    throw new RuntimeException("venue capacity not enough");
-                }
-                // 调用 DataMapper 更新事件
-                boolean isSuccess =  eventRepository.updateEvent(event);
-                List<Ticket> tickets = ticketRepository.getTicketsFromEvent(event.getId());
+            Venue venue = venueRepository.getVenueById(event.getVenueId(),connection);
+            Club club = clubRepository.findClubById(event.getClubId(),connection);
 
-                ticketRepository.invalidateTicketCaches(tickets);
-                clubRepository.invalidateClubCache(event.getClubId());
-                return isSuccess;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }finally {
+            if(event.getCost().compareTo(BigDecimal.valueOf(club.getBudget()))>0){
+                throw new RuntimeException("budget not enough");
             }
-    }
-    public void applyForRSVP(int eventId, int studentId, int numTickets,List<Integer> participates_id) throws Exception {
-        Connection connection = databaseConnectionManager.nextConnection();
-        try {
-            connection.setAutoCommit(false);  // 关闭自动提交，手动管理事务
-
-            // 1. 查找 Event 并更新其容量（使用乐观锁控制）
-            Event event = eventRepository.findEventById(eventId,connection);
-            event.setCapacity(event.getCapacity() - numTickets);
-
-            // 更新 Event 的容量（乐观锁控制）
-            boolean isUpdated = eventRepository.updateCapacity(event, connection);
-            if (!isUpdated) {
-                throw new OptimisticLockingFailureException("Failed to update event capacity due to version mismatch.");
+            if(event.getCapacity()>venue.getCapacity()){
+                throw new RuntimeException("venue capacity not enough");
             }
+            System.out.println(event);
 
-            // 2. 保存 RSVP
-            RSVP rsvp = new RSVP(studentId, eventId, numTickets, participates_id);
-            rsvp.setEvent(event);
-            rsvpRepository.saveRSVP(connection, rsvp);  // 保存 RSVP，生成自增 ID
-
-            // 3. 为每个参与者保存 Tickets
-            for (Integer participantId : participates_id) {
-                Ticket ticket = new Ticket(participantId, rsvp.getId(), eventId, TicketStatus.Issued);
-                ticketRepository.saveTicket(connection, ticket);  // 保存 Ticket
-            }
-
-            // 提交事务
+            boolean isSuccess =  eventRepository.updateEvent(event,connection);
             connection.commit();
-        } catch (Exception e) {
+            return isSuccess;
+        }catch (Exception e) {
             try {
                 connection.rollback();  // 事务回滚
+                throw new OptimisticLockingFailureException("Failed to update event capacity due to version mismatch: "+e.getMessage());
             } catch (SQLException rollbackEx) {
                 rollbackEx.printStackTrace();
             }
             throw new RuntimeException("Error in RSVP and Ticket processing: " + e.getMessage());
         } finally {
             try {
-                connection.setAutoCommit(true);  // 恢复自动提交模式
+                // 恢复自动提交模式并关闭连接
+                if (!connection.getAutoCommit()) {
+                    connection.setAutoCommit(true);  // 恢复自动提交模式
+                }
                 databaseConnectionManager.releaseConnection(connection);  // 释放数据库连接
             } catch (SQLException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+    public void applyForRSVP(int eventId, int studentId, int numTickets,List<Integer> participates_id,int retryCount) throws Exception {
+
+        while (retryCount-- > 0) {
+            Connection connection = databaseConnectionManager.nextConnection();
+            try {
+                try {
+                    // 确保在执行任何事务之前禁用自动提交
+                    if (connection.getAutoCommit()) {
+                        connection.setAutoCommit(false);  // 禁用自动提交，手动管理事务
+                    }
+                    // 1. 查找 Event 并更新其容量（使用乐观锁控制）
+                    Event event = eventRepository.findEventById(eventId,connection);
+                    event.setCapacity(event.getCapacity() - numTickets);
+
+                    // 更新 Event 的容量（乐观锁控制）
+                    boolean isUpdated = eventRepository.updateCapacity(event, connection);
+                    if (!isUpdated) {
+                        throw new OptimisticLockingFailureException("Failed to update event capacity due to version mismatch.");
+                    }
+
+                    // 2. 保存 RSVP
+                    RSVP rsvp = new RSVP(studentId, eventId, numTickets, participates_id);
+                    rsvp.setEvent(event);
+                    rsvpRepository.saveRSVP(connection, rsvp);  // 保存 RSVP，生成自增 ID
+
+                    // 3. 为每个参与者保存 Tickets
+                    for (Integer participantId : participates_id) {
+                        Ticket ticket = new Ticket(participantId, rsvp.getId(), eventId, TicketStatus.Issued);
+                        ticketRepository.saveTicket(connection, ticket);  // 保存 Ticket
+                    }
+
+                    // 提交事务
+                    connection.commit();
+                } catch (Exception e) {
+                    try {
+                        connection.rollback();  // 事务回滚
+                        throw new OptimisticLockingFailureException("Failed to update event capacity due to version mismatch.");
+                    } catch (SQLException rollbackEx) {
+                        rollbackEx.printStackTrace();
+                    }
+                    throw new RuntimeException("Error in RSVP and Ticket processing: " + e.getMessage());
+                } finally {
+                    try {
+                        // 恢复自动提交模式并关闭连接
+                        if (!connection.getAutoCommit()) {
+                            connection.setAutoCommit(true);  // 恢复自动提交模式
+                        }
+                        databaseConnectionManager.releaseConnection(connection);  // 释放数据库连接
+
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return;  // 成功时直接返回
+            } catch (OptimisticLockingFailureException e) {
+                if (retryCount == 0) {
+                    throw e;  // 重试次数用尽，抛出异常
+                }
+                // 等待一段时间后重试
+                Thread.sleep(100);
             }
         }
     }
@@ -199,12 +233,12 @@ public class EventService {
         eventDeleteUoW.commit();
     }
 
-    public Integer getCurrentCapacity(Event event)throws Exception{
-        List<Ticket> tickets = ticketRepository.getTicketsFromEvent(event.getId());
-        int count=0;
-        for(Ticket ticket:tickets){
-            if(ticket.getStatus().equals(TicketStatus.Issued))count++;
-        }
-        return event.getCapacity()-count;
-    }
+//    public Integer getCurrentCapacity(Event event)throws Exception{
+//        List<Ticket> tickets = ticketRepository.getTicketsFromEvent(event.getId());
+//        int count=0;
+//        for(Ticket ticket:tickets){
+//            if(ticket.getStatus().equals(TicketStatus.Issued))count++;
+//        }
+//        return event.getCapacity()-count;
+//    }
 }

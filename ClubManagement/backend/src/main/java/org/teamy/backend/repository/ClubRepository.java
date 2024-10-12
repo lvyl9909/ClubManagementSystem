@@ -8,6 +8,7 @@ import org.teamy.backend.model.Student;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,20 +48,16 @@ public class ClubRepository {
         return instance;
     }
 
-    public Club findClubById(int id) throws SQLException {
+    public Club findClubById(int id, Connection connection) throws SQLException {
         try {
-            // Guava Cache 的 get 方法，确保同一时间只有一个线程执行加载逻辑
-            return clubCache.get(id, () -> {
-                // 从数据库加载Club
-                Club club = clubDataMapper.findClubById(id);
-                if (club != null) {
-                    club.setStudentId(studentsClubsDataMapper.findStudentIdByClubId(id));
-                    club.setEventsId(eventDataMapper.findEventIdByClubId(id));
-                    club.setFundingApplicationsId(fundingApplicationMapper.findApplicationIdByClubId(id));
-                }
-                return club;
-            });
-        } catch (ExecutionException e) {
+            Club club = clubDataMapper.findClubById(id,connection);
+            if (club != null) {
+                club.setStudentId(studentsClubsDataMapper.findStudentIdByClubId(id,connection));
+                club.setEventsId(eventDataMapper.findEventIdByClubId(id,connection));
+                club.setFundingApplicationsId(fundingApplicationMapper.findApplicationIdByClubId(id,connection));
+            }
+            return club;
+        } catch (RuntimeException e) {
             throw new SQLException("Error fetching club data", e);
         }
     }

@@ -43,20 +43,14 @@ public class EventRepository {
     // 查找事件时先检查缓存
     public Event findEventById(int id,Connection connection) {
         // 先从缓存中获取
-        Event event = eventCache.getIfPresent(id);
-        if (event != null) {
-            return event; // 如果缓存中有，则直接返回
-        }
+        Event event;
 
         // 如果缓存中没有，查询数据库
         event = eventDataMapper.findEventById(id,connection);
-        event.setVenue(venueDataMapper.findVenueById(event.getVenueId()));
-        event.setClub(clubDataMapper.findClubById(event.getVenueId()));
+        event.setVenue(venueDataMapper.findVenueById(event.getVenueId(),connection));
+        event.setClub(clubDataMapper.findClubById(event.getVenueId(),connection));
         if (event != null) {
-            event.setVenueName(venueDataMapper.findVenueById(event.getVenueId()).getName());
-
-            // 将查询结果存入缓存
-            eventCache.put(id, event);
+            event.setVenueName(venueDataMapper.findVenueById(event.getVenueId(),connection).getName());
         }
         return event;
     }
@@ -82,19 +76,15 @@ public class EventRepository {
     }
 
     // 更新事件并更新缓存
-    public boolean updateEvent(Event event) throws Exception {
-        boolean result = eventDataMapper.updateEvent(event);
-        if (result) {
-            // 更新缓存
-            eventCache.put(event.getId(), event);
-        }
+    public boolean updateEvent(Event event,Connection connection) throws Exception {
+        boolean result = eventDataMapper.updateEvent(event,connection);
         return result;
     }
 
-    public Event lazyLoadClub(Event event){
+    public Event lazyLoadClub(Event event,Connection connection){
 
         try {
-            Club club = clubDataMapper.findClubById(event.getClubId());
+            Club club = clubDataMapper.findClubById(event.getClubId(),connection);
             System.out.println(club);
             event.setClub(club);
 //            eventCache.put(event.getId(),event);

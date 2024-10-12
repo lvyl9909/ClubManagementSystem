@@ -65,19 +65,19 @@ public class ContextListener implements ServletContextListener {
         EventRepository eventRepository = EventRepository.getInstance(eventDataMapper,venueDataMapper,clubDataMapper);
         FundingApplicationRepository fundingApplicationRepository = FundingApplicationRepository.getInstance(fundingApplicationMapper);
         RSVPRepository rsvpRepository = RSVPRepository.getInstance(rsvpDataMapper);
-        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
+        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper,databaseConnectionManager);
         StudentRepository studentRepository = StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper,fundingApplicationMapper);
         ClubRepository clubRepository = ClubRepository.getInstance(clubDataMapper,eventDataMapper,fundingApplicationMapper,studentRepository,studentClubDataMapper);
         TicketRepository ticketRepository = TicketRepository.getInstance(ticketDataMapper);
         VenueRepository venueRepository = VenueRepository.getInstance(venueDataMapper);
 
-        ClubService clubService = ClubService.getInstance(clubRepository,studentRepository);
+        ClubService clubService = ClubService.getInstance(clubRepository,studentRepository,databaseConnectionManager);
         EventService eventService = EventService.getInstance(eventRepository,rsvpRepository,ticketRepository,venueRepository,clubRepository,databaseConnectionManager);
         FundingApplicationService fundingApplicationService =FundingApplicationService.getInstance(fundingApplicationRepository,clubRepository);
         RSVPService rsvpService = RSVPService.getInstance(rsvpRepository);
         StudentClubService studentClubService = StudentClubService.getInstance(studentClubRepository,clubRepository,studentRepository);
         StudentService studentService =StudentService.getInstance(studentRepository);
-        VenueService venueService = VenueService.getInstance(venueRepository);
+        VenueService venueService = VenueService.getInstance(venueRepository,databaseConnectionManager);
         TicketService ticketService = TicketService.getInstance(ticketRepository,studentRepository,eventDataMapper,databaseConnectionManager);
         CustomUserDetailsService customUserDetailsService = CustomUserDetailsService.getInstance(studentRepository,studentClubRepository);
 

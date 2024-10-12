@@ -170,7 +170,7 @@ public class EventController extends HttpServlet {
 
             List<Integer> participatesId = (List<Integer>) jsonMap.get("participants_id");
             System.out.println("participant:"+participatesId);
-            eventService.applyForRSVP(eventId, Math.toIntExact(studentService.getCurrentStudent().getId()), numTickets, participatesId);
+            eventService.applyForRSVP(eventId, Math.toIntExact(studentService.getCurrentStudent().getId()), numTickets, participatesId,1);
             return ResponseEntity.ok(null); // 成功返回空响应
         } catch (NotEnoughTicketsException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
@@ -227,7 +227,7 @@ public class EventController extends HttpServlet {
         Event event = null;
         try {
             event = eventService.getEventById(eventId);
-            Integer currentCapacity = eventService.getCurrentCapacity(event);
+            Integer currentCapacity = event.getCapacity();
             event.setCurrentCapacity(currentCapacity);
             return ResponseEntity.ok(event);
         }catch (NumberFormatException e) {

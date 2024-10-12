@@ -66,7 +66,7 @@ public class WebSecurityConfig implements ServletContextAware {
         FundingApplicationMapper fundingApplicationMapper = FundingApplicationMapper.getInstance(databaseConnectionManager);
 
         StudentRepository userRepository =  StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper,fundingApplicationMapper);
-        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
+        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper,databaseConnectionManager);
         return new CustomUserDetailsService(userRepository,studentClubRepository);
     }
     //未认证的入口

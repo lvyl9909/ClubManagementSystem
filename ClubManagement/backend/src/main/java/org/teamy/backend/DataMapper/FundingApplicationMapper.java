@@ -93,8 +93,7 @@ public class FundingApplicationMapper {
         }
     }
 
-    public List<Integer> findApplicationIdByClubId(Integer clubId){
-        var connection = databaseConnectionManager.nextConnection();
+    public List<Integer> findApplicationIdByClubId(Integer clubId,Connection connection){
         List<Integer> applicationsId= new ArrayList<>();
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT application_id FROM fundingapplications WHERE club = ?");
@@ -106,9 +105,6 @@ public class FundingApplicationMapper {
             return applicationsId;
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            databaseConnectionManager.releaseConnection(connection);
-
         }
     }
     public List<Integer> findApplicationIdByReviewerId(Integer reviewerId){

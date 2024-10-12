@@ -45,7 +45,6 @@ public class TicketRepository {
     public void saveTicket(Connection connection,Ticket ticket) {
         try {
             ticketDataMapper.saveTicket(connection,ticket);
-            ticketCache.put(ticket.getId(), ticket); // Update cache
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -71,8 +70,8 @@ public class TicketRepository {
         ticketCache.invalidate(ticketId); // Remove from cache
     }
 
-    public List<Ticket> getTicketsFromEvent(Integer eventId) throws SQLException {
-        return ticketDataMapper.getTicketsFromEvent(eventId);
+    public List<Ticket> getTicketsFromEvent(Integer eventId,Connection connection) throws SQLException {
+        return ticketDataMapper.getTicketsFromEvent(eventId,connection);
     }
 
     public List<Ticket> getTicketsFromEvent(Connection connection,Integer eventId) throws SQLException {

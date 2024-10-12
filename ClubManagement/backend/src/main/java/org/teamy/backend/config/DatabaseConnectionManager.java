@@ -9,7 +9,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 public class DatabaseConnectionManager {
-    private static final int MAX_CONNECTIONS = 10;
+    private static final int MAX_CONNECTIONS = 20;
     private static final Duration ACQUIRE_CONNECTION_TIMEOUT = Duration.ofMillis(100);
     private final String url;
     private final String username;
@@ -43,17 +43,27 @@ public class DatabaseConnectionManager {
     }
     public Connection nextConnection() {
         try {
-            return connectionPool.poll(ACQUIRE_CONNECTION_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
+            Connection connection = connectionPool.poll(ACQUIRE_CONNECTION_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
+            if (connection == null) {
+                throw new RuntimeException("Failed to acquire connection from pool. Pool may be exhausted.");
+            }
+            if (connection.isClosed() || !connection.isValid(2)) {
+                connection = connect();  // 创建新连接替换无效连接
+            }
+            return connection;
+        } catch (InterruptedException | SQLException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error acquiring connection", e);
         }
     }
 
     public void releaseConnection(Connection connection) {
         try {
+            if (connection.isClosed() || !connection.isValid(2)) {  // 2 秒的超时检测
+                connection = connect();  // 如果连接无效，重新创建连接
+            }
             connectionPool.offer(connection, ACQUIRE_CONNECTION_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | SQLException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }

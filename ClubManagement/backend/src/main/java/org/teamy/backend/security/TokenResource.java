@@ -134,24 +134,6 @@ public class TokenResource extends HttpServlet {
                     Arrays.stream(cookies).forEach(cookie ->
                             System.out.println("Cookie Name: " + cookie.getName() + ", Cookie Value: " + cookie.getValue()));
                 }
-
-
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-                    System.out.println("当前用户：" + authentication.getName());
-                    System.out.println("权限列表：" + authentication.getAuthorities());
-
-                    System.out.println("用户的权限：");
-                    for (GrantedAuthority authority : authentication.getAuthorities()) {
-                        System.out.println(authority.getAuthority());
-                    }
-                } else {
-                    System.out.println("没有可用的身份验证信息");
-                    throw new ForbiddenException();
-                }
-
-
-
                 var refreshToken = getRefreshCookie(req);
                 System.out.println(refreshToken);
                 var token = jwtTokenService.refresh(refreshRequest.getAccessToken(), refreshToken);
@@ -211,12 +193,30 @@ public class TokenResource extends HttpServlet {
     }
 
     private String getRefreshCookie(HttpServletRequest req) {
+        Cookie[] cookies = Optional.ofNullable(req.getCookies()).orElse(new Cookie[]{});
+        System.out.println("Total cookies: " + cookies.length);
 
-        return Arrays.stream(Optional.ofNullable(req.getCookies()).orElse(new Cookie[]{}))
-                .filter(c -> c.getName().equals(COOKIE_NAME_REFRESH_TOKEN))
+        // Step 2: 打印每个 cookie 的名称和值
+        Arrays.stream(cookies).forEach(cookie ->
+                System.out.println("Cookie Name: " + cookie.getName() + ", Cookie Value: " + cookie.getValue())
+        );
+
+        // Step 3: 查找特定的 refresh token cookie
+        return Arrays.stream(cookies)
+                .filter(c -> {
+                    boolean isMatch = c.getName().equals(COOKIE_NAME_REFRESH_TOKEN);
+                    System.out.println("Checking cookie: " + c.getName() + ", Match: " + isMatch);
+                    return isMatch;
+                })
                 .findFirst()
-                .map(Cookie::getValue)
-                .orElseThrow(() -> new BadCredentialsException("no refresh cookie set"));
+                .map(cookie -> {
+                    System.out.println("Found refresh token cookie: " + cookie.getValue());
+                    return cookie.getValue();
+                })
+                .orElseThrow(() -> {
+                    System.out.println("No refresh token cookie found");
+                    return new BadCredentialsException("No refresh cookie set");
+                });
     }
 
 

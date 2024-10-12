@@ -45,13 +45,12 @@ public class EventDataMapper {
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
                         rs.getInt("capacity"),
-                        rs.getInt("version")
+                        rs.getInt("capacity_version"),
+                        rs.getInt("event_version")
                 );
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            databaseConnectionManager.releaseConnection(connection);
         }
         return null;
     }
@@ -85,7 +84,8 @@ public class EventDataMapper {
                         rs.getInt("club_id"),
                         rs.getString("status"),       // 根据需要将字符串转换为 Enum
                         rs.getInt("capacity"),
-                        rs.getInt("version")
+                        rs.getInt("capacity_version"),
+                        rs.getInt("event_version")
                 );
                 events.add(event);
             }
@@ -135,7 +135,8 @@ public class EventDataMapper {
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
                         rs.getInt("capacity"),
-                        rs.getInt("version")
+                        rs.getInt("capacity_version"),
+                        rs.getInt("event_version")
                 );
                 events.add(event);
             }
@@ -190,7 +191,8 @@ public class EventDataMapper {
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
                         rs.getInt("capacity"),
-                        rs.getInt("version")
+                        rs.getInt("capacity_version"),
+                        rs.getInt("event_version")
                 );
                 events.add(event);
             }
@@ -203,11 +205,11 @@ public class EventDataMapper {
 
         return events;
     }
-    public boolean updateEvent(Event event) throws Exception {
-        var connection = databaseConnectionManager.nextConnection();
+    public boolean updateEvent(Event event, Connection connection) throws Exception {
 
-        // SQL 更新语句，更新指定的事件
-        String query = "UPDATE events SET title = ?, description = ?, date = ?, time = ?, venue = ?, cost = ?, club_id = ?, status = ?::event_status,capacity = ? WHERE event_id = ?";
+        // SQL 更新语句，更新指定的事件，检查 version
+        String query = "UPDATE events SET title = ?, description = ?, date = ?, time = ?, venue = ?, cost = ?, club_id = ?, status = ?::event_status, capacity = ?, event_version = event_version + 1 WHERE event_id = ? AND event_version = ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, event.getTitle());
             stmt.setString(2, event.getDescription());
@@ -217,28 +219,31 @@ public class EventDataMapper {
             stmt.setBigDecimal(6, event.getCost());
             stmt.setInt(7, event.getClubId());
             stmt.setString(8, event.getStatus().name());  // 假设状态是枚举类型
-            stmt.setInt(9,event.getCapacity());
+            stmt.setInt(9, event.getCapacity());
             stmt.setInt(10, event.getId());  // 使用 eventId 作为更新条件
+            stmt.setInt(11, event.getEventVersion());  // 传入当前版本号，乐观锁控制
+            System.out.println(event.getEventVersion());
 
             // 执行更新操作
             int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                // 如果更新失败，说明版本不匹配
+                throw new OptimisticLockingFailureException("Failed to update event: version mismatch.");
+            }
             return rowsAffected > 0;  // 返回是否成功更新
         } catch (SQLException e) {
             e.printStackTrace();
             throw new Exception("Error updating event: " + e.getMessage());
-        } finally {
-            // 释放数据库连接
-            databaseConnectionManager.releaseConnection(connection);
         }
     }
 
     public boolean updateEventCapacity(Event event, Connection connection) throws Exception {
         // SQL 更新语句，使用 version 进行乐观锁控制
-        String query = "UPDATE events SET capacity = ?, version = version + 1 WHERE event_id = ? AND version = ?";
+        String query = "UPDATE events SET capacity = ?, capacity_version = capacity_version + 1 WHERE event_id = ? AND capacity_version = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, event.getCapacity());       // 设置新的 capacity
             stmt.setInt(2, event.getId());             // 使用 eventId 作为更新条件
-            stmt.setInt(3, event.getVersion());        // 使用当前的 version 作为乐观锁检查条件
+            stmt.setInt(3, event.getCapacityVersion());        // 使用当前的 version 作为乐观锁检查条件
 
             // 执行更新操作
             int rowsAffected = stmt.executeUpdate();
@@ -248,16 +253,15 @@ public class EventDataMapper {
             }
 
             // 更新成功后，递增 event 的本地 version
-            event.setVersion(event.getVersion() + 1);
+            event.setCapacityVersion(event.getCapacityVersion() + 1);
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new Exception("Error updating event capacity: " + e.getMessage());
+            throw new OptimisticLockingFailureException("Error updating event capacity: " + e.getMessage());
         }
     }
 
-    public List<Integer> findEventIdByClubId(Integer clubId){
-        var connection = databaseConnectionManager.nextConnection();
+    public List<Integer> findEventIdByClubId(Integer clubId,Connection connection){
         List<Integer> eventsId= new ArrayList<>();
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT event_id FROM events WHERE club_id = ?");
@@ -269,9 +273,6 @@ public class EventDataMapper {
             return eventsId;
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            databaseConnectionManager.releaseConnection(connection);
-
         }
     }
 }
