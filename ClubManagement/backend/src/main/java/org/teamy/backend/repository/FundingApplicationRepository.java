@@ -21,8 +21,8 @@ public class FundingApplicationRepository {
         }
         return instance;
     }
-    public FundingApplication findFundingApplicationsByIds(int Id) {
-        return fundingApplicationMapper.findFundingApplicationsByIds(Id);
+    public FundingApplication findFundingApplicationsByIds(int Id,Connection connection) {
+        return fundingApplicationMapper.findFundingApplicationsByIds(Id,connection);
     }
     public List<FundingApplication> getAllFundingApplication() {
         try {
@@ -39,13 +39,17 @@ public class FundingApplicationRepository {
         return fundingApplicationMapper.saveFundingApplication(fundingApplication, conn);
     }
 
-    public boolean approveFundingApplication(int reviewerId,int applicationId){
-        return fundingApplicationMapper.approveFundingApplication(applicationId,reviewerId);
+    public boolean reviewFundingApplication(int reviewerId,FundingApplication application,String stat,Connection connection){
+        return fundingApplicationMapper.reviewFundingApplication(application,reviewerId,stat,connection);
     }
     public boolean rejectFundingApplication(int reviewerId,int applicationId){
         return fundingApplicationMapper.rejectFundingApplication(applicationId,reviewerId);
     }
-    public boolean updateFundingApplication(FundingApplication fundingApplication) throws Exception {
-        return fundingApplicationMapper.updateFundingApplication(fundingApplication);
+    public boolean updateFundingApplication(FundingApplication fundingApplication,Connection connection) throws Exception {
+        return fundingApplicationMapper.updateFundingApplication(fundingApplication,connection);
+    }
+
+    public boolean existsByClubIdAndSemester(Integer clubId, Integer semester, Connection connection) throws SQLException {
+        return fundingApplicationMapper.existsByClubIdAndSemester(clubId,semester,connection);
     }
 }

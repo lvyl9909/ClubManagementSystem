@@ -24,22 +24,12 @@ public class ClubRepository {
     private final StudentClubDataMapper studentsClubsDataMapper;
     private static ClubRepository instance;
 
-    private final Cache<Integer, Club> clubCache;
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
-
     private ClubRepository(ClubDataMapper clubDataMapper, EventDataMapper eventDataMapper, FundingApplicationMapper fundingApplicationMapper, StudentRepository studentRepository, StudentClubDataMapper studentsClubsDataMapper) {
         this.clubDataMapper = clubDataMapper;
         this.eventDataMapper = eventDataMapper;
         this.fundingApplicationMapper = fundingApplicationMapper;
         this.studentRepository = studentRepository;
         this.studentsClubsDataMapper = studentsClubsDataMapper;
-
-        // Initialize cache with max size and expiration time
-        this.clubCache = CacheBuilder.newBuilder()
-                .maximumSize(100) // Maximum 100 clubs in the cache
-                .expireAfterWrite(30, TimeUnit.MINUTES) // Expire entries after 10 minutes
-                .build();
     }
     public static synchronized ClubRepository getInstance(ClubDataMapper clubDataMapper, EventDataMapper eventDataMapper, FundingApplicationMapper fundingApplicationMapper, StudentRepository studentRepository, StudentClubDataMapper studentsClubsDataMapper) {
         if (instance == null) {
@@ -63,10 +53,6 @@ public class ClubRepository {
     }
     public boolean saveClub(Club club) throws Exception {
         boolean result = clubDataMapper.saveClub(club);
-        if (result) {
-            // Update cache after saving
-            clubCache.put(club.getId(), club);
-        }
         return result;
     }
     public List<Club> getAllClub() {
@@ -87,8 +73,6 @@ public class ClubRepository {
         try {
             List<Event> events = eventDataMapper.findEventsByIds(club.getEventsId());
             club.setEvents(events);
-
-            clubCache.put(club.getId(),club);
         } catch (SQLException e) {
             throw new RuntimeException("Error loading students for club", e);
         }
@@ -99,15 +83,9 @@ public class ClubRepository {
             List<FundingApplication> fundingApplications =
                     fundingApplicationMapper.findFundingApplicationsByIds(club.getFundingApplicationsId());
             club.setFundingApplications(fundingApplications);
-
-            clubCache.put(club.getId(),club);
         } catch (SQLException e) {
             throw new RuntimeException("Error loading Application for club", e);
         }
         return club;
-    }
-    // 失效Club缓存的操作
-    public void invalidateClubCache(Integer clubId) {
-        clubCache.invalidate(clubId);
     }
 }

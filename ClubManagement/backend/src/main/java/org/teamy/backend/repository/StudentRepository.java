@@ -17,8 +17,6 @@ public class StudentRepository {
     private final StudentClubDataMapper studentsClubsDataMapper;
     private final FundingApplicationMapper fundingApplicationMapper;
     private static StudentRepository instance;
-    private final Cache<Integer, Student> studentCache;
-
     private StudentRepository(ClubDataMapper clubDataMapper,
                               RSVPDataMapper rsvpDataMapper,
                               TicketDataMapper ticketDataMapper,
@@ -30,12 +28,6 @@ public class StudentRepository {
         this.studentDataMapper = studentDataMapper;
         this.studentsClubsDataMapper = studentsClubsDataMapper;
         this.fundingApplicationMapper = fundingApplicationMapper;
-
-        // Initialize cache with max size and expiration time
-        this.studentCache = CacheBuilder.newBuilder()
-                .maximumSize(100) // Maximum 100 students in the cache
-                .expireAfterWrite(30, TimeUnit.MINUTES) // Expire cache entries after 10 minutes
-                .build();
     }
     public static synchronized StudentRepository getInstance(ClubDataMapper clubDataMapper,
                                                              RSVPDataMapper rsvpDataMapper,
@@ -50,20 +42,13 @@ public class StudentRepository {
     // Find student by ID with caching
     public Student findStudentById(int id) throws SQLException {
         // Check the cache first
-        Student student = studentCache.getIfPresent(id);
-        if (student != null) {
-            return student; // Return cached student if available
-        }
-
+        Student student;
         // If not in cache, fetch from the database and cache the result
         student = studentDataMapper.findStudentById(id);
         if (student != null) {
             student.setClubId(studentsClubsDataMapper.findClubIdByStudentId(id));
             student.setRsvpsId(rsvpDataMapper.findRSVPIdByStudentId(id));
             student.setTicketsId(ticketDataMapper.getTicketsIdFromStudent(id));
-
-            // Add to cache
-            studentCache.put(id, student);
         }
 
         return student;
@@ -76,9 +61,6 @@ public class StudentRepository {
                 student.setClubId(studentsClubsDataMapper.findClubIdByStudentId(Math.toIntExact(student.getId())));
                 student.setRsvpsId(rsvpDataMapper.findRSVPIdByStudentId(Math.toIntExact(student.getId())));
                 student.setTicketsId(ticketDataMapper.getTicketsIdFromStudent(Math.toIntExact(student.getId())));
-
-                // Add each student to the cache
-                studentCache.put(Math.toIntExact(student.getId()), student);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -117,10 +99,6 @@ public class StudentRepository {
             List<Club> clubs = clubDataMapper.findClubsByIds(student.getClubId());
             System.out.println("club list:" + clubs);
             student.setClubs(clubs);
-
-            // 懒加载之后，将更新后的学生对象写入缓存
-            studentCache.put(Math.toIntExact(student.getId()), student);
-
         } catch (SQLException e) {
             throw new RuntimeException("Error loading students for club", e);
         }
@@ -132,10 +110,6 @@ public class StudentRepository {
             System.out.println("lazyloadticket: getticketid"+student.getTicketsId());
             List<Ticket> tickets = ticketDataMapper.findTicketsByIds(student.getTicketsId());
             student.setTickets(tickets);
-
-            // 更新缓存中的学生对象
-            studentCache.put(Math.toIntExact(student.getId()), student);
-
         } catch (SQLException e) {
             throw new RuntimeException("Error loading tickets for student", e);
         }
@@ -146,22 +120,9 @@ public class StudentRepository {
             // 从数据库加载 RSVP 数据
             List<RSVP> rsvps = rsvpDataMapper.findRSVPsByIds(student.getRsvpsId());
             student.setRsvps(rsvps);
-
-            // 更新缓存中的学生对象
-            studentCache.put(Math.toIntExact(student.getId()), student);
-
         } catch (SQLException e) {
             throw new RuntimeException("Error loading RSVPs for student", e);
         }
         return student;
-    }
-
-    public void invalidateStudentCache(Integer studentId) {
-        studentCache.invalidate(studentId);
-    }
-    public void invalidateStudentCaches(List<Integer> studentsId) {
-        for (Integer studentId:studentsId){
-            studentCache.invalidate(studentId);
-        }
     }
 }

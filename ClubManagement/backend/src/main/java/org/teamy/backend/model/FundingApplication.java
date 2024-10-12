@@ -19,8 +19,9 @@ public class FundingApplication extends DomainObject {
     private FacultyAdministrator reviewer;
     private Integer reviewerId;
 
+    private Integer version;
 
-    public FundingApplication(Integer id,String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date, Integer reviewerId) {
+    public FundingApplication(Integer id,String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date, Integer reviewerId,Integer version) {
         this.setId(id);
         this.description = description;
         this.amount = amount;
@@ -29,6 +30,7 @@ public class FundingApplication extends DomainObject {
         this.status = status;
         this.date = date.toString();
         this.reviewerId = reviewerId;
+        this.version = version;
     }
 
     public FundingApplication(String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date) {
@@ -42,6 +44,14 @@ public class FundingApplication extends DomainObject {
     }
 
     public FundingApplication() {
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     public String getDescription() {

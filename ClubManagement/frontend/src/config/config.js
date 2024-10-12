@@ -13,7 +13,7 @@ export default [
         label: 'Club',
         icon: 'ShopOutlined',
         url: '/club/index',
-        roles: ['ROLE_ADMIN'], // 仅管理员可以看到
+        roles: ['ROLE_USER'], // 仅管理员可以看到
     },
     {
         path: '/event',

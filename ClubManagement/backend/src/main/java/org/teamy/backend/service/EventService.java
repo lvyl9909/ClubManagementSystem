@@ -94,7 +94,6 @@ public class EventService {
             System.out.println("pass test");
             boolean isSuccess =  eventRepository.saveEvent(event);
             System.out.println("save");
-            clubRepository.invalidateClubCache(event.getClubId());
             return isSuccess;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -121,6 +120,8 @@ public class EventService {
         Connection connection = databaseConnectionManager.nextConnection();
         try{
             connection.setAutoCommit(false);  // 关闭自动提交，手动管理事务
+            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
             // 检查事件是否存在
             Event existingEvent = eventRepository.findEventById(event.getId(),connection);
             if (existingEvent == null) {
@@ -169,6 +170,7 @@ public class EventService {
                     // 确保在执行任何事务之前禁用自动提交
                     if (connection.getAutoCommit()) {
                         connection.setAutoCommit(false);  // 禁用自动提交，手动管理事务
+                        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
                     }
                     // 1. 查找 Event 并更新其容量（使用乐观锁控制）
                     Event event = eventRepository.findEventById(eventId,connection);

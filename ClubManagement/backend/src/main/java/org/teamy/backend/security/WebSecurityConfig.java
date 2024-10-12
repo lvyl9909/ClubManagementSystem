@@ -88,7 +88,7 @@ public class WebSecurityConfig implements ServletContextAware {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, TokenAuthenticationFilter tokenAuthenticationFilter, AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
         return http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .and()
                 .exceptionHandling()
                 .defaultAuthenticationEntryPointFor(authenticationEntryPoint, PROTECTED_URLS)
@@ -120,6 +120,7 @@ public class WebSecurityConfig implements ServletContextAware {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        System.out.println("Allowed Origin: " + System.getProperty(PROPERTY_CORS_ORIGINS_UI));
         configuration.setAllowedOrigins(Arrays.asList(System.getProperty(PROPERTY_CORS_ORIGINS_UI)));
         configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT","DELETE"));

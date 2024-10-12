@@ -11,15 +11,13 @@ const ViewFunding = () => {
     const path = process.env.REACT_APP_API_BASE_URL;
 
     useEffect(() => {
+        console.log(user);
 
-        console.log(user)
         const fetchFundingApplications = async () => {
             setLoading(true);
             try {
-                // 调用后端 API 获取所有资金申请数据
-                const response = await doCall(`${path}/admin/fundingapplication`, 'GET',{
-                    credentials: 'include' // 确保发送 cookies
-                });
+                // 硬编码路径或使用外部常量
+                const response = await doCall(`${path}/admin/fundingapplication`, 'GET');
                 if (response.ok) {
                     const data = await response.json(); // 解析 JSON 数据
                     console.log(data);
@@ -35,8 +33,9 @@ const ViewFunding = () => {
             }
         };
 
-        fetchFundingApplications();
-    }, [path]);
+        fetchFundingApplications(); // 无需依赖 path，直接调用
+
+    }, []);
 
     // Approve Funding Application
     const handleApprove = async (applicationId) => {

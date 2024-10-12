@@ -20,19 +20,11 @@ public class EventRepository {
     private final ClubDataMapper clubDataMapper;
 
     private static EventRepository instance;
-    private final Cache<Integer, Event> eventCache;
-
 
     private EventRepository(EventDataMapper eventDataMapper, VenueDataMapper venueDataMapper, ClubDataMapper clubDataMapper) {
         this.eventDataMapper = eventDataMapper;
         this.venueDataMapper = venueDataMapper;
         this.clubDataMapper = clubDataMapper;
-
-        // 初始化缓存，设置最大容量和过期时间
-        this.eventCache = CacheBuilder.newBuilder()
-                .maximumSize(100) // 最大缓存100个事件
-                .expireAfterWrite(30, TimeUnit.MINUTES) // 缓存条目在10分钟后过期
-                .build();
     }
     public static synchronized EventRepository getInstance(EventDataMapper eventDataMapper, VenueDataMapper venueDataMapper, ClubDataMapper clubDataMapper){
         if (instance == null){
@@ -58,7 +50,6 @@ public class EventRepository {
     public void deleteEvent(Connection connection,int eventId) {
         eventDataMapper.deleteEvent(connection,eventId);
         // 从缓存中移除对应的事件
-        eventCache.invalidate(eventId);
     }    public List<Event> findEventsByTitle(String title) throws SQLException {
         return eventDataMapper.findEventsByTitle(title);
     }
@@ -97,8 +88,5 @@ public class EventRepository {
     public boolean updateCapacity(Event event,Connection connection) throws Exception {
         boolean result = eventDataMapper.updateEventCapacity(event,connection);
         return result;
-    }
-    public void invalidateEventCache(Integer eventId) {
-        eventCache.invalidate(eventId);
     }
 }

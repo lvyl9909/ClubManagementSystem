@@ -110,17 +110,23 @@ public class RSVPConcurrencyTest {
         // 提交并发任务
         List<Future<Boolean>> futures = new ArrayList<>();
         for (int i = 0; i < numberOfThreads; i++) {
+            final int index=i;
             final int currentStudentId = studentId + i;  // 模拟不同的学生 ID
             Callable<Boolean> task = () -> {
+                long startTime = System.currentTimeMillis(); // 记录开始时间
                 try {
-                    Thread.sleep(random.nextInt(500));  // 0 到 500 毫秒的随机延迟
-
                     // 调用 applyForRSVP 方法
-                    eventService.applyForRSVP(eventId, currentStudentId, numTickets, participates_id,8);
+                    eventService.applyForRSVP(eventId, currentStudentId, numTickets, participates_id,3);
                     return true;  // 成功
                 } catch (Exception e) {
                     System.err.println("Error applying for RSVP: " + e.getMessage());
                     return false;  // 失败
+                }finally {
+                    long lockAcquiredTime = System.currentTimeMillis(); // 获取锁之后的时间
+
+                    // 计算完成时间
+                    long waitTime = lockAcquiredTime - startTime;
+                    System.out.println("Thread " + index + " waited " + waitTime + " ms to acquire the lock");
                 }
             };
             futures.add(executorService.submit(task));

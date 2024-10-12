@@ -77,7 +77,7 @@ public class AdminController extends HttpServlet {
                 throw new IllegalArgumentException("Missing 'id' parameter.");
             }
 
-            fundingApplicationService.approveFundingApplication(Integer.valueOf(idParam),Math.toIntExact(facultyAdministrator.getId()));
+            fundingApplicationService.reviewFundingApplication(Integer.valueOf(idParam),Math.toIntExact(facultyAdministrator.getId()),"Approved");
             return ResponseEntity.ok(null);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
@@ -118,7 +118,7 @@ public class AdminController extends HttpServlet {
                 throw new IllegalArgumentException("Missing 'id' parameter.");
             }
 
-            fundingApplicationService.rejectFundingApplication(Integer.valueOf(idParam),Math.toIntExact(facultyAdministrator.getId()));
+            fundingApplicationService.reviewFundingApplication(Integer.valueOf(idParam),Math.toIntExact(facultyAdministrator.getId()),"Rejected");
             return ResponseEntity.ok(null);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,

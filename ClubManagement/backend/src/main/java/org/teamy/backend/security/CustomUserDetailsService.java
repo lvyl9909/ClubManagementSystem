@@ -57,8 +57,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                     roles.add(new Role("ADMIN"));
                     System.out.println("add role administrator:"+user.getAuthorities());
                     user.setRoles(roles);
-
-
                }
                 System.out.println("yong hu quan xian :"+user.getAuthorities());
                 System.out.println(user.getPassword());

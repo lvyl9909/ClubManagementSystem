@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.*;
 
 public class FundingApplicationConcurrencyTest {
@@ -97,7 +98,7 @@ public class FundingApplicationConcurrencyTest {
         venueRepository = VenueRepository.getInstance(venueDataMapper);
         fundingApplicationRepository = FundingApplicationRepository.getInstance(fundingApplicationMapper);
 
-        fundingApplicationService = FundingApplicationService.getInstance(fundingApplicationRepository, clubRepository);
+        fundingApplicationService = FundingApplicationService.getInstance(fundingApplicationRepository, clubRepository,databaseConnectionManager);
 
     }
 
@@ -127,10 +128,11 @@ public class FundingApplicationConcurrencyTest {
         for (int i = 0; i < numberOfThreads; i++) {
             final int index = i;
             Callable<Boolean> task = () -> {
+                long startTime = System.currentTimeMillis(); // 记录开始时间
+
                 try (Connection conn = databaseConnectionManager.nextConnection()) {
                     // 模拟锁持有时间，延长锁持有时间
-                    Thread.sleep(2000); // 2秒，模拟一个较长的操作
-
+                    Thread.sleep(200); // 0.2秒，模拟一个较长的操作
 
                     // 调用 saveFundingApplication 方法
                     return fundingApplicationService.saveFundingApplication(applications.get(index), conn);
@@ -142,6 +144,12 @@ public class FundingApplicationConcurrencyTest {
                     System.err.println("Error saving funding application for thread " + index + ": " + e.getMessage());
                     e.printStackTrace();
                     return false;
+                }finally {
+                    long lockAcquiredTime = System.currentTimeMillis(); // 获取锁之后的时间
+
+                    // 计算完成时间
+                    long waitTime = lockAcquiredTime - startTime;
+                    System.out.println("Thread " + index + " waited " + waitTime + " ms to acquire the lock");
                 }
             };
             futures.add(executorService.submit(task));
@@ -173,5 +181,107 @@ public class FundingApplicationConcurrencyTest {
         // 添加断言
         assert successCount > 0 : "At least one operation should succeed";
         assert failureCount >= 0 : "Some operations may fail due to lock contention";
+    }
+
+    @Test
+    public void testConcurrentFundingApplicationReviews() throws InterruptedException, ExecutionException {
+        int numberOfThreads = 10;  // 模拟 10 个线程并发审核
+        int applicationId = 22;     // 假设测试的 funding application ID 为 1
+        int reviewerId = 1;        // 假设测试的 reviewer ID 为 1
+
+        // 创建线程池
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+
+        // 创建任务列表
+        List<Callable<Boolean>> tasks = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < numberOfThreads; i++) {
+            final int threadNumber = i;
+            Callable<Boolean> task = () -> {
+                try {
+                    // 随机设置状态为 Approved 或 Rejected
+                    String status = random.nextBoolean() ? "Approved" : "Rejected";
+                    System.out.println("Thread " + threadNumber + " is reviewing the funding application with status: " + status);
+
+                    // 调用审核资金申请的方法
+                    fundingApplicationService.reviewFundingApplication(applicationId, reviewerId, status);
+
+                    System.out.println("Thread " + threadNumber + " finished with status: " + status);
+                    return true;
+                } catch (Exception e) {
+                    System.err.println("Thread " + threadNumber + " encountered an error: " + e.getMessage());
+                    return false;
+                }
+            };
+            tasks.add(task);
+        }
+
+        // 提交所有任务
+        List<Future<Boolean>> futures = executorService.invokeAll(tasks);
+
+        // 检查所有线程是否成功执行
+        for (int i = 0; i < numberOfThreads; i++) {
+            Future<Boolean> future = futures.get(i);
+            if (future.get()) {
+                System.out.println("Thread " + i + " succeeded.");
+            } else {
+                System.out.println("Thread " + i + " failed.");
+            }
+        }
+
+        // 关闭线程池
+        executorService.shutdown();
+    }
+
+    @Test
+    public void testConcurrentUpdateFundingApplications() throws InterruptedException, ExecutionException {
+        int numberOfThreads = 10;  // 模拟 10 个线程并发更新
+        int applicationId = 16;     // 假设测试的 funding application ID 为 1
+
+        // 创建线程池
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+
+        // 创建任务列表
+        List<Callable<Boolean>> tasks = new ArrayList<>();
+
+        for (int i = 0; i < numberOfThreads; i++) {
+            final int threadNumber = i;
+            Callable<Boolean> task = () -> {
+                try {
+                    // 构造一个模拟的 FundingApplication 对象，每个线程可以模拟不同的更新
+                    FundingApplication application = fundingApplicationService.findFundingApplicationById(applicationId);
+
+                    application.setAmount(BigDecimal.valueOf(1000));
+                    System.out.println("Thread " + threadNumber + " is updating the funding application.");
+
+                    // 调用 updateFundingApplication 方法进行更新
+                    boolean success = fundingApplicationService.updateFundingApplication(application);
+
+                    System.out.println("Thread " + threadNumber + " finished. Success: " + success);
+                    return success;
+                } catch (Exception e) {
+                    System.err.println("Thread " + threadNumber + " encountered an error: " + e.getMessage());
+                    return false;
+                }
+            };
+            tasks.add(task);
+        }
+
+        // 提交所有任务
+        List<Future<Boolean>> futures = executorService.invokeAll(tasks);
+
+        // 检查所有线程是否成功执行
+        for (int i = 0; i < numberOfThreads; i++) {
+            Future<Boolean> future = futures.get(i);
+            if (future.get()) {
+                System.out.println("Thread " + i + " succeeded.");
+            } else {
+                System.out.println("Thread " + i + " failed.");
+            }
+        }
+
+        // 关闭线程池
+        executorService.shutdown();
     }
 }
