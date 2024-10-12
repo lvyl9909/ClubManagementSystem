@@ -4,7 +4,9 @@ import org.teamy.backend.DataMapper.FundingApplicationMapper;
 import org.teamy.backend.model.Event;
 import org.teamy.backend.model.FundingApplication;
 import org.teamy.backend.repository.*;
+import org.teamy.backend.concurrent.LockManagerWait;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -22,29 +24,50 @@ public class FundingApplicationService {
         this.fundingApplicationRepository = fundingApplicationRepository;
         this.clubRepository = clubRepository;
     }
-    public boolean saveFundingApplication(FundingApplication fundingApplication) throws Exception {
-        // You can add additional business logic here, such as data validation
-        if (fundingApplication ==null) {
-            throw new IllegalArgumentException("Club cannot be empty");
+    public boolean saveFundingApplication(FundingApplication fundingApplication, Connection conn) throws Exception {
+        if (fundingApplication == null) {
+            throw new IllegalArgumentException("Funding application cannot be null");
         }
 
-        // Recall methods in DAO layer
+        String clubId = String.valueOf(fundingApplication.getClubId());
+        String threadName = Thread.currentThread().getName();
+
         try {
-            boolean isSuccess =  fundingApplicationRepository.saveFundingApplication(fundingApplication);
-            clubRepository.invalidateClubCache(fundingApplication.getClubId());
+            // Start of thread-level locking
+            LockManagerWait.getInstance().acquireLock(clubId, threadName);
+
+            conn.setAutoCommit(false);
+
+            // Lock the funding application at the database level to prevent concurrent submissions
+            fundingApplicationRepository.lockFundingApplicationByClubId(fundingApplication.getClubId(), conn);
+
+            // Save the funding application
+            boolean isSuccess = fundingApplicationRepository.saveFundingApplication(fundingApplication, conn);
+
+            // Commit the transaction
+            conn.commit();
+
             return isSuccess;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            conn.rollback();
+            throw new RuntimeException("Error saving funding application: " + e.getMessage(), e);
+        } finally {
+            // Release the thread-level lock
+            LockManagerWait.getInstance().releaseLock(clubId, threadName);
+
+            conn.setAutoCommit(true);
         }
     }
 
-    public List<FundingApplication> getAllFundingApplication(){
+
+    public List<FundingApplication> getAllFundingApplication() {
         try {
             return fundingApplicationRepository.getAllFundingApplication();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
 
     public void approveFundingApplication(int applicationId,int reviewerId){
         fundingApplicationRepository.approveFundingApplication(reviewerId,applicationId);

@@ -1,6 +1,7 @@
 package org.teamy.backend.model;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.SimpleTimeZone;
@@ -30,14 +31,14 @@ public class FundingApplication extends DomainObject {
         this.reviewerId = reviewerId;
     }
 
-    public FundingApplication(String description, BigDecimal amount, Integer semester, Club club, fundingApplicationStatus status, Date date) {
+    public FundingApplication(String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date) {
         this.description = description;
         this.amount = amount;
         this.semester = semester;
-        this.club = club;
+        this.clubId = clubId;
         this.status = status;
-        this.date = date.toString();
-        this.reviewer = null;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        this.date =  dateFormat.format(date);
     }
 
     public FundingApplication() {
@@ -97,7 +98,7 @@ public class FundingApplication extends DomainObject {
         return date;
     }
     public java.sql.Date getSqlDate() {
-        return java.sql.Date.valueOf(LocalDate.parse(date));
+        return java.sql.Date.valueOf(date);  // 这里的 date 已经是格式化后的字符串
     }
 
 
@@ -118,6 +119,9 @@ public class FundingApplication extends DomainObject {
     }
 
     public void setClubId(Integer clubId) {
+        if (clubId == null || clubId <= 0) {
+            throw new IllegalArgumentException("Club ID must be positive");
+        }
         this.clubId = clubId;
     }
 
@@ -126,6 +130,9 @@ public class FundingApplication extends DomainObject {
     }
 
     public void setReviewerId(Integer reviewerId) {
+        if (reviewerId != null && reviewerId <= 0) {
+            throw new IllegalArgumentException("Reviewer ID must be positive");
+        }
         this.reviewerId = reviewerId;
     }
 

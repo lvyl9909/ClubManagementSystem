@@ -23,7 +23,7 @@ public class FundingApplicationMapper {
     private FundingApplicationMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
-    public FundingApplication findfundingApplicationById(int Id) {
+    public FundingApplication findFundingApplicationsByIds(int Id) {
         var connection = databaseConnectionManager.nextConnection();
         List<Event> events;
 
@@ -75,32 +75,25 @@ public class FundingApplicationMapper {
 
         return fundingApplications;
     }
-    public boolean saveFundingApplication(FundingApplication fundingApplication)throws SQLException{
-        var connection = databaseConnectionManager.nextConnection();
-        try {
-            PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO fundingapplications (description, amount,semester,club,status,date) VALUES (?, ?,?,?,?::funding_application_status,?)"
-            );
+    public boolean saveFundingApplication(FundingApplication fundingApplication, Connection conn) throws SQLException {
+        String query = "INSERT INTO fundingapplications (description, amount, semester, club, status, date) VALUES (?, ?, ?, ?, ?::funding_application_status, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, fundingApplication.getDescription());
             stmt.setBigDecimal(2, fundingApplication.getAmount());
-            stmt.setInt(3,fundingApplication.getSemester());
-            stmt.setInt(4,fundingApplication.getClubId());
-            stmt.setString(5,fundingApplicationStatus.Submitted.name());
-            stmt.setDate(6,fundingApplication.getSqlDate());
-            int rowsAffected = stmt.executeUpdate();  // 检查受影响的行数
+            stmt.setInt(3, fundingApplication.getSemester());
+            stmt.setInt(4, fundingApplication.getClubId());
+            stmt.setString(5, fundingApplicationStatus.Submitted.name());
+            stmt.setDate(6, fundingApplication.getSqlDate());
+
+            int rowsAffected = stmt.executeUpdate();
             System.out.println(rowsAffected);
-            if (rowsAffected == 0) {
-                throw new SQLException("Inserting ticket failed, no rows affected.");
-            }else {
-                return true;
-            }
-        } catch (SQLException e){
-            e.printStackTrace();  // 打印异常信息
-            throw new RuntimeException("Error inserting ticket: " + e.getMessage());
-        } finally{
-            databaseConnectionManager.releaseConnection(connection);
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error inserting funding application: " + e.getMessage());
         }
     }
+
     public List<Integer> findApplicationIdByClubId(Integer clubId){
         var connection = databaseConnectionManager.nextConnection();
         List<Integer> applicationsId= new ArrayList<>();
@@ -240,4 +233,12 @@ public class FundingApplicationMapper {
             databaseConnectionManager.releaseConnection(connection);
         }
     }
+    public void lockFundingApplicationByClubId(int clubId, Connection conn) throws SQLException {
+        String lockQuery = "SELECT * FROM fundingapplications WHERE club = ? FOR UPDATE";
+        try (PreparedStatement lockStatement = conn.prepareStatement(lockQuery)) {
+            lockStatement.setInt(1, clubId);
+            lockStatement.executeQuery();
+        }
+    }
+
 }
