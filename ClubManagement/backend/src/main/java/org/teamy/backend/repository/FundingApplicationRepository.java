@@ -21,8 +21,11 @@ public class FundingApplicationRepository {
         }
         return instance;
     }
+    public FundingApplication findFundingApplicationsByIdsWithLock(int Id,Connection connection) {
+        return fundingApplicationMapper.findFundingApplicationsByIdsWithLock(Id,connection);
+    }
     public FundingApplication findFundingApplicationsByIds(int Id,Connection connection) {
-        return fundingApplicationMapper.findFundingApplicationsByIds(Id,connection);
+        return fundingApplicationMapper.findFundingApplicationsById(Id,connection);
     }
     public List<FundingApplication> getAllFundingApplication() {
         try {

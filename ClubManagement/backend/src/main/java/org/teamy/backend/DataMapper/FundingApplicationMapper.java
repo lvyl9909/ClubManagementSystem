@@ -24,10 +24,40 @@ public class FundingApplicationMapper {
     private FundingApplicationMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
-    public FundingApplication findFundingApplicationsByIds(int id,Connection connection) {
+    public FundingApplication findFundingApplicationsByIdsWithLock(int id,Connection connection) {
         try {
             // 使用 SELECT ... FOR UPDATE 来锁定对应的记录
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM fundingapplications WHERE application_id = ? FOR UPDATE");
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                // 获取 fundingapplication 的 status
+                String statusString = rs.getString("status");
+                fundingApplicationStatus status = fundingApplicationStatus.fromString(statusString);
+
+                // 返回 fundingApplication 对象
+                return new FundingApplication(
+                        rs.getInt("application_id"),
+                        rs.getString("description"),
+                        rs.getBigDecimal("amount"),
+                        rs.getInt("semester"),
+                        rs.getInt("club"),
+                        status,
+                        rs.getDate("date"),
+                        rs.getInt("reviewer"),
+                        rs.getInt("version")
+                );
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+    public FundingApplication findFundingApplicationsById(int id,Connection connection) {
+        try {
+            // 使用 SELECT ... FOR UPDATE 来锁定对应的记录
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM fundingapplications WHERE application_id = ?");
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 

@@ -92,7 +92,7 @@ public class FundingApplicationService {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
             // 获取 fundingApplication 对象
-            fundingApplication = fundingApplicationRepository.findFundingApplicationsByIds(applicationId, connection);
+            fundingApplication = fundingApplicationRepository.findFundingApplicationsByIdsWithLock(applicationId, connection);
 
             if (fundingApplication == null) {
                 throw new IllegalArgumentException("Funding application not found for id: " + applicationId);

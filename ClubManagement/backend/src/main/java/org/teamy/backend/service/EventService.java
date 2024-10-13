@@ -174,6 +174,9 @@ public class EventService {
                     }
                     // 1. 查找 Event 并更新其容量（使用乐观锁控制）
                     Event event = eventRepository.findEventById(eventId,connection);
+                    if(event.getCapacity() - numTickets<0){
+                        throw new IllegalArgumentException("no more tickets");
+                    }
                     event.setCapacity(event.getCapacity() - numTickets);
 
                     // 更新 Event 的容量（乐观锁控制）
