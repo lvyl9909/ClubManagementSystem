@@ -57,9 +57,7 @@ const ViewFunding = () => {
     // Reject Funding Application
     const handleReject = async (applicationId) => {
         try {
-            const response = await doCall(`${path}/admin/fundingapplication/reject?id=${applicationId}`, 'POST',{
-                credentials: 'include' // 确保发送 cookies
-            });
+            const response = await doCall(`${path}/admin/fundingapplication/reject?id=${applicationId}`, 'POST');
             if (response.ok) {
                 message.success('Funding application rejected');
                 setFundingApplications(fundingApplications.filter(funding => funding.id !== applicationId)); // 更新UI
