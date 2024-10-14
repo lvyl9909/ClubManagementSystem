@@ -57,7 +57,7 @@ public class FundingApplicationService {
             LockManagerWait.getInstance().acquireLock(clubId, threadName);
 
             conn.setAutoCommit(false);
-            conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+//            conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
             // 第二个判断：同一个 clubId 的资金申请在同一个 semester 不能重复
             int duplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), conn);
