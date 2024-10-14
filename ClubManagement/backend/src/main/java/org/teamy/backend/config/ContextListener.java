@@ -79,7 +79,7 @@ public class ContextListener implements ServletContextListener {
         StudentService studentService =StudentService.getInstance(studentRepository);
         VenueService venueService = VenueService.getInstance(venueRepository,databaseConnectionManager);
         TicketService ticketService = TicketService.getInstance(ticketRepository,studentRepository,eventDataMapper,databaseConnectionManager);
-        CustomUserDetailsService customUserDetailsService = CustomUserDetailsService.getInstance(studentRepository,studentClubRepository);
+        CustomUserDetailsService customUserDetailsService = new CustomUserDetailsService(studentRepository,studentClubRepository);
 
         sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager);
         sce.getServletContext().setAttribute(CLUB_SERVICE, clubService);

@@ -69,16 +69,20 @@ public class StudentRepository {
     }
     public Person findUserByUsername(String username) throws SQLException {
         Person person= studentDataMapper.findUserByUsername(username);
+        System.out.println(person.toString());
+
         if (person instanceof Student) {
             Student student = (Student) person;
             student.setClubId(studentsClubsDataMapper.findClubIdByStudentId(Math.toIntExact(student.getId())));
             student.setRsvpsId(rsvpDataMapper.findRSVPIdByStudentId(Math.toIntExact(student.getId())));
             student.setTicketsId(ticketDataMapper.getTicketsIdFromStudent(Math.toIntExact(student.getId())));
+            System.out.println(student.toString());
             return student;
         }else if(person instanceof FacultyAdministrator){
             FacultyAdministrator admin = (FacultyAdministrator) person;
 //            admin.setFundingApplicationIds(fundingApplicationMapper.findApplicationIdByReviewerId(Math.toIntExact(admin.getId())));
             //读取application
+            System.out.println(admin.toString());
             return admin;
         }
         return null;

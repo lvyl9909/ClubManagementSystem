@@ -49,6 +49,7 @@ export async function doCall(path, method, data) {
         headers,
         body,
         credentials: 'include',
+        mode:'cors'
     });
 
 

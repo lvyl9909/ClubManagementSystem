@@ -24,13 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final StudentRepository studentRepository;
     private final StudentClubRepository studentClubRepository;
-    private static CustomUserDetailsService instance;
-    public static synchronized CustomUserDetailsService getInstance(StudentRepository studentRepository,StudentClubRepository studentClubRepository) {
-        if (instance == null) {
-            instance = new CustomUserDetailsService(studentRepository,studentClubRepository);
-        }
-        return instance;
-    }
     public CustomUserDetailsService(StudentRepository studentRepository,StudentClubRepository studentClubRepository) {
         this.studentRepository = studentRepository;
         this.studentClubRepository = studentClubRepository;
@@ -54,11 +47,13 @@ public class CustomUserDetailsService implements UserDetailsService {
                     }
                     user.setRoles(roles);
                 } else if (user instanceof FacultyAdministrator) {
-                    roles.add(new Role("ADMIN"));
+//                    roles.add(new Role("ADMIN"));
                     System.out.println("add role administrator:"+user.getAuthorities());
-                    user.setRoles(roles);
+//                    user.setRoles(roles);
                }
-                System.out.println("yong hu quan xian :"+user.getAuthorities());
+                for (GrantedAuthority authority : user.getAuthorities()) {
+                    System.out.println(authority.getAuthority());
+                }
                 System.out.println(user.getPassword());
             }
             return user;
