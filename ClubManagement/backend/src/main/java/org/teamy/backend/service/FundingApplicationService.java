@@ -59,6 +59,14 @@ public class FundingApplicationService {
             conn.setAutoCommit(false);
             conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
+
+            // 第二个判断：同一个 clubId 的资金申请在同一个 semester 不能重复
+            boolean isDuplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), conn);
+
+            if (isDuplicateInSameSemester) {
+                throw new IllegalStateException("A funding application already exists for this club and semester.");
+            }
+
             // Lock the funding application at the database level to prevent concurrent submissions
             fundingApplicationRepository.lockFundingApplicationByClubId(fundingApplication.getClubId(), conn);
 
@@ -144,7 +152,6 @@ public class FundingApplicationService {
             }
             throw new RuntimeException("Error reviewing funding application: " + e.getMessage(), e);
         } finally {
-            // 释放线程级别的锁
             String clubId = null;
             if (connection != null) {
                 try {
@@ -152,14 +159,16 @@ public class FundingApplicationService {
                     LockManagerWait.getInstance().releaseLock(clubId, threadName);
                 } catch (Exception e) {
                     e.printStackTrace();
-                } finally {
-                    try {
-                        connection.setAutoCommit(true);  // 恢复自动提交模式
-                        connection.close();  // 关闭连接
-                    } catch (SQLException closeEx) {
-                        closeEx.printStackTrace();
-                    }
                 }
+            }
+            // 锁释放后再关闭连接
+            try {
+                if (connection != null) {
+                    connection.setAutoCommit(true);  // 恢复自动提交模式
+                    connection.close();  // 关闭连接
+                }
+            } catch (SQLException closeEx) {
+                closeEx.printStackTrace();
             }
         }
     }
@@ -172,7 +181,7 @@ public class FundingApplicationService {
 
             // 禁止自动提交，开启事务
             connection.setAutoCommit(false);
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
             // 获取当前 fundingApplication 的最新版本，确保使用正确的版本号
             FundingApplication fundingApplicationFromDb = fundingApplicationRepository.findFundingApplicationsByIds(fundingApplication.getId(), connection);

@@ -113,7 +113,7 @@ public class FundingApplicationConcurrencyTest {
                     "Funding for project " + i,
                     BigDecimal.valueOf(1000 + i * 100),
                     1,
-                    1,  // 确保 club 对象不为 null 且包含有效的 clubId
+                    9,  // 确保 club 对象不为 null 且包含有效的 clubId
                     fundingApplicationStatus.Submitted,
                     new java.util.Date()
             );

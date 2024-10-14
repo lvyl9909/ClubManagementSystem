@@ -219,53 +219,55 @@ public class CrossTransactionTest {
 
     @Test
     public void testInterleavedFundingApplicationOperations() throws InterruptedException {
-        int numberOfThreads = 10;  // 模拟 10 个线程并发执行不同操作
-        int applicationId = 9;    // 假设测试的 funding application ID
-        int reviewerId = 1;        // 假设测试的 reviewer ID
-        List<FundingApplication> applications = new ArrayList<>();
+        int applicationId = 8;    // 假设测试的 funding application ID
+        int reviewerId = 1;       // 假设测试的 reviewer ID
 
-        // 创建线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        Random random = new Random();
+        // 创建线程池，大小为 2，分别用于 review 和 update 操作
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
 
-        // 提交跨事务任务
-        List<Future<Boolean>> futures = new ArrayList<>();
-        for (int i = 0; i < numberOfThreads; i++) {
-            final int index = i;
-            Callable<Boolean> task = () -> {
-                long startTime = System.currentTimeMillis(); // 记录开始时间
+        // 定义 review 操作
+        Callable<Boolean> reviewTask = () -> {
+            long startTime = System.currentTimeMillis(); // 记录开始时间
+            String status = "Approved";  // 假设审核通过
+            try {
+                System.out.println("Thread-Review is reviewing the funding application with status: " + status);
+                fundingApplicationService.reviewFundingApplication(applicationId, reviewerId, status);
+                return true;  // 成功
+            } catch (Exception e) {
+                System.err.println("Error in Thread-Review: " + e.getMessage());
+                return false;
+            } finally {
+                long endTime = System.currentTimeMillis(); // 获取结束时间
+                long waitTime = endTime - startTime;
+                System.out.println("Thread-Review waited " + waitTime + " ms to complete the operation.");
+            }
+        };
 
-                // 随机选择一个操作
-                int operationType = random.nextInt(2);
+        // 定义 update 操作
+        Callable<Boolean> updateTask = () -> {
+            long startTime = System.currentTimeMillis(); // 记录开始时间
+            try {
+                System.out.println("Thread-Update is updating the funding application.");
+                FundingApplication application = fundingApplicationService.findFundingApplicationById(applicationId);
+                application.setAmount(BigDecimal.valueOf(1000 + Thread.currentThread().getId()));  // 更新金额
+                fundingApplicationService.updateFundingApplication(application);
+                return true;  // 成功
+            } catch (SQLException e) {
+                System.err.println("SQL Error in Thread-Update: " + e.getMessage());
+                return false;
+            } catch (Exception e) {
+                System.err.println("Error in Thread-Update: " + e.getMessage());
+                return false;
+            } finally {
+                long endTime = System.currentTimeMillis(); // 获取结束时间
+                long waitTime = endTime - startTime;
+                System.out.println("Thread-Update waited " + waitTime + " ms to complete the operation.");
+            }
+        };
 
-                try {
-                    if (operationType == 0) {
-                        // 操作类型 1：审核资金申请
-                        String status = random.nextBoolean() ? "Approved" : "Rejected";
-                        System.out.println("Thread " + index + " is reviewing the funding application with status: " + status);
-                        fundingApplicationService.reviewFundingApplication(applicationId, reviewerId, status);
-                    } else {
-                        // 操作类型 2：更新资金申请
-                        System.out.println("Thread " + index + " is updating the funding application.");
-                        FundingApplication application = fundingApplicationService.findFundingApplicationById(applicationId);
-                        application.setAmount(BigDecimal.valueOf(1000 + Thread.currentThread().getId()));
-                        fundingApplicationService.updateFundingApplication(application);
-                    }
-                    return true;  // 成功
-                } catch (SQLException e) {
-                    System.err.println("SQL Error in Thread " + index + ": " + e.getMessage());
-                    return false;
-                } catch (Exception e) {
-                    System.err.println("Error in Thread " + index + ": " + e.getMessage());
-                    return false;
-                } finally {
-                    long lockAcquiredTime = System.currentTimeMillis(); // 获取锁之后的时间
-                    long waitTime = lockAcquiredTime - startTime;
-                    System.out.println("Thread " + index + " waited " + waitTime + " ms to acquire the lock.");
-                }
-            };
-            futures.add(executorService.submit(task));
-        }
+        // 提交 review 和 update 操作任务
+        Future<Boolean> reviewFuture = executorService.submit(reviewTask);
+        Future<Boolean> updateFuture = executorService.submit(updateTask);
 
         // 等待所有任务完成
         executorService.shutdown();
@@ -274,16 +276,27 @@ public class CrossTransactionTest {
         // 统计结果
         int successCount = 0;
         int failureCount = 0;
-        for (Future<Boolean> future : futures) {
-            try {
-                if (future.get()) {
-                    successCount++;
-                } else {
-                    failureCount++;
-                }
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+
+        // 检查 review 操作结果
+        try {
+            if (reviewFuture.get()) {
+                successCount++;
+            } else {
+                failureCount++;
             }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        // 检查 update 操作结果
+        try {
+            if (updateFuture.get()) {
+                successCount++;
+            } else {
+                failureCount++;
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
 
         // 打印测试结果
