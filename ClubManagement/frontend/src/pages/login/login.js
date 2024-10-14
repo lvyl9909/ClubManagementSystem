@@ -1,7 +1,7 @@
 import React,{ useState, useEffect }  from 'react'
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button } from 'antd';
 import "./login.css"
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {useAuth} from '../../router/auth';
 
 
@@ -14,6 +14,16 @@ const Login = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate()
 
+    useEffect(() => {
+        if (user) {
+            if (user.authorities?.includes('ROLE_ADMIN')) {
+                navigate('/view_funding');
+            } else if (user.authorities?.includes('ROLE_USER')) {
+                navigate('/home');
+            }
+        }
+    }, [user, navigate]);
+
     const handleLogin = async (values) => {
         const { username, password } = values;
         setError('');
@@ -23,7 +33,6 @@ const Login = () => {
             if(authenticationError){
                 return;
             }
-            navigate('/home');
         } catch (error) {
             setError('Invalid Username or Password! Please try again.');
         }

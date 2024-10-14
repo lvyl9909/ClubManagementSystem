@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Col, Row, Card, Table } from 'antd'
+import { Col, Row, Card } from 'antd'
 import { useNavigate } from 'react-router-dom';
 //import { getData } from '../../api'
 import "./home.css"
@@ -13,8 +13,6 @@ const Home = () => {
     const [user, setUser] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const navigate = useNavigate();
-    const nowuser = useAuth();
     useEffect(() => {
 
         const fetchUserData = async () => {
