@@ -99,7 +99,6 @@ public class FundingApplicationService {
 
     public void reviewFundingApplication(int applicationId,int reviewerId,String stat){
         Connection connection = null;
-        String threadName = Thread.currentThread().getName();
         FundingApplication fundingApplication = null;
         try {
             // 获取数据库连接
@@ -109,16 +108,11 @@ public class FundingApplicationService {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
             // 获取 fundingApplication 对象
-            fundingApplication = fundingApplicationRepository.findFundingApplicationsByIdsWithLock(applicationId, connection);
+            fundingApplication = fundingApplicationRepository.findFundingApplicationsByIds(applicationId, connection);
 
             if (fundingApplication == null) {
                 throw new IllegalArgumentException("Funding application not found for id: " + applicationId);
             }
-
-            String clubId = String.valueOf(fundingApplication.getClubId());
-
-            // 应用线程级别锁，确保同一时间只有一个线程处理此 clubId
-            LockManagerWait.getInstance().acquireLock(clubId, threadName);
 
             // 第一个判断：资金申请的状态必须是 Reviewed，才能进行审批
             if (fundingApplication.getStatus() != fundingApplicationStatus.Submitted) {
@@ -152,16 +146,6 @@ public class FundingApplicationService {
             }
             throw new RuntimeException("Error reviewing funding application: " + e.getMessage(), e);
         } finally {
-            String clubId = null;
-            if (connection != null) {
-                try {
-                    clubId = String.valueOf(fundingApplication.getClubId());
-                    LockManagerWait.getInstance().releaseLock(clubId, threadName);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            // 锁释放后再关闭连接
             try {
                 if (connection != null) {
                     connection.setAutoCommit(true);  // 恢复自动提交模式

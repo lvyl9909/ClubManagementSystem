@@ -206,15 +206,18 @@ public class FundingApplicationMapper {
 
     public boolean reviewFundingApplication(FundingApplication application, int reviewerId, String stat, Connection connection) {
         try {
+            // 使用乐观锁更新事件状态，检查 version 是否匹配
+            PreparedStatement updateStmt = connection.prepareStatement(
+                    "UPDATE fundingapplications SET status = ?::funding_application_status, reviewer = ?, version = version + 1 " +
+                            "WHERE application_id = ? AND version = ?");
 
-            // 更新事件状态
-            PreparedStatement updateStmt = connection.prepareStatement("UPDATE fundingapplications SET status = ?::funding_application_status, reviewer = ? WHERE application_id = ?");
-            updateStmt.setString(1, stat);
-            updateStmt.setInt(2, reviewerId);
-            updateStmt.setInt(3, application.getId());  // 获取 FundingApplication 的 ID
+            updateStmt.setString(1, stat);               // 设置状态
+            updateStmt.setInt(2, reviewerId);            // 设置审查员ID
+            updateStmt.setInt(3, application.getId());   // 设置 FundingApplication 的 ID
+            updateStmt.setInt(4, application.getVersion()); // 检查当前版本号
 
             int rowsAffected = updateStmt.executeUpdate();  // 执行更新
-            return rowsAffected > 0;
+            return rowsAffected > 0;  // 如果返回的影响行数大于 0，说明更新成功
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             throw new RuntimeException(e);

@@ -219,7 +219,7 @@ public class CrossTransactionTest {
 
     @Test
     public void testInterleavedFundingApplicationOperations() throws InterruptedException {
-        int applicationId = 8;    // 假设测试的 funding application ID
+        int applicationId = 9;    // 假设测试的 funding application ID
         int reviewerId = 1;       // 假设测试的 reviewer ID
 
         // 创建线程池，大小为 2，分别用于 review 和 update 操作
