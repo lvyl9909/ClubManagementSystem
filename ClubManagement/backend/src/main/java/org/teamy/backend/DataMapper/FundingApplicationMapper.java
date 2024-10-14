@@ -99,11 +99,10 @@ public class FundingApplicationMapper {
                         rs.getDate("date"), rs.getInt("reviewer"),rs.getInt("version"));
                 fundingApplications.add(fundingApplication);
             }
+            return fundingApplications;
         } finally {
             databaseConnectionManager.releaseConnection(connection);
         }
-
-        return fundingApplications;
     }
     public boolean saveFundingApplication(FundingApplication fundingApplication, Connection conn) throws SQLException {
         String query = "INSERT INTO fundingapplications (description, amount, semester, club, status, date) VALUES (?, ?, ?, ?, ?::funding_application_status, ?)";

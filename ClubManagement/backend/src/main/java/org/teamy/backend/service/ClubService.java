@@ -9,6 +9,7 @@ import org.teamy.backend.repository.ClubRepository;
 import org.teamy.backend.repository.StudentRepository;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,9 +31,16 @@ public class ClubService {
     }
 
     public Club getClubById(int id) throws Exception {
-        Connection connection = databaseConnectionManager.nextConnection();
-        Club club = clubRepository.findClubById(id,connection);
-        return club;
+        Connection connection =null;
+        try {
+            connection = databaseConnectionManager.nextConnection();
+            Club club = clubRepository.findClubById(id,connection);
+            return club;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            databaseConnectionManager.releaseConnection(connection);
+        }
     }
     public List<Club> getAllClub() {
         try {

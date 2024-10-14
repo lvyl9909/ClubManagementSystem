@@ -31,8 +31,17 @@ public class FundingApplicationService {
     }
 
     public FundingApplication findFundingApplicationById(int id){
-        Connection connection = databaseConnectionManager.nextConnection();
-        return fundingApplicationRepository.findFundingApplicationsByIds(id,connection);
+        Connection connection =null;
+        try {
+            connection.setAutoCommit(false);
+
+            connection= databaseConnectionManager.nextConnection();
+            return fundingApplicationRepository.findFundingApplicationsByIds(id,connection);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+
+        }
     }
     public boolean saveFundingApplication(FundingApplication fundingApplication, Connection conn) throws Exception {
         if (fundingApplication == null) {
