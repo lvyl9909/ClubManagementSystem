@@ -237,7 +237,7 @@ public class FundingApplicationConcurrencyTest {
     @Test
     public void testConcurrentUpdateFundingApplications() throws InterruptedException, ExecutionException {
         int numberOfThreads = 10;  // 模拟 10 个线程并发更新
-        int applicationId = 16;     // 假设测试的 funding application ID 为 1
+        int applicationId = 4;     // 假设测试的 funding application ID 为 1
 
         // 创建线程池
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);

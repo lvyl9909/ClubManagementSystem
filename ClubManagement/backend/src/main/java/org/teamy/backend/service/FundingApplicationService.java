@@ -33,9 +33,10 @@ public class FundingApplicationService {
     public FundingApplication findFundingApplicationById(int id){
         Connection connection =null;
         try {
-            connection.setAutoCommit(false);
 
             connection= databaseConnectionManager.nextConnection();
+            connection.setAutoCommit(false);
+
             return fundingApplicationRepository.findFundingApplicationsByIds(id,connection);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -179,7 +180,7 @@ public class FundingApplicationService {
             // 将数据库中的版本号赋值给传入的对象，以便后续的乐观锁检查
             fundingApplication.setVersion(fundingApplicationFromDb.getVersion());
 
-            // 第一个判断：资金申请的状态必须是 Reviewed，才能进行审批
+            // 第一个判断：资金申请的状态必须没被审批，才能进行更新
             if (fundingApplication.getStatus() != fundingApplicationStatus.Submitted) {
                 throw new IllegalStateException("Funding application is not in 'Submitted' status.");
             }
