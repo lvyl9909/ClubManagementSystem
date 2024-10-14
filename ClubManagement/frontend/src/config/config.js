@@ -5,7 +5,7 @@ export default [
         label: 'Home',
         icon: 'HomeOutlined',
         url: '/home/index',
-        roles: ['ROLE_ADMIN', 'ROLE_USER'], // 所有角色都可以看到
+        roles: ['ROLE_USER'], // 所有角色都可以看到
     },
     {
         path: '/club',
@@ -34,7 +34,7 @@ export default [
                 name: 'page1',
                 label: 'Page1',
                 icon: 'SettingOutlined',
-                roles: ['ROLE_ADMIN'], // 仅管理员可以看到
+                roles: ['ROLE_USER'], // 仅管理员可以看到
             },
             {
                 path: '/other/pageTwo',
