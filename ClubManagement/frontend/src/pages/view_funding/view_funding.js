@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Descriptions, Spin, message, Button, Modal, Row, Col } from 'antd'; // 导入必要组件
+import {Card, Descriptions, Spin, message, Button, Modal, Row, Col, Table, Tabs,Tag} from 'antd'; // 导入必要组件
 import { doCall } from '../../router/api';
 import { useAuth } from '../../router/auth';
-
+const { Column } = Table;
+const { TabPane } = Tabs;
 const ViewFunding = () => {
     const [fundingApplications, setFundingApplications] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -82,6 +83,19 @@ const ViewFunding = () => {
         }
     };
 
+    const getStatusTag = (status) => {
+        switch (status) {
+            case 'Approved':
+                return <Tag color="green">Approved</Tag>;
+            case 'Rejected':
+                return <Tag color="red">Rejected</Tag>;
+            case 'Submitted':
+                return <Tag color="purple">Submitted</Tag>;
+            default:
+                return <Tag>{status}</Tag>;
+        }
+    };
+
     if (loading) {
         return <Spin size="large" />;
     }
@@ -90,49 +104,151 @@ const ViewFunding = () => {
         return <div style={{ color: 'red' }}>{error}</div>;
     }
 
+
+
+//     return (
+//         <div style={{ margin: '20px' }}>
+//             {fundingApplications.length > 0 ? (
+//                 fundingApplications.map((funding, index) => (
+//                     <Card key={index} style={{ marginBottom: '20px' }}>
+//                         <Descriptions bordered>
+//                             <Descriptions.Item label="Description">{funding.description}</Descriptions.Item>
+//                             <Descriptions.Item label="Club">{funding.club?.name || 'N/A'}</Descriptions.Item>
+//                         </Descriptions>
+//                         {/* View Button */}
+//                         <div style={{ marginTop: '20px', textAlign: 'right' }}>
+//                             <Button type="primary" onClick={() => showModal(funding)}>
+//                                 View
+//                             </Button>
+//                         </div>
+//                     </Card>
+//                 ))
+//             ) : (
+//                 <div>No funding applications available</div>
+//             )}
+//
+//             {/* Modal for showing details with Approve/Reject buttons */}
+//             <Modal
+//                 title="Funding Application Details"
+//                 visible={isModalVisible}
+//                 onCancel={handleModalClose}
+//                 footer={[
+//                     <Button key="reject" danger onClick={() => handleReject(currentApplication.id)}>
+//                         Reject
+//                     </Button>,
+//                     <Button key="approve" type="primary" onClick={() => handleApprove(currentApplication.id)}>
+//                         Approve
+//                     </Button>
+//                 ]}
+//                 width={800} // 设置弹窗宽度自适应
+//             >
+//                 {currentApplication && (
+//                     <Descriptions bordered column={1} layout="vertical">
+//                         <Descriptions.Item label="Description">{currentApplication.description}</Descriptions.Item>
+//                         <Descriptions.Item label="Amount">{currentApplication.amount}</Descriptions.Item>
+//                         <Descriptions.Item label="Semester">{currentApplication.semester}</Descriptions.Item>
+//                         <Descriptions.Item label="Club">{currentApplication.club?.name || 'N/A'}</Descriptions.Item>
+//                         <Descriptions.Item label="Status">{currentApplication.status}</Descriptions.Item>
+//                         <Descriptions.Item label="Date">{currentApplication.date}</Descriptions.Item>
+//                     </Descriptions>
+//                 )}
+//             </Modal>
+//         </div>
+//     );
+// };
+    const approvedApplications = fundingApplications.filter(app => app.status === 'Approved');
+    const rejectedApplications = fundingApplications.filter(app => app.status === 'Rejected');
+    const activeApplications = fundingApplications.filter(app => app.status !== 'Approved' && app.status !== 'Rejected');
+
     return (
         <div style={{ margin: '20px' }}>
-            {fundingApplications.length > 0 ? (
-                fundingApplications.map((funding, index) => (
-                    <Card key={index} style={{ marginBottom: '20px' }}>
-                        <Descriptions bordered>
-                            <Descriptions.Item label="Description">{funding.description}</Descriptions.Item>
-                            <Descriptions.Item label="Club">{funding.club?.name || 'N/A'}</Descriptions.Item>
-                        </Descriptions>
-                        {/* View Button */}
-                        <div style={{ marginTop: '20px', textAlign: 'right' }}>
-                            <Button type="primary" onClick={() => showModal(funding)}>
-                                View
-                            </Button>
-                        </div>
-                    </Card>
-                ))
-            ) : (
-                <div>No funding applications available</div>
-            )}
+            <Tabs defaultActiveKey="1">
+                <TabPane tab="Approved Applications" key="1">
+                    <Table dataSource={approvedApplications} rowKey="id">
+                        <Column title="Club" dataIndex={['club', 'name']} key="club" render={text => text || 'N/A'} />
+                        <Column title="Description" dataIndex="description" key="description" />
+                        <Column
+                            title="Action"
+                            key="action"
+                            render={(_, record) => (
+                                <Button type="primary" ghost onClick={() => showModal(record)}>
+                                    View
+                                </Button>
+                            )}
+                        />
+                    </Table>
+                </TabPane>
 
-            {/* Modal for showing details with Approve/Reject buttons */}
+                <TabPane tab="Rejected Applications" key="2">
+                    <Table dataSource={rejectedApplications} rowKey="id">
+                        <Column title="Club" dataIndex={['club', 'name']} key="club" render={text => text || 'N/A'} />
+                        <Column title="Description" dataIndex="description" key="description" />
+                        <Column
+                            title="Action"
+                            key="action"
+                            render={(_, record) => (
+                                <Button type="primary" ghost onClick={() => showModal(record)}>
+                                    View
+                                </Button>
+                            )}
+                        />
+                    </Table>
+                </TabPane>
+
+                <TabPane tab="Active Applications" key="3">
+                    <Table dataSource={activeApplications} rowKey="id">
+                        <Column title="Club" dataIndex={['club', 'name']} key="club" render={text => text || 'N/A'} />
+                        <Column title="Description" dataIndex="description" key="description" />
+                        <Column
+                            title="Action"
+                            key="action"
+                            render={(_, record) => (
+                                <>
+                                    <Button type="primary" ghost onClick={() => showModal(record)} style={{ marginRight: '10px' }}>
+                                        View
+                                    </Button>
+                                </>
+                            )}
+                        />
+                    </Table>
+                </TabPane>
+            </Tabs>
+
+            {/* Modal for showing detailed funding application information */}
             <Modal
                 title="Funding Application Details"
                 visible={isModalVisible}
                 onCancel={handleModalClose}
-                footer={[
-                    <Button key="reject" danger onClick={() => handleReject(currentApplication.id)}>
-                        Reject
-                    </Button>,
-                    <Button key="approve" type="primary" onClick={() => handleApprove(currentApplication.id)}>
-                        Approve
-                    </Button>
-                ]}
-                width={800} // 设置弹窗宽度自适应
+                footer={
+                    currentApplication && currentApplication.status !== 'Approved' && currentApplication.status !== 'Rejected' ? (
+                        <div style={{ textAlign: 'center' }}>
+                            <Button
+                                key="reject"
+                                type="primary" danger
+                                onClick={() => handleReject(currentApplication.id)}
+                                style={{ marginRight: '10px' }}
+                            >
+                                Reject
+                            </Button>
+                            <Button
+                                key="approve"
+                                type="primary"
+                                onClick={() => handleApprove(currentApplication.id)}
+                                style={{ backgroundColor: 'ForestGreen', color: 'white' }}
+                            >
+                                Approve
+                            </Button>
+                        </div>
+                    ) : null
+                }
             >
                 {currentApplication && (
                     <Descriptions bordered column={1} layout="vertical">
+                        <Descriptions.Item label="Club">{currentApplication.club?.name || 'N/A'}</Descriptions.Item>
                         <Descriptions.Item label="Description">{currentApplication.description}</Descriptions.Item>
                         <Descriptions.Item label="Amount">{currentApplication.amount}</Descriptions.Item>
                         <Descriptions.Item label="Semester">{currentApplication.semester}</Descriptions.Item>
-                        <Descriptions.Item label="Club">{currentApplication.club?.name || 'N/A'}</Descriptions.Item>
-                        <Descriptions.Item label="Status">{currentApplication.status}</Descriptions.Item>
+                        <Descriptions.Item label="Status">{getStatusTag(currentApplication.status)}</Descriptions.Item>
                         <Descriptions.Item label="Date">{currentApplication.date}</Descriptions.Item>
                     </Descriptions>
                 )}

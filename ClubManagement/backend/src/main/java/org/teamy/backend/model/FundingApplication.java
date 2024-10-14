@@ -14,7 +14,7 @@ public class FundingApplication extends DomainObject {
 
     private Club club;
     private fundingApplicationStatus status;
-//    private List<Event> event;
+
     private String date;
     private FacultyAdministrator reviewer;
     private Integer reviewerId;

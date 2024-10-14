@@ -55,7 +55,7 @@ public class WebSecurityConfig implements ServletContextAware {
     private ServletContext servletContext;
     private DatabaseConnectionManager databaseConnectionManager;
 
-    //定义表单登陆的方法
+    //Define the form login method
     @Bean
     public UserDetailsService userDetailsService() {
         ClubDataMapper clubDataMapper = ClubDataMapper.getInstance(databaseConnectionManager);
@@ -69,7 +69,7 @@ public class WebSecurityConfig implements ServletContextAware {
         StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper,databaseConnectionManager);
         return new CustomUserDetailsService(userRepository,studentClubRepository);
     }
-    //未认证的入口
+    // Non-authenticated point
     @Bean
     AuthenticationEntryPoint unauthorizedEntryPoint() {
         return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);

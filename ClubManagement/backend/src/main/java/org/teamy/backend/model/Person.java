@@ -56,7 +56,7 @@ public class Person implements UserDetails {
         this.phoneNumber = phoneNumber;
         this.password=password;
         this.username=username;
-        this.roles.add(new Role("USER")); // 默认添加 USER 角色
+        this.roles.add(new Role("USER")); // add USER role by default
         this.isActive=true;
     }
     public Person(Long id,String name, String email, Long phoneNumber,String password,String username,boolean isActive,String role) {
@@ -76,7 +76,7 @@ public class Person implements UserDetails {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.username=username;
-        this.roles.add(new Role("USER")); // 默认添加 USER 角色
+        this.roles.add(new Role("USER")); //Add USER role by default
         this.isActive=isActive;
     }
 

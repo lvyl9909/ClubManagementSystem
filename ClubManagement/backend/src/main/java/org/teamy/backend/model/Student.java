@@ -144,7 +144,4 @@ public class Student extends Person{
         }
         return false;
     }
-    public boolean isMemberOfClub(int clubId) {
-        return this.clubId != null && this.clubId.contains(clubId);
-    }
 }

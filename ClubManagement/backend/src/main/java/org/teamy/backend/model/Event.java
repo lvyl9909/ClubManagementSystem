@@ -225,7 +225,7 @@ public class Event extends DomainObject {
             return false;
         }
     }
-    // 方法来处理与业务相关的逻辑
+    // Methods to handle business-related logic
     public void validateBudget() {
         if (this.cost.compareTo(BigDecimal.valueOf(club.getBudget())) > 0) {
             throw new RuntimeException("Budget not enough");

@@ -32,7 +32,7 @@ public class VenueRepository {
 
     public Map<Integer, Venue> getAllVenue(Connection connection) {
         if (venueList == null || venueList.isEmpty()) {
-            // 从 List<Venue> 转换为 Map<Venue.getId(), Venue>
+            // Convert from List<Venue> to Map<Venue.getId(), Venue>
             venueList = venueDataMapper.getAllVenue(connection).stream()
                     .collect(Collectors.toMap(Venue::getId, venue -> venue));
         }
@@ -41,7 +41,7 @@ public class VenueRepository {
 
     public Venue getVenueById(Integer Id,Connection connection){
         if (venueList == null || venueList.isEmpty()) {
-            // 从 List<Venue> 转换为 Map<Venue.getId(), Venue>
+            // Convert from List<Venue> to Map<Venue.getId(), Venue>
             venueList = venueDataMapper.getAllVenue(connection).stream()
                     .collect(Collectors.toMap(Venue::getId, venue -> venue));
         }

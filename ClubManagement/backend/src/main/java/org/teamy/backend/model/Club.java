@@ -89,7 +89,7 @@ public class Club extends DomainObject {
         this.events = events;
     }
 
-    //还需要加lazy load
+
     public List<FundingApplication> getFundingApplications() {
         return FundingApplications;
     }
@@ -110,9 +110,7 @@ public class Club extends DomainObject {
         return this.budget;
     }
 
-//    public void setBudget(float budget){
-//        this.budget = budget;
-//    }
+
     public void setBudget(float budget) {
         if (budget < 0) {
             throw new IllegalArgumentException("Budget cannot be negative");  // domain logic, no persistence dependency

@@ -46,14 +46,14 @@ public class EventRepository {
         }
         return event;
     }
-    // 删除事件并从缓存中移除
+    // Delete the event and remove it from the cache
     public void deleteEvent(Connection connection,int eventId) {
         eventDataMapper.deleteEvent(connection,eventId);
         // 从缓存中移除对应的事件
     }    public List<Event> findEventsByTitle(String title) throws SQLException {
         return eventDataMapper.findEventsByTitle(title);
     }
-    // 保存事件并更新缓存
+    // Save the event and update the cache
     public boolean saveEvent(Event event) throws Exception {
         boolean result = eventDataMapper.saveEvent(event);
         if (result) {

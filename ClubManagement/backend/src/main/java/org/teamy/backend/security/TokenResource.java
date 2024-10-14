@@ -127,7 +127,7 @@ public class TokenResource extends HttpServlet {
                 var refreshRequest = mapper.readValue(bodyBuffer.toString(), RefreshRequest.class);
                 Cookie[] cookies = req.getCookies();
                 if (cookies == null) {
-                    // 说明请求中没有任何 cookies
+                    // no cookies in the request
                     System.out.println("No cookies in request");
                 } else {
                     System.out.println("Cookies count: " + cookies.length);

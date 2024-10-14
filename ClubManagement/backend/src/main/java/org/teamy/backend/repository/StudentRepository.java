@@ -117,7 +117,7 @@ public class StudentRepository {
     }
     public Student lazyLoadRSVP(Student student) {
         try {
-            // 从数据库加载 RSVP 数据
+            // Load RSVP data from the database
             List<RSVP> rsvps = rsvpDataMapper.findRSVPsByIds(student.getRsvpsId());
             student.setRsvps(rsvps);
         } catch (SQLException e) {
