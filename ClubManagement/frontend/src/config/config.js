@@ -27,7 +27,7 @@ export default [
         path: '/other',
         label: 'Other',
         icon: 'SettingOutlined',
-        roles: ['ROLE_ADMIN', 'ROLE_USER'], // 所有角色都可以看到
+        roles: ['ROLE_USER'], // 所有角色都可以看到
         children: [
             {
                 path: '/other/pageOne',

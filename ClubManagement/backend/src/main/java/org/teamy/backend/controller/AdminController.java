@@ -58,7 +58,6 @@ public class AdminController extends HttpServlet {
     private ResponseEntity approveApplication(HttpServletRequest req) {
         try {
             String idParam = req.getParameter("id"); // 获取查询字符串中的 "id" 参数
-            System.out.println("approve:"+idParam);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetails userDetails = null;
             if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
@@ -72,7 +71,7 @@ public class AdminController extends HttpServlet {
             if (idParam == null) {
                 throw new IllegalArgumentException("Missing 'id' parameter.");
             }
-
+            System.out.println("approve:"+idParam);
             fundingApplicationService.reviewFundingApplication(Integer.valueOf(idParam),Math.toIntExact(facultyAdministrator.getId()),"Approved");
             return ResponseEntity.ok(null);
         } catch (IllegalArgumentException e) {

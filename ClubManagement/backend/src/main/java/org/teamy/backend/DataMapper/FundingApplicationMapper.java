@@ -214,7 +214,6 @@ public class FundingApplicationMapper {
             updateStmt.setInt(3, application.getId());  // 获取 FundingApplication 的 ID
 
             int rowsAffected = updateStmt.executeUpdate();  // 执行更新
-
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
