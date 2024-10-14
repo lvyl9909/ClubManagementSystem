@@ -277,7 +277,7 @@ public class FundingApplicationMapper {
         }
     }
 
-    public boolean existsByClubIdAndSemester(Integer clubId, Integer semester, Connection connection )throws SQLException {
+    public int existsByClubIdAndSemester(Integer clubId, Integer semester, Connection connection )throws SQLException {
         String query = "SELECT COUNT(*) FROM fundingapplications WHERE club = ? AND semester = ?";
         PreparedStatement stmt = connection.prepareStatement(query);
         stmt.setInt(1, clubId);
@@ -285,9 +285,9 @@ public class FundingApplicationMapper {
         ResultSet rs = stmt.executeQuery();
 
         if (rs.next()) {
-            return rs.getInt(1) > 1;  // 如果有记录返回 true
+            return rs.getInt(1);  // 如果有记录返回 true
         }
 
-        return false;  // 没有记录则返回 false
+        return 0;  // 没有记录则返回 false
     }
 }

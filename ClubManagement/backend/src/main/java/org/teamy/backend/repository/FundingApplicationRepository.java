@@ -52,7 +52,7 @@ public class FundingApplicationRepository {
         return fundingApplicationMapper.updateFundingApplication(fundingApplication,connection);
     }
 
-    public boolean existsByClubIdAndSemester(Integer clubId, Integer semester, Connection connection) throws SQLException {
+    public int existsByClubIdAndSemester(Integer clubId, Integer semester, Connection connection) throws SQLException {
         return fundingApplicationMapper.existsByClubIdAndSemester(clubId,semester,connection);
     }
 }

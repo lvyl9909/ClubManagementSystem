@@ -61,9 +61,9 @@ public class FundingApplicationService {
 
 
             // 第二个判断：同一个 clubId 的资金申请在同一个 semester 不能重复
-            boolean isDuplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), conn);
+            int DuplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), conn);
 
-            if (isDuplicateInSameSemester) {
+            if (DuplicateInSameSemester>0) {
                 throw new IllegalStateException("A funding application already exists for this club and semester.");
             }
 
@@ -126,9 +126,9 @@ public class FundingApplicationService {
             }
 
             // 第二个判断：同一个 clubId 的资金申请在同一个 semester 不能重复
-            boolean isDuplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), connection);
+            int DuplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), connection);
 
-            if (isDuplicateInSameSemester) {
+            if (DuplicateInSameSemester>1) {
                 throw new IllegalStateException("A funding application already exists for this club and semester.");
             }
 
@@ -195,8 +195,8 @@ public class FundingApplicationService {
             }
 
             // 第二个判断：同一个 clubId 的资金申请在同一个 semester 不能重复
-            boolean isDuplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), connection);
-            if (isDuplicateInSameSemester) {
+            int DuplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), connection);
+            if (DuplicateInSameSemester>1) {
                 throw new IllegalStateException("A funding application already exists for this club and semester.");
             }
 
