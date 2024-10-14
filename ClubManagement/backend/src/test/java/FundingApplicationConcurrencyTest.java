@@ -113,7 +113,7 @@ public class FundingApplicationConcurrencyTest {
                     "Funding for project " + i,
                     BigDecimal.valueOf(1000 + i * 100),
                     1,
-                    9,  // 确保 club 对象不为 null 且包含有效的 clubId
+                    10,  // 确保 club 对象不为 null 且包含有效的 clubId
                     fundingApplicationStatus.Submitted,
                     new java.util.Date()
             );
@@ -150,6 +150,8 @@ public class FundingApplicationConcurrencyTest {
                     // 计算完成时间
                     long waitTime = lockAcquiredTime - startTime;
                     System.out.println("Thread " + index + " waited " + waitTime + " ms to acquire the lock");
+                    // 断言锁等待时间大于0，确保线程确实在等待
+                    assert waitTime > 0 : "Thread should have waited for the lock";
                 }
             };
             futures.add(executorService.submit(task));
