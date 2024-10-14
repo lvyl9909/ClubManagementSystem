@@ -36,8 +36,6 @@ public class EventRepository {
     public Event findEventById(int id,Connection connection) {
         // 先从缓存中获取
         Event event;
-
-        // 如果缓存中没有，查询数据库
         event = eventDataMapper.findEventById(id,connection);
         event.setVenue(venueDataMapper.findVenueById(event.getVenueId(),connection));
         event.setClub(clubDataMapper.findClubById(event.getVenueId(),connection));

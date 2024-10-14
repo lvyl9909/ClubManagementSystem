@@ -120,7 +120,6 @@ public class EventService {
         Connection connection = databaseConnectionManager.nextConnection();
         try{
             connection.setAutoCommit(false);  // 关闭自动提交，手动管理事务
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
             // 检查事件是否存在
             Event existingEvent = eventRepository.findEventById(event.getId(),connection);
@@ -170,10 +169,11 @@ public class EventService {
                     // 确保在执行任何事务之前禁用自动提交
                     if (connection.getAutoCommit()) {
                         connection.setAutoCommit(false);  // 禁用自动提交，手动管理事务
-                        connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+//                        connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
                     }
                     // 1. 查找 Event 并更新其容量（使用乐观锁控制）
                     Event event = eventRepository.findEventById(eventId,connection);
+                    System.out.println(event.getVersion());
                     if(event.getCapacity() - numTickets<0){
                         throw new IllegalArgumentException("no more tickets");
                     }
@@ -201,11 +201,11 @@ public class EventService {
                 } catch (Exception e) {
                     try {
                         connection.rollback();  // 事务回滚
-                        throw new OptimisticLockingFailureException("Failed to update event capacity due to version mismatch.");
+                        System.out.println("rollback");
+                        throw new RuntimeException("Error in RSVP and Ticket processing: " + e.getMessage());
                     } catch (SQLException rollbackEx) {
                         rollbackEx.printStackTrace();
                     }
-                    throw new RuntimeException("Error in RSVP and Ticket processing: " + e.getMessage());
                 } finally {
                     try {
                         // 恢复自动提交模式并关闭连接
@@ -213,7 +213,6 @@ public class EventService {
                             connection.setAutoCommit(true);  // 恢复自动提交模式
                         }
                         databaseConnectionManager.releaseConnection(connection);  // 释放数据库连接
-
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }

@@ -186,7 +186,7 @@ public class FundingApplicationConcurrencyTest {
     @Test
     public void testConcurrentFundingApplicationReviews() throws InterruptedException, ExecutionException {
         int numberOfThreads = 10;  // 模拟 10 个线程并发审核
-        int applicationId = 5;     // 假设测试的 funding application ID 为 1
+        int applicationId = 11;     // 假设测试的 funding application ID 为 1
         int reviewerId = 1;        // 假设测试的 reviewer ID 为 1
 
         // 创建线程池

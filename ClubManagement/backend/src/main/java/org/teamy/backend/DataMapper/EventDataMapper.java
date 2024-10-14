@@ -45,8 +45,7 @@ public class EventDataMapper {
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
                         rs.getInt("capacity"),
-                        rs.getInt("capacity_version"),
-                        rs.getInt("event_version")
+                        rs.getInt("version")
                 );
             }
         } catch (SQLException e) {
@@ -84,8 +83,7 @@ public class EventDataMapper {
                         rs.getInt("club_id"),
                         rs.getString("status"),       // 根据需要将字符串转换为 Enum
                         rs.getInt("capacity"),
-                        rs.getInt("capacity_version"),
-                        rs.getInt("event_version")
+                        rs.getInt("version")
                 );
                 events.add(event);
             }
@@ -135,8 +133,7 @@ public class EventDataMapper {
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
                         rs.getInt("capacity"),
-                        rs.getInt("capacity_version"),
-                        rs.getInt("event_version")
+                        rs.getInt("version")
                 );
                 events.add(event);
             }
@@ -191,9 +188,7 @@ public class EventDataMapper {
                         rs.getInt("club_id"),
                         rs.getString("status"), // 将状态从数据库转换为枚举类型
                         rs.getInt("capacity"),
-                        rs.getInt("capacity_version"),
-                        rs.getInt("event_version")
-                );
+                        rs.getInt("version"));
                 events.add(event);
             }
         } catch (SQLException e) {
@@ -208,7 +203,7 @@ public class EventDataMapper {
     public boolean updateEvent(Event event, Connection connection) throws Exception {
 
         // SQL 更新语句，更新指定的事件，检查 version
-        String query = "UPDATE events SET title = ?, description = ?, date = ?, time = ?, venue = ?, cost = ?, club_id = ?, status = ?::event_status, capacity = ?, event_version = event_version + 1 WHERE event_id = ? AND event_version = ?";
+        String query = "UPDATE events SET title = ?, description = ?, date = ?, time = ?, venue = ?, cost = ?, club_id = ?, status = ?::event_status, capacity = ?, version = version + 1 WHERE event_id = ? AND version = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, event.getTitle());
@@ -221,8 +216,8 @@ public class EventDataMapper {
             stmt.setString(8, event.getStatus().name());  // 假设状态是枚举类型
             stmt.setInt(9, event.getCapacity());
             stmt.setInt(10, event.getId());  // 使用 eventId 作为更新条件
-            stmt.setInt(11, event.getEventVersion());  // 传入当前版本号，乐观锁控制
-            System.out.println(event.getEventVersion());
+            stmt.setInt(11, event.getVersion());  // 传入当前版本号，乐观锁控制
+            System.out.println(event.getVersion());
 
             // 执行更新操作
             int rowsAffected = stmt.executeUpdate();
@@ -239,25 +234,26 @@ public class EventDataMapper {
 
     public boolean updateEventCapacity(Event event, Connection connection) throws Exception {
         // SQL 更新语句，使用 version 进行乐观锁控制
-        String query = "UPDATE events SET capacity = ?, capacity_version = capacity_version + 1 WHERE event_id = ? AND capacity_version = ?";
+        String query = "UPDATE events SET capacity = ?, version = version + 1 WHERE event_id = ? AND version = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, event.getCapacity());       // 设置新的 capacity
             stmt.setInt(2, event.getId());             // 使用 eventId 作为更新条件
-            stmt.setInt(3, event.getCapacityVersion());        // 使用当前的 version 作为乐观锁检查条件
+            stmt.setInt(3, event.getVersion());        // 使用当前的 version 作为乐观锁检查条件
 
             // 执行更新操作
             int rowsAffected = stmt.executeUpdate();
+            System.out.println(rowsAffected);
             if (rowsAffected == 0) {
                 // 如果没有行被更新，说明 version 不匹配，抛出乐观锁异常
                 throw new OptimisticLockingFailureException("Event version mismatch, update failed.");
             }
 
             // 更新成功后，递增 event 的本地 version
-            event.setCapacityVersion(event.getCapacityVersion() + 1);
+            event.setVersion(event.getVersion() + 1);
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new OptimisticLockingFailureException("Error updating event capacity: " + e.getMessage());
+            throw new SQLException("SQL Error: " + e.getMessage());
         }
     }
 

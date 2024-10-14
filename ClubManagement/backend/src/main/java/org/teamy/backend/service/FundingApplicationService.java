@@ -105,7 +105,6 @@ public class FundingApplicationService {
             connection = databaseConnectionManager.nextConnection();
             // 禁止自动提交，开启事务
             connection.setAutoCommit(false);
-            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
             // 获取 fundingApplication 对象
             fundingApplication = fundingApplicationRepository.findFundingApplicationsByIds(applicationId, connection);
@@ -130,7 +129,7 @@ public class FundingApplicationService {
             boolean isSuccess = fundingApplicationRepository.reviewFundingApplication(reviewerId, fundingApplication, stat, connection);
 
             if (!isSuccess) {
-                throw new RuntimeException("Failed to review the funding application.");
+                throw new OptimisticLockingFailureException("Failed to review the funding application because of optimistic lock.");
             }
 
             // 提交事务
