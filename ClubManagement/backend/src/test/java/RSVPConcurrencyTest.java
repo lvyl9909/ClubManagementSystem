@@ -98,15 +98,13 @@ public class RSVPConcurrencyTest {
     @Test
     public void testConcurrentRSVPApplications() throws InterruptedException {
         int numberOfThreads = 3;  // 例如模拟 10 个用户并发申请
-        int eventId = 1;  // 测试的 eventId
+        int eventId = 3;  // 测试的 eventId
         int studentId = 7;  // 假设一个学生 ID
         int numTickets = 2;  // 每个学生申请 2 张票
         List<Integer> participates_id = Arrays.asList(7, 8);  // 参与者 ID 列表
 
         // 创建线程池
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        Random random = new Random();
-
         // 提交并发任务
         List<Future<Boolean>> futures = new ArrayList<>();
         for (int i = 0; i < numberOfThreads; i++) {

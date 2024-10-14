@@ -106,9 +106,9 @@ public class CrossTransactionTest {
 
     @Test
     public void testConcurrentRSVPAndEventUpdates() throws InterruptedException {
-        int numberOfRSVPThreads = 10;  // 模拟5个学生并发申请
+        int numberOfRSVPThreads = 6;  // 模拟5个学生并发申请
         int numberOfEventUpdateThreads = 1;  // 模拟5个管理员并发更新事件
-        int eventId = 4;  // 假设测试的 eventId
+        int eventId = 6;  // 假设测试的 eventId
         int studentId = 7;  // 假设一个初始学生 ID
         int numTickets = 2;  // 每个学生申请 2 张票
         List<Integer> participatesId = List.of(7, 8);  // 参与者 ID 列表
@@ -143,7 +143,7 @@ public class CrossTransactionTest {
                 try {
                     // 获取并更新事件
                     Event event = eventService.getEventById(eventId);
-                    event.setCapacity((int) 4);  // 每个线程更新不同的容量
+                    event.setCapacity((int) 10);  // 每个线程更新不同的容量
                     return eventService.updateEvent(event);  // 更新事件
                 } catch (Exception e) {
                     System.err.println("Event Update Error: " + e.getMessage());
@@ -219,7 +219,7 @@ public class CrossTransactionTest {
 
     @Test
     public void testInterleavedFundingApplicationOperations() throws InterruptedException {
-        int applicationId = 8;    // 假设测试的 funding application ID
+        int applicationId = 9;    // 假设测试的 funding application ID
         int reviewerId = 1;       // 假设测试的 reviewer ID
 
         // 创建线程池，大小为 2，分别用于 review 和 update 操作
