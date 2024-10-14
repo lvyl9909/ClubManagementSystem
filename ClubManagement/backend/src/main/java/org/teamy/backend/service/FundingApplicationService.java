@@ -59,16 +59,11 @@ public class FundingApplicationService {
             conn.setAutoCommit(false);
             conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
-
             // 第二个判断：同一个 clubId 的资金申请在同一个 semester 不能重复
-            int DuplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), conn);
-
-            if (DuplicateInSameSemester>0) {
+            int duplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), conn);
+            if (duplicateInSameSemester > 0) {
                 throw new IllegalStateException("A funding application already exists for this club and semester.");
             }
-
-            // Lock the funding application at the database level to prevent concurrent submissions
-            fundingApplicationRepository.lockFundingApplicationByClubId(fundingApplication.getClubId(), conn);
 
             // Save the funding application
             boolean isSuccess = fundingApplicationRepository.saveFundingApplication(fundingApplication, conn);
