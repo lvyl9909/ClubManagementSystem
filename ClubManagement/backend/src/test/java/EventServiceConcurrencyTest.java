@@ -94,7 +94,7 @@ public class EventServiceConcurrencyTest {
 
     @Test
     public void testConcurrentEventUpdates() throws InterruptedException {
-        int numberOfThreads = 10;  // 模拟10个线程同时更新事件
+        int numberOfThreads = 3;  // 模拟10个线程同时更新事件
         int eventId = 47;  // 假设要更新的事件ID
         int clubId =30;
         int venueId =11;

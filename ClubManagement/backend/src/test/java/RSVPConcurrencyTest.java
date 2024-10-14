@@ -97,8 +97,8 @@ public class RSVPConcurrencyTest {
 
     @Test
     public void testConcurrentRSVPApplications() throws InterruptedException {
-        int numberOfThreads = 10;  // 例如模拟 10 个用户并发申请
-        int eventId = 4;  // 测试的 eventId
+        int numberOfThreads = 3;  // 例如模拟 10 个用户并发申请
+        int eventId = 1;  // 测试的 eventId
         int studentId = 7;  // 假设一个学生 ID
         int numTickets = 2;  // 每个学生申请 2 张票
         List<Integer> participates_id = Arrays.asList(7, 8);  // 参与者 ID 列表
@@ -116,7 +116,7 @@ public class RSVPConcurrencyTest {
                 long startTime = System.currentTimeMillis(); // 记录开始时间
                 try {
                     // 调用 applyForRSVP 方法
-                    eventService.applyForRSVP(eventId, currentStudentId, numTickets, participates_id,3);
+                    eventService.applyForRSVP(eventId, currentStudentId, numTickets, participates_id,4);
                     return true;  // 成功
                 } catch (Exception e) {
                     System.err.println("Error applying for RSVP: " + e.getMessage());

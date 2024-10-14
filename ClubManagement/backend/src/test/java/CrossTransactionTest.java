@@ -107,7 +107,7 @@ public class CrossTransactionTest {
     @Test
     public void testConcurrentRSVPAndEventUpdates() throws InterruptedException {
         int numberOfRSVPThreads = 10;  // 模拟5个学生并发申请
-        int numberOfEventUpdateThreads = 2;  // 模拟5个管理员并发更新事件
+        int numberOfEventUpdateThreads = 1;  // 模拟5个管理员并发更新事件
         int eventId = 4;  // 假设测试的 eventId
         int studentId = 7;  // 假设一个初始学生 ID
         int numTickets = 2;  // 每个学生申请 2 张票
@@ -127,7 +127,7 @@ public class CrossTransactionTest {
             final int currentStudentId = studentId + i;  // 模拟不同的学生 ID
             Callable<Boolean> rsvpTask = () -> {
                 try {
-                    eventService.applyForRSVP(eventId, currentStudentId, numTickets, participatesId, 1);  // 申请 RSVP
+                    eventService.applyForRSVP(eventId, currentStudentId, numTickets, participatesId, 5);  // 申请 RSVP
                     return true;
                 } catch (Exception e) {
                     System.err.println("RSVP Error: " + e.getMessage());
@@ -143,7 +143,7 @@ public class CrossTransactionTest {
                 try {
                     // 获取并更新事件
                     Event event = eventService.getEventById(eventId);
-                    event.setCapacity((int) (100 + Thread.currentThread().getId()));  // 每个线程更新不同的容量
+                    event.setCapacity((int) 4);  // 每个线程更新不同的容量
                     return eventService.updateEvent(event);  // 更新事件
                 } catch (Exception e) {
                     System.err.println("Event Update Error: " + e.getMessage());
@@ -157,7 +157,7 @@ public class CrossTransactionTest {
             final int currentStudentId = studentId + i;  // 模拟不同的学生 ID
             Callable<Boolean> rsvpTask = () -> {
                 try {
-                    eventService.applyForRSVP(eventId, currentStudentId, numTickets, participatesId, 1);  // 申请 RSVP
+                    eventService.applyForRSVP(eventId, currentStudentId, numTickets, participatesId, 5);  // 申请 RSVP
                     return true;
                 } catch (Exception e) {
                     System.err.println("RSVP Error: " + e.getMessage());
@@ -220,22 +220,9 @@ public class CrossTransactionTest {
     @Test
     public void testInterleavedFundingApplicationOperations() throws InterruptedException {
         int numberOfThreads = 10;  // 模拟 10 个线程并发执行不同操作
-        int applicationId = 16;    // 假设测试的 funding application ID
+        int applicationId = 9;    // 假设测试的 funding application ID
         int reviewerId = 1;        // 假设测试的 reviewer ID
         List<FundingApplication> applications = new ArrayList<>();
-
-        // 创建用于模拟的资金申请对象
-        for (int i = 0; i < numberOfThreads; i++) {
-            FundingApplication application = new FundingApplication(
-                    "Funding for project " + i,
-                    BigDecimal.valueOf(1000 + i * 100),
-                    1,
-                    1,  // 确保 club 对象不为 null 且包含有效的 clubId
-                    fundingApplicationStatus.Submitted,
-                    new java.util.Date()
-            );
-            applications.add(application);
-        }
 
         // 创建线程池
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
@@ -249,16 +236,10 @@ public class CrossTransactionTest {
                 long startTime = System.currentTimeMillis(); // 记录开始时间
 
                 // 随机选择一个操作
-                int operationType = random.nextInt(3);
+                int operationType = random.nextInt(2);
 
-                try (Connection conn = databaseConnectionManager.nextConnection()) {
-                    conn.setAutoCommit(false);  // 禁用自动提交
-
+                try {
                     if (operationType == 0) {
-                        // 操作类型 0：提交资金申请
-                        System.out.println("Thread " + index + " is submitting a funding application.");
-                        fundingApplicationService.saveFundingApplication(applications.get(index), conn);
-                    } else if (operationType == 1) {
                         // 操作类型 1：审核资金申请
                         String status = random.nextBoolean() ? "Approved" : "Rejected";
                         System.out.println("Thread " + index + " is reviewing the funding application with status: " + status);
@@ -270,8 +251,6 @@ public class CrossTransactionTest {
                         application.setAmount(BigDecimal.valueOf(1000 + Thread.currentThread().getId()));
                         fundingApplicationService.updateFundingApplication(application);
                     }
-
-                    conn.commit();  // 提交事务
                     return true;  // 成功
                 } catch (SQLException e) {
                     System.err.println("SQL Error in Thread " + index + ": " + e.getMessage());

@@ -65,7 +65,6 @@ public class FundingApplicationService {
         } finally {
             // Release the thread-level lock
             LockManagerWait.getInstance().releaseLock(clubId, threadName);
-
             conn.setAutoCommit(true);
         }
     }
@@ -163,13 +162,18 @@ public class FundingApplicationService {
 
             // 禁止自动提交，开启事务
             connection.setAutoCommit(false);
-            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
             // 获取当前 fundingApplication 的最新版本，确保使用正确的版本号
             FundingApplication fundingApplicationFromDb = fundingApplicationRepository.findFundingApplicationsByIds(fundingApplication.getId(), connection);
 
             // 将数据库中的版本号赋值给传入的对象，以便后续的乐观锁检查
             fundingApplication.setVersion(fundingApplicationFromDb.getVersion());
+
+            // 第一个判断：资金申请的状态必须是 Reviewed，才能进行审批
+            if (fundingApplication.getStatus() != fundingApplicationStatus.Submitted) {
+                throw new IllegalStateException("Funding application is not in 'Submitted' status.");
+            }
 
             // 第二个判断：同一个 clubId 的资金申请在同一个 semester 不能重复
             boolean isDuplicateInSameSemester = fundingApplicationRepository.existsByClubIdAndSemester(fundingApplication.getClubId(), fundingApplication.getSemester(), connection);

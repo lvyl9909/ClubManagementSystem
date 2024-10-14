@@ -170,7 +170,7 @@ public class EventService {
                     // 确保在执行任何事务之前禁用自动提交
                     if (connection.getAutoCommit()) {
                         connection.setAutoCommit(false);  // 禁用自动提交，手动管理事务
-                        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+                        connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
                     }
                     // 1. 查找 Event 并更新其容量（使用乐观锁控制）
                     Event event = eventRepository.findEventById(eventId,connection);
@@ -224,7 +224,7 @@ public class EventService {
                     throw e;  // 重试次数用尽，抛出异常
                 }
                 // 等待一段时间后重试
-                Thread.sleep(100);
+                Thread.sleep(200);
             }
         }
     }
