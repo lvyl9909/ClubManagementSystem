@@ -60,7 +60,7 @@ public class Ticket extends DomainObject {
     }
 
     public void setEventId(Integer eventId) {
-        eventId = eventId;
+        this.eventId = eventId;
     }
 
     public Integer getStudentId() {

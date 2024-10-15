@@ -26,9 +26,7 @@ public class ClubDataMapper {
         this.databaseConnectionManager = databaseConnectionManager;
     }
 
-    public Club findClubById(int Id){
-        var connection = databaseConnectionManager.nextConnection();
-
+    public Club findClubById(int Id,Connection connection){
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM clubs WHERE clubs.club_id = ?");
             stmt.setInt(1, Id);
@@ -38,9 +36,6 @@ public class ClubDataMapper {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            databaseConnectionManager.releaseConnection(connection);
-
         }
         return null;
     }

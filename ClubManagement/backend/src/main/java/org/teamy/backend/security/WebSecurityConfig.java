@@ -55,7 +55,7 @@ public class WebSecurityConfig implements ServletContextAware {
     private ServletContext servletContext;
     private DatabaseConnectionManager databaseConnectionManager;
 
-    //定义表单登陆的方法
+    //Define the form login method
     @Bean
     public UserDetailsService userDetailsService() {
         ClubDataMapper clubDataMapper = ClubDataMapper.getInstance(databaseConnectionManager);
@@ -63,12 +63,13 @@ public class WebSecurityConfig implements ServletContextAware {
         TicketDataMapper ticketDataMapper = TicketDataMapper.getInstance(databaseConnectionManager);
         StudentDataMapper studentDataMapper = StudentDataMapper.getInstance(databaseConnectionManager);
         StudentClubDataMapper studentClubDataMapper = StudentClubDataMapper.getInstance(databaseConnectionManager);
+        FundingApplicationMapper fundingApplicationMapper = FundingApplicationMapper.getInstance(databaseConnectionManager);
 
-        StudentRepository userRepository =  StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper);
-        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
+        StudentRepository userRepository =  StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper,fundingApplicationMapper);
+        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper,databaseConnectionManager);
         return new CustomUserDetailsService(userRepository,studentClubRepository);
     }
-    //未认证的入口
+    // Non-authenticated point
     @Bean
     AuthenticationEntryPoint unauthorizedEntryPoint() {
         return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
@@ -87,7 +88,7 @@ public class WebSecurityConfig implements ServletContextAware {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, TokenAuthenticationFilter tokenAuthenticationFilter, AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
         return http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .and()
                 .exceptionHandling()
                 .defaultAuthenticationEntryPointFor(authenticationEntryPoint, PROTECTED_URLS)
@@ -119,6 +120,7 @@ public class WebSecurityConfig implements ServletContextAware {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        System.out.println("Allowed Origin: " + System.getProperty(PROPERTY_CORS_ORIGINS_UI));
         configuration.setAllowedOrigins(Arrays.asList(System.getProperty(PROPERTY_CORS_ORIGINS_UI)));
         configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT","DELETE"));

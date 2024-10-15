@@ -15,5 +15,5 @@ public class Role implements GrantedAuthority {
         return String.format("ROLE_%s", roleName);
     }
 
-    // Getter 和 Setter 方法...
+    // Getter and Setter method...
 }

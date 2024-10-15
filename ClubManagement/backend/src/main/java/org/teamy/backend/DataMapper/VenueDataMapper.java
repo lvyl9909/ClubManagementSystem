@@ -5,6 +5,7 @@ import org.teamy.backend.model.Ticket;
 import org.teamy.backend.model.TicketStatus;
 import org.teamy.backend.model.Venue;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,8 +24,7 @@ public class VenueDataMapper {
     private VenueDataMapper(DatabaseConnectionManager databaseConnectionManager) {
         this.databaseConnectionManager = databaseConnectionManager;
     }
-    public Venue findVenueById(Integer Id){
-        var connection = databaseConnectionManager.nextConnection();
+    public Venue findVenueById(Integer Id,Connection connection){
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM venues WHERE id = ?");
             stmt.setInt(1, Id);
@@ -34,13 +34,10 @@ public class VenueDataMapper {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            databaseConnectionManager.releaseConnection(connection);
         }
         return null;
     }
-    public List<Venue> getAllVenue(){
-        var connection = databaseConnectionManager.nextConnection();
+    public List<Venue> getAllVenue(Connection connection){
         List<Venue> venues =new ArrayList<>();
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM venues");
@@ -53,8 +50,6 @@ public class VenueDataMapper {
             return venues;
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            databaseConnectionManager.releaseConnection(connection);
         }
     }
 }

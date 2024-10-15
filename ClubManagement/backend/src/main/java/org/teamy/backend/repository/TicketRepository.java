@@ -15,14 +15,8 @@ import java.util.concurrent.TimeUnit;
 public class TicketRepository {
     private final TicketDataMapper ticketDataMapper;
     private static TicketRepository instance;
-    private final Cache<Integer, Ticket> ticketCache;
-
     private TicketRepository(TicketDataMapper ticketDataMapper) {
         this.ticketDataMapper = ticketDataMapper;
-        this.ticketCache = CacheBuilder.newBuilder()
-                .maximumSize(100)  // Maximum 100 tickets in cache
-                .expireAfterWrite(30, TimeUnit.MINUTES)  // Tickets expire 10 minutes after being cached
-                .build();
     }
 
     public static synchronized TicketRepository getInstance(TicketDataMapper ticketDataMapper){
@@ -32,20 +26,13 @@ public class TicketRepository {
         return instance;
     }
     public Ticket findTicketById(int Id) {
-        Ticket ticket = ticketCache.getIfPresent(Id);
-        if (ticket == null) {
-            // If not in cache, query from database and put in cache
-            ticket = ticketDataMapper.findTicketById(Id);
-            if (ticket != null) {
-                ticketCache.put(Id, ticket); // Add ticket to cache
-            }
-        }
+        Ticket ticket = ticketDataMapper.findTicketById(Id);
+
         return ticket;
     }
     public void saveTicket(Connection connection,Ticket ticket) {
         try {
             ticketDataMapper.saveTicket(connection,ticket);
-            ticketCache.put(ticket.getId(), ticket); // Update cache
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -60,33 +47,21 @@ public class TicketRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        ticketCache.putAll(cacheUpdates);  // 批量更新缓存
     }
     public void deleteTicket(Integer ticketId)throws SQLException {
         ticketDataMapper.deleteTicket(ticketId);
-        ticketCache.invalidate(ticketId); // Remove from cache
     }
     public void deleteTicket(Connection connection,Integer ticketId)throws SQLException {
         ticketDataMapper.deleteTicket(connection,ticketId);
-        ticketCache.invalidate(ticketId); // Remove from cache
     }
 
-    public List<Ticket> getTicketsFromEvent(Integer eventId) throws SQLException {
-        return ticketDataMapper.getTicketsFromEvent(eventId);
+    public List<Ticket> getTicketsFromEvent(Integer eventId,Connection connection) throws SQLException {
+        return ticketDataMapper.getTicketsFromEvent(eventId,connection);
     }
 
     public List<Ticket> getTicketsFromEvent(Connection connection,Integer eventId) throws SQLException {
         return ticketDataMapper.getTicketsFromEvent(connection,eventId);
     }
 
-
-    public void invalidateTicketCache(Integer ticketId) {
-        ticketCache.invalidate(ticketId);
-    }
-    public void invalidateTicketCaches(List<Ticket> tickets) {
-        for (Ticket ticket:tickets){
-            ticketCache.invalidate(ticket.getId());
-        }
-    }
 
 }

@@ -1,11 +1,14 @@
 package org.teamy.backend.security;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.teamy.backend.DataMapper.StudentDataMapper;
+import org.teamy.backend.model.FacultyAdministrator;
 import org.teamy.backend.model.Person;
 import org.teamy.backend.model.Student;
 import org.teamy.backend.repository.StudentClubRepository;
@@ -21,13 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final StudentRepository studentRepository;
     private final StudentClubRepository studentClubRepository;
-    private static CustomUserDetailsService instance;
-    public static synchronized CustomUserDetailsService getInstance(StudentRepository studentRepository,StudentClubRepository studentClubRepository) {
-        if (instance == null) {
-            instance = new CustomUserDetailsService(studentRepository,studentClubRepository);
-        }
-        return instance;
-    }
     public CustomUserDetailsService(StudentRepository studentRepository,StudentClubRepository studentClubRepository) {
         this.studentRepository = studentRepository;
         this.studentClubRepository = studentClubRepository;
@@ -45,15 +41,19 @@ public class CustomUserDetailsService implements UserDetailsService {
                 Set<Role> roles = new HashSet<>();
                 if (user instanceof Student) {
                     roles.add(new Role("USER"));
-                }else{
-
+                    List<Integer> clubIds = studentClubRepository.findClubIdByStudentId(Math.toIntExact(user.getId()));
+                    for (Integer clubId : clubIds) {
+                        roles.add(new Role("CLUB_" + clubId));
+                    }
+                    user.setRoles(roles);
+                } else if (user instanceof FacultyAdministrator) {
+//                    roles.add(new Role("ADMIN"));
+                    System.out.println("add role administrator:"+user.getAuthorities());
+//                    user.setRoles(roles);
+               }
+                for (GrantedAuthority authority : user.getAuthorities()) {
+                    System.out.println(authority.getAuthority());
                 }
-                List<Integer> clubIds = studentClubRepository.findClubIdByStudentId(Math.toIntExact(user.getId()));
-                for (Integer clubId : clubIds) {
-                    roles.add(new Role("CLUB_" + clubId));
-                }
-                user.setRoles(roles);
-                System.out.println("yong hu quan xian :"+user.getAuthorities());
                 System.out.println(user.getPassword());
             }
             return user;
@@ -62,5 +62,5 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
     }
 
-    // 你可以添加方法来动态添加或删除用户
+
 }

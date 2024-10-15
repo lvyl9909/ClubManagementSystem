@@ -65,23 +65,23 @@ public class ContextListener implements ServletContextListener {
         EventRepository eventRepository = EventRepository.getInstance(eventDataMapper,venueDataMapper,clubDataMapper);
         FundingApplicationRepository fundingApplicationRepository = FundingApplicationRepository.getInstance(fundingApplicationMapper);
         RSVPRepository rsvpRepository = RSVPRepository.getInstance(rsvpDataMapper);
-        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper);
-        StudentRepository studentRepository = StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper);
+        StudentClubRepository studentClubRepository = StudentClubRepository.getInstance(studentClubDataMapper,databaseConnectionManager);
+        StudentRepository studentRepository = StudentRepository.getInstance(clubDataMapper,rsvpDataMapper,ticketDataMapper,studentDataMapper,studentClubDataMapper,fundingApplicationMapper);
         ClubRepository clubRepository = ClubRepository.getInstance(clubDataMapper,eventDataMapper,fundingApplicationMapper,studentRepository,studentClubDataMapper);
         TicketRepository ticketRepository = TicketRepository.getInstance(ticketDataMapper);
         VenueRepository venueRepository = VenueRepository.getInstance(venueDataMapper);
 
-        ClubService clubService = ClubService.getInstance(clubRepository,studentRepository);
+        ClubService clubService = ClubService.getInstance(clubRepository,studentRepository,databaseConnectionManager);
         EventService eventService = EventService.getInstance(eventRepository,rsvpRepository,ticketRepository,venueRepository,clubRepository,databaseConnectionManager);
-        FundingApplicationService fundingApplicationService =FundingApplicationService.getInstance(fundingApplicationRepository,clubRepository);
+        FundingApplicationService fundingApplicationService =FundingApplicationService.getInstance(fundingApplicationRepository,clubRepository,databaseConnectionManager);
         RSVPService rsvpService = RSVPService.getInstance(rsvpRepository);
-        StudentClubService studentClubService = StudentClubService.getInstance(studentClubRepository,studentRepository,clubRepository);
+        StudentClubService studentClubService = StudentClubService.getInstance(studentClubRepository,clubRepository,studentRepository);
         StudentService studentService =StudentService.getInstance(studentRepository);
-        VenueService venueService = VenueService.getInstance(venueRepository);
-        TicketService ticketService = TicketService.getInstance(ticketRepository,studentRepository,eventDataMapper);
-        CustomUserDetailsService customUserDetailsService = CustomUserDetailsService.getInstance(studentRepository,studentClubRepository);
+        VenueService venueService = VenueService.getInstance(venueRepository,databaseConnectionManager);
+        TicketService ticketService = TicketService.getInstance(ticketRepository,studentRepository,eventDataMapper,databaseConnectionManager);
+        CustomUserDetailsService customUserDetailsService = new CustomUserDetailsService(studentRepository,studentClubRepository);
 
-        sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager );
+        sce.getServletContext().setAttribute(DATABASE_SERVICE, databaseConnectionManager);
         sce.getServletContext().setAttribute(CLUB_SERVICE, clubService);
         sce.getServletContext().setAttribute(USER_DETAILS_SERVICE, customUserDetailsService);
         sce.getServletContext().setAttribute(EVENT_SERVICE, eventService);
