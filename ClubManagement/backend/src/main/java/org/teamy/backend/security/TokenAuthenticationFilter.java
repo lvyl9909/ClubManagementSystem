@@ -30,6 +30,12 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException{
+        String token1 = request.getHeader("Authorization");
+        if (token1 != null) {
+            // Log the token and ensure it is being passed correctly
+            System.out.println("Received Token: " + token1);
+        }
+
         var authorizationHeader = Optional.ofNullable(request.getHeader(HEADER_AUTHORIZATION))
                 .orElseThrow(() -> new BadCredentialsException(String.format("%s header is required", HEADER_AUTHORIZATION)));
         var matcher = PATTERN_TOKEN.matcher(authorizationHeader);
@@ -38,6 +44,9 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
             var authentication = jwtTokenService.readToken(token);
             try {
                 var result = getAuthenticationManager().authenticate(authentication); // 验证对象
+                for (GrantedAuthority authority:result.getAuthorities()){
+                    System.out.println("token authentication: "+authority.getAuthority());
+                }
                 SecurityContextHolder.getContext().setAuthentication(result);
                 return result;
             } catch (AuthenticationException e) {
