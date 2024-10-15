@@ -468,6 +468,35 @@ function ManageClub() {
         }
     };
 
+    const handleCancelApplication = async (application) => {
+        Modal.confirm({
+            title: 'Are you sure you want to cancel this application?',
+            content: 'This action cannot be undone.',
+            okText: 'Yes',
+            cancelText: 'No',
+            onOk: async () => {
+                try {
+                    const cancelData = {
+                        ...application,  // Pass the full application object to the backend
+                        reviewerId: 1,
+                    };
+                    console.log(cancelData)
+                    const res = await doCall(`${path}/student/fundingappliction/cancel`, 'POST', cancelData);
+                    if (res.ok) {
+                        message.success('Funding application canceled successfully');
+                        fetchFundingApplications();  // Refresh the funding applications list
+                    } else {
+                        message.error('Failed to cancel funding application');
+                    }
+                } catch (error) {
+                    console.error('Error canceling funding application:', error);
+                    message.error('An error occurred while canceling the funding application');
+                }
+            }
+        });
+    };
+
+
     return (
         <div className="club-management">
             <Tabs defaultActiveKey="1">
@@ -703,13 +732,24 @@ function ManageClub() {
                                         title="Action"
                                         key="action"
                                         render={(text, record) => (
-                                            <Button
-                                                type="primary" ghost
-                                                onClick={() => handleModifyApplication(record)}
-                                                disabled={record.status !== 'Submitted'}  // Disable if status is "Cancelled"
-                                            >
-                                                Modify
-                                            </Button>
+                                            <>
+                                                <Button
+                                                    type="primary" ghost
+                                                    onClick={() => handleModifyApplication(record)}
+                                                    disabled={record.status !== 'Submitted'}  // Disable if status is not "Submitted"
+                                                    style={{ marginRight: 8 }}
+                                                >
+                                                    Modify
+                                                </Button>
+                                                <Button
+                                                    type="danger"
+                                                    style={record.status === 'Submitted' ? { backgroundColor: '#ff4d4f', color: '#fff', cursor: 'pointer' } : { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' }}
+                                                    onClick={() => handleCancelApplication(record)}
+                                                    disabled={record.status !== 'Submitted'}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </>
                                         )}
                                     />
                                 </Table>
@@ -792,7 +832,7 @@ function ManageClub() {
                                 <DatePicker style={{ width: '100%' }} />
                             </Form.Item>
                             <Form.Item>
-                                <Button type="primary" htmlType="submit">Submit</Button>
+                                <Button type="primary" htmlType="submit">Modify</Button>
                             </Form.Item>
                         </Form>
                     </Modal>
