@@ -741,9 +741,8 @@ function ManageClub() {
                                                 >
                                                     Modify
                                                 </Button>
-                                                <Button
-                                                    type="danger"
-                                                    style={record.status === 'Submitted' ? { backgroundColor: '#ff4d4f', color: '#fff', cursor: 'pointer' } : { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' }}
+                                                <Button danger
+                                                    style={record.status === 'Submitted' ? { color: 'red', cursor: 'pointer' } : { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' }}
                                                     onClick={() => handleCancelApplication(record)}
                                                     disabled={record.status !== 'Submitted'}
                                                 >
