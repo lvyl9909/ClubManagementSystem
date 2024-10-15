@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -51,7 +52,9 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         super.successfulAuthentication(request, response, chain, authResult);
 
         System.out.println("User authenticated: " + authResult.getName());
-        System.out.println("Authorities: " + authResult.getAuthorities().toString());
+        for (GrantedAuthority authentication:authResult.getAuthorities()) {
+            System.out.println("Authorities: " + authentication.getAuthority());
+        }
         chain.doFilter(request, response);
     }
 }

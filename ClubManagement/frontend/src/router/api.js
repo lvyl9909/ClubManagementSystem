@@ -34,7 +34,6 @@ export async function doCall(path, method, data) {
     const type = localStorage.getItem('type');
 
      if (accessToken &&!path.includes('/auth/token')){
-    //if (accessToken){
         headers.Authorization = `${type} ${accessToken}`;
         // console.log("type",localStorage.getItem('type'));
     }
