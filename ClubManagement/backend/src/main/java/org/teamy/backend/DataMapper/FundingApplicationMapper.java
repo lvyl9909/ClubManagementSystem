@@ -84,6 +84,36 @@ public class FundingApplicationMapper {
         }
         return null;
     }
+    public FundingApplication findFundingApplicationsByIdBeforeReview(int id,Connection connection) {
+        try {
+            // 使用 SELECT ... FOR UPDATE 来锁定对应的记录
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM fundingapplications WHERE application_id = ?");
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                // 获取 fundingapplication 的 status
+                String statusString = rs.getString("status");
+                fundingApplicationStatus status = fundingApplicationStatus.fromString(statusString);
+
+                // 返回 fundingApplication 对象
+                return new FundingApplication(
+                        rs.getInt("application_id"),
+                        rs.getString("description"),
+                        rs.getBigDecimal("amount"),
+                        rs.getInt("semester"),
+                        rs.getInt("club"),
+                        status,
+                        rs.getDate("date"),
+                        rs.getInt("version")
+                );
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
     public List<FundingApplication> findAllApplication()throws SQLException{
         var connection = databaseConnectionManager.nextConnection();
         List<FundingApplication> fundingApplications = new ArrayList<>();
@@ -242,7 +272,7 @@ public class FundingApplicationMapper {
     }
     public boolean updateFundingApplication(FundingApplication fundingApplication, Connection connection) throws Exception {
         // SQL 查询增加了对版本号的检查，确保乐观锁的机制生效
-        String query = "UPDATE fundingapplications SET description = ?, amount = ?, semester = ?, club = ?, date = ?, reviewer = ?, version = version + 1 " +
+        String query = "UPDATE fundingapplications SET description = ?, amount = ?, semester = ?, club = ?, date = ?,  version = version + 1 " +
                 "WHERE application_id = ? AND version = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             // 设置参数
@@ -251,9 +281,8 @@ public class FundingApplicationMapper {
             stmt.setInt(3, fundingApplication.getSemester());
             stmt.setInt(4, fundingApplication.getClubId());
             stmt.setDate(5, java.sql.Date.valueOf(fundingApplication.getDate()));  // 假设 getDate() 返回 LocalDate
-            stmt.setLong(6, fundingApplication.getReviewerId());
-            stmt.setInt(7, fundingApplication.getId());
-            stmt.setInt(8, fundingApplication.getVersion());  // 设置版本号参数
+            stmt.setInt(6, fundingApplication.getId());
+            stmt.setInt(7, fundingApplication.getVersion());  // 设置版本号参数
 
             // 执行更新操作
             int rowsAffected = stmt.executeUpdate();

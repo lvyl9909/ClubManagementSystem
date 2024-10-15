@@ -27,6 +27,9 @@ public class FundingApplicationRepository {
     public FundingApplication findFundingApplicationsByIds(int Id,Connection connection) {
         return fundingApplicationMapper.findFundingApplicationsById(Id,connection);
     }
+    public FundingApplication findFundingApplicationsByIdBeforeReview(int Id,Connection connection) {
+        return fundingApplicationMapper.findFundingApplicationsByIdBeforeReview(Id,connection);
+    }
     public List<FundingApplication> getAllFundingApplication() {
         try {
             return fundingApplicationMapper.findAllApplication();

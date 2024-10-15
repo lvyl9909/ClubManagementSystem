@@ -172,7 +172,7 @@ public class FundingApplicationService {
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
             // 获取当前 fundingApplication 的最新版本，确保使用正确的版本号
-            FundingApplication fundingApplicationFromDb = fundingApplicationRepository.findFundingApplicationsByIds(fundingApplication.getId(), connection);
+            FundingApplication fundingApplicationFromDb = fundingApplicationRepository.findFundingApplicationsByIdBeforeReview(fundingApplication.getId(), connection);
 
             // 将数据库中的版本号赋值给传入的对象，以便后续的乐观锁检查
             fundingApplication.setVersion(fundingApplicationFromDb.getVersion());
