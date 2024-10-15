@@ -32,7 +32,16 @@ public class FundingApplication extends DomainObject {
         this.reviewerId = reviewerId;
         this.version = version;
     }
-
+    public FundingApplication(Integer id,String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date,Integer version) {
+        this.setId(id);
+        this.description = description;
+        this.amount = amount;
+        this.semester = semester;
+        this.clubId = clubId;
+        this.status = status;
+        this.date = date.toString();
+        this.version = version;
+    }
     public FundingApplication(String description, BigDecimal amount, Integer semester, Integer clubId, fundingApplicationStatus status, Date date) {
         this.description = description;
         this.amount = amount;

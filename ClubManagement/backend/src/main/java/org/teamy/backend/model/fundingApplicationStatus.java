@@ -4,7 +4,9 @@ public enum fundingApplicationStatus {
     Submitted,
     Reviewed,
     Approved,
+    Cancelled,
     Rejected;
+
     public static fundingApplicationStatus fromString(String status) {
         switch (status) {
             case "Submitted":
@@ -15,6 +17,8 @@ public enum fundingApplicationStatus {
                 return Approved;
             case "Rejected":
                 return Rejected;
+            case "Cancelled":
+                return Cancelled;
             default:
                 throw new IllegalArgumentException("Unknown status: " + status);
         }

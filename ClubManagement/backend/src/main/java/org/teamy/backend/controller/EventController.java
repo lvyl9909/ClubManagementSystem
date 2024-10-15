@@ -174,13 +174,11 @@ public class EventController extends HttpServlet {
             Map<String, Object> jsonMap = mapper.readValue(json, new TypeReference<Map<String, Object>>() {});
 
             int eventId = (Integer) jsonMap.get("eventId");
-            int studentId = (Integer) jsonMap.get("studentId");
             int numTickets = (Integer) jsonMap.get("numTickets");
 
             List<Integer> participatesId = (List<Integer>) jsonMap.get("participants_id");
             System.out.println("participant:"+participatesId);
-//            eventService.applyForRSVP(eventId, Math.toIntExact(studentService.getCurrentStudent().getId()), numTickets, participatesId,1);
-            eventService.applyForRSVP(eventId, studentId, numTickets, participatesId,4);
+            eventService.applyForRSVP(eventId, Math.toIntExact(studentService.getCurrentStudent().getId()), numTickets, participatesId,1);
 
             return ResponseEntity.ok(null); // 成功返回空响应
         } catch (OptimisticLockingFailureException e) {

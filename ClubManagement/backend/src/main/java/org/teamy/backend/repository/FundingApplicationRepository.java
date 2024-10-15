@@ -27,6 +27,9 @@ public class FundingApplicationRepository {
     public FundingApplication findFundingApplicationsByIds(int Id,Connection connection) {
         return fundingApplicationMapper.findFundingApplicationsById(Id,connection);
     }
+    public FundingApplication findFundingApplicationsByIdBeforeReview(int Id,Connection connection) {
+        return fundingApplicationMapper.findFundingApplicationsByIdBeforeReview(Id,connection);
+    }
     public List<FundingApplication> getAllFundingApplication() {
         try {
             return fundingApplicationMapper.findAllApplication();
@@ -54,5 +57,9 @@ public class FundingApplicationRepository {
 
     public int existsByClubIdAndSemester(Integer clubId, Integer semester, Connection connection) throws SQLException {
         return fundingApplicationMapper.existsByClubIdAndSemester(clubId,semester,connection);
+    }
+
+    public boolean cancelApplication(FundingApplication fundingApplication, Connection connection) throws Exception {
+        return fundingApplicationMapper.cancelApplication(fundingApplication,connection);
     }
 }

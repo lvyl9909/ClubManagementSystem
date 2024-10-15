@@ -68,6 +68,59 @@ public class FundingApplicationController extends HttpServlet {
                     resp,
                     () -> updateApplication(req)
             ).handle();
+        }else if(pathInfo.equals("/cancel")){
+            MarshallingRequestHandler.of(
+                    mapper, // 使用Jackson的ObjectMapper
+                    resp,
+                    () -> cancelApplication(req)
+            ).handle();
+        }
+    }
+
+    private ResponseEntity cancelApplication(HttpServletRequest req) {
+        try {
+            // 解析请求体中的Club数据，假设请求体是JSON格式
+            FundingApplication fundingApplication = parseApplictionFromRequest(req);
+
+            // 调用Service层保存Club
+            boolean isSaved = fundingApplicationService.cancelFundingApplication(fundingApplication);
+
+            if (isSaved) {
+                return ResponseEntity.ok(null);
+            } else {
+                return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                        Error.builder()
+                                .status(HttpServletResponse.SC_BAD_REQUEST)
+                                .message("Failed to save the event.")
+                                .reason("Failed to save the event.")
+                                .build()
+                );
+            }
+        } catch (OptimisticLockingFailureException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_CONFLICT,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_CONFLICT)
+                            .message("conflict.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_BAD_REQUEST)
+                            .message("Failed to save the event.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                            .message("An error occurred while saving the event.")
+                            .reason(e.getMessage())
+                            .build()
+            );
         }
     }
 

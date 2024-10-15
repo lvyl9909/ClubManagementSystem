@@ -178,27 +178,27 @@ function ManageClub() {
 
 
 
-        const fetchClubEvents = async () => {
-            try {
-                const res = await doCall(`${path}/student/events/?id=-1`, 'GET');
-                if (res.ok) {
-                    const data = await res.json();
-                    const filteredEvents = data.filter(event => String(event.clubId) === String(id));
-                    setAllEvents(data);
-                    setClubEvents(filteredEvents);
-                } else {
-                    setError('Failed to load events');
-                }
-            } catch (error) {
-                console.error('Error fetching events:', error);
-                setError('An error occurred while fetching events');
-            } finally {
-                setLoading(false);
+    const fetchClubEvents = async () => {
+        try {
+            const res = await doCall(`${path}/student/events/?id=-1`, 'GET');
+            if (res.ok) {
+                const data = await res.json();
+                const filteredEvents = data.filter(event => String(event.clubId) === String(id));
+                setAllEvents(data);
+                setClubEvents(filteredEvents);
+            } else {
+                setError('Failed to load events');
             }
-        };
-        useEffect(() => {
-            fetchClubEvents(); // Fetch events for the current club when the component loads
-        }, []);
+        } catch (error) {
+            console.error('Error fetching events:', error);
+            setError('An error occurred while fetching events');
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchClubEvents(); // Fetch events for the current club when the component loads
+    }, []);
 
 
     const onSelectChange = (newSelectedRowKeys) => {
@@ -272,16 +272,16 @@ function ManageClub() {
     const handleEditEvent = async (event) => {
         setCurrentEvent(event);
         // try {
-            // // Fetch all venues from the backend
-            // const res = await doCall(`${path}/student/venues/getAllVenue`, 'GET');
-            // if (res.ok) {
-            //     const venueData = await res.json();
-            //     setVenues(venueData);
-            //
-            //     // Find the venue name based on venueId
-            //     const currentVenue = venueData.find(venue => venue.id === event.venueId);
-            //
-            //     // Set form fields with event and venue details
+        // // Fetch all venues from the backend
+        // const res = await doCall(`${path}/student/venues/getAllVenue`, 'GET');
+        // if (res.ok) {
+        //     const venueData = await res.json();
+        //     setVenues(venueData);
+        //
+        //     // Find the venue name based on venueId
+        //     const currentVenue = venueData.find(venue => venue.id === event.venueId);
+        //
+        //     // Set form fields with event and venue details
         const selectedVenue = venues.find(venue => venue.id === event.venueId);
 
         // Set form fields with event details, including the preselected venue ID
@@ -347,6 +347,10 @@ function ManageClub() {
         setCreateModalVisible(true); // Show create modal
     };
 
+    const handleCreateNewApplication = () => {
+        form.resetFields();
+        setCreateFundingModalVisible(true);
+    }
     // Handle event creation submission
     const handleCreateEvent = async (values) => {
         try {
@@ -400,7 +404,6 @@ function ManageClub() {
     const handleCreateFundingApplication = async (values) => {
         try {
             const newFunding = {
-                title: values.title,
                 description: values.description,
                 amount: values.amount,
                 semester: values.semester,
@@ -427,10 +430,12 @@ function ManageClub() {
         setCurrentFunding(application);
         // Pre-fill form with application data
         form.setFieldsValue({
-            title: application.title,
             description: application.description,
             amount: application.amount,
             semester: application.semester,
+            date: moment(application.date, 'YYYY-MM-DD'),
+            clubId: application.clubId, // Hidden field
+            version: application.version  // Hidden field
         });
         setModifyFundingModalVisible(true);
     };
@@ -440,12 +445,13 @@ function ManageClub() {
         try {
             const updatedFunding = {
                 ...currentFunding,
-                title: values.title,
                 description: values.description,
                 amount: values.amount,
                 semester: values.semester,
-                date: moment().format('YYYY-MM-DD'),
-                clubId: id,
+                clubId: currentFunding.clubId,  // 不需要显示的 clubId
+                date: moment().format('YYYY-MM-DD'),  // 更新日期
+                version: currentFunding.version,  // version 自动加1
+                reviewerId: 1,  // 设置 reviewerId 为1
             };
 
             const res = await doCall(`${path}/student/fundingappliction/update`, 'POST', updatedFunding);
@@ -682,7 +688,7 @@ function ManageClub() {
                                 <Button
                                     type="primary"
                                     style={{ marginBottom: '16px' }}
-                                    onClick={() => setCreateFundingModalVisible(true)}
+                                    onClick={handleCreateNewApplication}
                                 >
                                     Create New Funding Application
                                 </Button>
@@ -719,9 +725,6 @@ function ManageClub() {
                         footer={null}
                     >
                         <Form form={form} onFinish={handleCreateFundingApplication}>
-                            <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please enter the title' }]}>
-                                <Input />
-                            </Form.Item>
                             <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Please enter the description' }]}>
                                 <Input.TextArea rows={3} />
                             </Form.Item>
@@ -750,13 +753,6 @@ function ManageClub() {
                     >
                         <Form form={form} onFinish={handleModifyFundingSubmit}>  {/* 表单提交时调用 handleModifyFundingSubmit 函数 */}
                             <Form.Item
-                                name="title"
-                                label="Title"
-                                rules={[{ required: true, message: 'Please enter the title' }]}
-                            >
-                                <Input />
-                            </Form.Item>
-                            <Form.Item
                                 name="description"
                                 label="Description"
                                 rules={[{ required: true, message: 'Please enter the description' }]}
@@ -780,11 +776,27 @@ function ManageClub() {
                                     <Option value={2}>2</Option>
                                 </Select>
                             </Form.Item>
+                            {/* 隐藏的表单项，用于设置 club 和 version */}
+                            <Form.Item name="clubId" style={{ display: 'none' }}>
+                                <Input />
+                            </Form.Item>
+                            <Form.Item name="version" style={{ display: 'none' }}>
+                                <Input />
+                            </Form.Item>
+                            {/* reviewer 字段不可编辑 */}
+                            <Form.Item
+                                name="date"
+                                label="Date"
+                                rules={[{ required: true, message: 'Please select a date' }]}
+                            >
+                                <DatePicker style={{ width: '100%' }} />
+                            </Form.Item>
                             <Form.Item>
                                 <Button type="primary" htmlType="submit">Submit</Button>
                             </Form.Item>
                         </Form>
                     </Modal>
+
 
 
                 </TabPane>

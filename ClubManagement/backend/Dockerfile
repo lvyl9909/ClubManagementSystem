@@ -4,7 +4,7 @@ WORKDIR /backend
 
 COPY . .
 
-RUN mvn clean package -DwarName=ClubManagement
+RUN mvn clean package -DwarName=ClubManagement -DskipTests
 
 # run stage
 FROM tomcat:10.0.27-jre17

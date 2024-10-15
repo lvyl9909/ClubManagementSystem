@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.cors.CorsConfiguration;
@@ -151,7 +152,9 @@ public class WebSecurityConfig implements ServletContextAware {
     }
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter(AuthenticationManager authenticationManager, SimpleUrlAuthenticationSuccessHandler simpleUrlAuthenticationSuccessHandler) {
-        var filter = new TokenAuthenticationFilter(STUDENT_PROTECTED_URLS, jwtTokenService);
+        RequestMatcher combinedMatcher = new OrRequestMatcher(ADMIN_PROTECTED_URLS, STUDENT_PROTECTED_URLS);
+
+        var filter = new TokenAuthenticationFilter(combinedMatcher, jwtTokenService);
         filter.setAuthenticationManager(authenticationManager);
         filter.setAuthenticationSuccessHandler(simpleUrlAuthenticationSuccessHandler);
         return filter;
