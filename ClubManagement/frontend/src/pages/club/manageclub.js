@@ -239,10 +239,10 @@ function ManageClub() {
     };
 
     const getStatusTagColor = (status) => {
-        if (status === 'Ongoing') return 'green';
-        if (status === 'Cancelled') return 'red';
-        if (status === 'Submitted') return 'blue';
-        if (status === 'Reviewed') return 'purple'
+        if (status === 'Ongoing'||status === 'Approved') return 'green';
+        if (status === 'Cancelled'||status === 'Rejected') return 'red';
+        if (status === 'Submitted') return 'purple';
+        if (status === 'Reviewed') return 'blue'
         return 'volcano';
     };
 
