@@ -63,6 +63,9 @@ function ManageClub() {
 
     const [fundingApplications, setFundingApplications] = useState([]);
     const [createFundingModalVisible, setCreateFundingModalVisible] = useState(false); // Modal for creating new funding
+    const [modifyFundingModalVisible, setModifyFundingModalVisible] = useState(false); // For modifying an application
+    const [currentFunding, setCurrentFunding] = useState(null); // The funding application being modified
+
 
 
     const checkAuthorization = () => {
@@ -419,6 +422,46 @@ function ManageClub() {
         }
     };
 
+    // Handle modifying funding application
+    const handleModifyApplication = (application) => {
+        setCurrentFunding(application);
+        // Pre-fill form with application data
+        form.setFieldsValue({
+            title: application.title,
+            description: application.description,
+            amount: application.amount,
+            semester: application.semester,
+        });
+        setModifyFundingModalVisible(true);
+    };
+
+    // Handle submitting modified application
+    const handleModifyFundingSubmit = async (values) => {
+        try {
+            const updatedFunding = {
+                ...currentFunding,
+                title: values.title,
+                description: values.description,
+                amount: values.amount,
+                semester: values.semester,
+                date: moment().format('YYYY-MM-DD'),
+                clubId: id,
+            };
+
+            const res = await doCall(`${path}/student/fundingappliction/update`, 'POST', updatedFunding);
+            if (res.ok) {
+                message.success('Funding application modified successfully');
+                setModifyFundingModalVisible(false); // Close modal
+                fetchFundingApplications(); // Refresh funding applications
+            } else {
+                message.error('Failed to modify funding application');
+            }
+        } catch (error) {
+            console.error('Error modifying funding application:', error);
+            message.error('An error occurred while modifying the funding application');
+        }
+    };
+
     return (
         <div className="club-management">
             <Tabs defaultActiveKey="1">
@@ -650,6 +693,19 @@ function ManageClub() {
                                     <Column title="date" dataIndex="date" key="date" />
                                     <Column title="status" dataIndex="status" key="status"
                                             render={status => <Tag color={getStatusTagColor(status)}>{status}</Tag>}/>
+                                    <Column
+                                        title="Action"
+                                        key="action"
+                                        render={(text, record) => (
+                                            <Button
+                                                type="primary" ghost
+                                                onClick={() => handleModifyApplication(record)}
+                                                disabled={record.status !== 'Submitted'}  // Disable if status is "Cancelled"
+                                            >
+                                                Modify
+                                            </Button>
+                                        )}
+                                    />
                                 </Table>
                             </Card>
                         </Col>
@@ -686,6 +742,51 @@ function ManageClub() {
                             </Form.Item>
                         </Form>
                     </Modal>
+                    <Modal
+                        visible={modifyFundingModalVisible} // 控制模态框是否可见
+                        title="Modify Funding Application"
+                        onCancel={() => setModifyFundingModalVisible(false)} // 取消时关闭模态框
+                        footer={null}
+                    >
+                        <Form form={form} onFinish={handleModifyFundingSubmit}>  {/* 表单提交时调用 handleModifyFundingSubmit 函数 */}
+                            <Form.Item
+                                name="title"
+                                label="Title"
+                                rules={[{ required: true, message: 'Please enter the title' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                            <Form.Item
+                                name="description"
+                                label="Description"
+                                rules={[{ required: true, message: 'Please enter the description' }]}
+                            >
+                                <Input.TextArea rows={3} />
+                            </Form.Item>
+                            <Form.Item
+                                name="amount"
+                                label="Amount"
+                                rules={[{ required: true, message: 'Please enter the amount' }]}
+                            >
+                                <InputNumber min={0} precision={2} style={{ width: '100%' }} />
+                            </Form.Item>
+                            <Form.Item
+                                name="semester"
+                                label="Semester"
+                                rules={[{ required: true, message: 'Please select a semester' }]}
+                            >
+                                <Select placeholder="Select a semester">
+                                    <Option value={1}>1</Option>
+                                    <Option value={2}>2</Option>
+                                </Select>
+                            </Form.Item>
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit">Submit</Button>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+
+
                 </TabPane>
             </Tabs>
         </div>

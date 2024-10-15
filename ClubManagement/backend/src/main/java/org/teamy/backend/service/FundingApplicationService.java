@@ -163,6 +163,7 @@ public class FundingApplicationService {
 
     public boolean updateFundingApplication(FundingApplication fundingApplication) throws Exception {
         Connection connection = null;
+        System.out.println(fundingApplication.getDescription()+fundingApplication.getReviewer()+fundingApplication.getDate());
         try {
             // 获取数据库连接
             connection = databaseConnectionManager.nextConnection();
