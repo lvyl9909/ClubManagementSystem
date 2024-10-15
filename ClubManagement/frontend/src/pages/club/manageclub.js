@@ -347,6 +347,10 @@ function ManageClub() {
         setCreateModalVisible(true); // Show create modal
     };
 
+    const handleCreateNewApplication = () => {
+        form.resetFields();
+        setCreateFundingModalVisible(true);
+    }
     // Handle event creation submission
     const handleCreateEvent = async (values) => {
         try {
@@ -400,7 +404,6 @@ function ManageClub() {
     const handleCreateFundingApplication = async (values) => {
         try {
             const newFunding = {
-                title: values.title,
                 description: values.description,
                 amount: values.amount,
                 semester: values.semester,
@@ -685,7 +688,7 @@ function ManageClub() {
                                 <Button
                                     type="primary"
                                     style={{ marginBottom: '16px' }}
-                                    onClick={() => setCreateFundingModalVisible(true)}
+                                    onClick={handleCreateNewApplication}
                                 >
                                     Create New Funding Application
                                 </Button>
@@ -722,9 +725,6 @@ function ManageClub() {
                         footer={null}
                     >
                         <Form form={form} onFinish={handleCreateFundingApplication}>
-                            <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please enter the title' }]}>
-                                <Input />
-                            </Form.Item>
                             <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Please enter the description' }]}>
                                 <Input.TextArea rows={3} />
                             </Form.Item>
