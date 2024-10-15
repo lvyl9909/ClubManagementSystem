@@ -33,7 +33,8 @@ export async function doCall(path, method, data) {
     const accessToken = localStorage.getItem('accessToken');
     const type = localStorage.getItem('type');
 
-    if (accessToken &&!path.includes('/auth/token')){
+     if (accessToken &&!path.includes('/auth/token')){
+    //if (accessToken){
         headers.Authorization = `${type} ${accessToken}`;
         // console.log("type",localStorage.getItem('type'));
     }
@@ -48,6 +49,7 @@ export async function doCall(path, method, data) {
         headers,
         body,
         credentials: 'include',
+        mode:'cors'
     });
 
 

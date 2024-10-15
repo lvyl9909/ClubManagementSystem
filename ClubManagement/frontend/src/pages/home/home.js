@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Col, Row, Card, Table } from 'antd'
+import { Col, Row, Card } from 'antd'
+import { useNavigate } from 'react-router-dom';
 //import { getData } from '../../api'
 import "./home.css"
 import * as Icon from "@ant-design/icons";
@@ -13,6 +14,7 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     useEffect(() => {
+
         const fetchUserData = async () => {
             try {
                 const res = await doCall(`${path}/student/userdetailed/info`, 'GET');
@@ -31,6 +33,8 @@ const Home = () => {
         };
         fetchUserData();
     }, []);
+
+
 
     if (loading) {
         return <p>Loading...</p>;

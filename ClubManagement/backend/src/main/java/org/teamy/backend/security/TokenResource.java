@@ -7,7 +7,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +32,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @WebServlet("/auth/token")
 public class TokenResource extends HttpServlet {
@@ -66,15 +73,22 @@ public class TokenResource extends HttpServlet {
                 System.out.println(login.getUsername());
                 UserDetails userDetails = Optional.ofNullable(userDetailsService.loadUserByUsername(login.getUsername()))
                         .orElseThrow(ForbiddenException::new);
-                System.out.println(userDetails.getAuthorities()); // 打印用户的权限
-//                if (!passwordEncoder.matches(login.getPassword(), userDetails.getPassword())) {
-//                    throw new ForbiddenException();
-//                }
+                for (GrantedAuthority authority : userDetails.getAuthorities()) {
+                    System.out.println(authority.getAuthority());
+
+                }
+
                 System.out.println(login.getPassword());
                 System.out.println(userDetails.getPassword());
+
                 if (!login.getPassword().equals(userDetails.getPassword())) {
                     throw new ForbiddenException();
                 }
+                // 校验密码成功后，创建 Authentication 对象并设置到 SecurityContextHolder 中
+                Authentication auth = new UsernamePasswordAuthenticationToken(
+                        userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
+
                 System.out.println("password correct");
                 var token = jwtTokenService.createToken(userDetails);
                 System.out.println("token created");
@@ -82,6 +96,9 @@ public class TokenResource extends HttpServlet {
                 addSameSiteCookie(resp, refreshCookie, "None");
 //                resp.addCookie(refreshCookie);
                 System.out.println("Cookie added");
+
+
+
                 return tokenResponse(token.getAccessToken());
             }catch (UsernameNotFoundException e) {
                 return ResponseEntity.of(HttpServletResponse.SC_UNAUTHORIZED, Error.builder()
@@ -112,14 +129,13 @@ public class TokenResource extends HttpServlet {
                 var refreshRequest = mapper.readValue(bodyBuffer.toString(), RefreshRequest.class);
                 Cookie[] cookies = req.getCookies();
                 if (cookies == null) {
-                    // 说明请求中没有任何 cookies
+                    // no cookies in the request
                     System.out.println("No cookies in request");
                 } else {
                     System.out.println("Cookies count: " + cookies.length);
                     Arrays.stream(cookies).forEach(cookie ->
                             System.out.println("Cookie Name: " + cookie.getName() + ", Cookie Value: " + cookie.getValue()));
                 }
-
                 var refreshToken = getRefreshCookie(req);
                 System.out.println(refreshToken);
                 var token = jwtTokenService.refresh(refreshRequest.getAccessToken(), refreshToken);
@@ -136,6 +152,9 @@ public class TokenResource extends HttpServlet {
             }
         })).handle();
     }
+
+
+
 
     private Cookie refreshCookie(String refreshToken, String contextPath) {
         var cookie = new Cookie(COOKIE_NAME_REFRESH_TOKEN, refreshToken);
@@ -176,12 +195,30 @@ public class TokenResource extends HttpServlet {
     }
 
     private String getRefreshCookie(HttpServletRequest req) {
+        Cookie[] cookies = Optional.ofNullable(req.getCookies()).orElse(new Cookie[]{});
+        System.out.println("Total cookies: " + cookies.length);
 
-        return Arrays.stream(Optional.ofNullable(req.getCookies()).orElse(new Cookie[]{}))
-                .filter(c -> c.getName().equals(COOKIE_NAME_REFRESH_TOKEN))
+        // Step 2: 打印每个 cookie 的名称和值
+        Arrays.stream(cookies).forEach(cookie ->
+                System.out.println("Cookie Name: " + cookie.getName() + ", Cookie Value: " + cookie.getValue())
+        );
+
+        // Step 3: 查找特定的 refresh token cookie
+        return Arrays.stream(cookies)
+                .filter(c -> {
+                    boolean isMatch = c.getName().equals(COOKIE_NAME_REFRESH_TOKEN);
+                    System.out.println("Checking cookie: " + c.getName() + ", Match: " + isMatch);
+                    return isMatch;
+                })
                 .findFirst()
-                .map(Cookie::getValue)
-                .orElseThrow(() -> new BadCredentialsException("no refresh cookie set"));
+                .map(cookie -> {
+                    System.out.println("Found refresh token cookie: " + cookie.getValue());
+                    return cookie.getValue();
+                })
+                .orElseThrow(() -> {
+                    System.out.println("No refresh token cookie found");
+                    return new BadCredentialsException("No refresh cookie set");
+                });
     }
 
 

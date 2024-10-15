@@ -6,6 +6,7 @@ import org.teamy.backend.DataMapper.TicketDataMapper;
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.RSVP;
 import org.teamy.backend.model.Ticket;
+import org.teamy.backend.repository.EventRepository;
 import org.teamy.backend.repository.RSVPRepository;
 import org.teamy.backend.repository.TicketRepository;
 import org.teamy.backend.service.StudentService;

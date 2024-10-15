@@ -5,6 +5,7 @@ import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Ticket;
 import org.teamy.backend.model.TicketStatus;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,8 +41,7 @@ public class StudentClubDataMapper {
         return clubsId;
     }
 
-    public List<Integer> findStudentIdByClubId(Integer clubId) throws SQLException {
-        var connection = databaseConnectionManager.nextConnection();
+    public List<Integer> findStudentIdByClubId(Integer clubId, Connection connection) throws SQLException {
         List<Integer> studentsId = new ArrayList<>();
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM students_clubs WHERE club_id = ?");
@@ -51,8 +51,8 @@ public class StudentClubDataMapper {
             while (rs.next()) {
                 studentsId.add(rs.getInt("student_id"));
             }
-        } finally {
-            databaseConnectionManager.releaseConnection(connection);
+        } catch (Exception e){
+            throw e;
         }
         return studentsId;
     }

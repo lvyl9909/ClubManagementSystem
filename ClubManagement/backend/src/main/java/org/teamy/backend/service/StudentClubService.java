@@ -27,20 +27,16 @@ public class StudentClubService {
         this.clubRepository = clubRepository;
         this.studentRepository = studentRepository;
     }
-    public void addAdmin(Integer clubId,Integer studentId){
+    public synchronized void addAdmin(Integer clubId,Integer studentId){
         try {
             studentClubRepository.addNewAdmin(clubId,studentId);
-            clubRepository.invalidateClubCache(clubId);
-            studentRepository.invalidateStudentCache(studentId);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-    public void deleteAdmin(Integer clubId,Integer studentId){
+    public synchronized void deleteAdmin(Integer clubId,Integer studentId){
         try {
             studentClubRepository.deleteAdmin(clubId,studentId);
-            clubRepository.invalidateClubCache(clubId);
-            studentRepository.invalidateStudentCache(studentId);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

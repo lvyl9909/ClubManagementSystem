@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.model.Event;
 import org.teamy.backend.model.exception.NotEnoughTicketsException;
+import org.teamy.backend.model.exception.OptimisticLockingFailureException;
 import org.teamy.backend.model.request.ResponseEntity;
 import org.teamy.backend.model.exception.Error;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
@@ -132,7 +133,14 @@ public class EventController extends HttpServlet {
                                 .build()
                 );
             }
-
+        }catch (OptimisticLockingFailureException e){
+            return ResponseEntity.of(HttpServletResponse.SC_CONFLICT,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_CONFLICT)
+                            .message("conflict on update.")
+                            .reason(e.getMessage())
+                            .build()
+            );
         } catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()
@@ -166,13 +174,23 @@ public class EventController extends HttpServlet {
             Map<String, Object> jsonMap = mapper.readValue(json, new TypeReference<Map<String, Object>>() {});
 
             int eventId = (Integer) jsonMap.get("eventId");
+            int studentId = (Integer) jsonMap.get("studentId");
             int numTickets = (Integer) jsonMap.get("numTickets");
 
             List<Integer> participatesId = (List<Integer>) jsonMap.get("participants_id");
             System.out.println("participant:"+participatesId);
-            eventService.applyForRSVP(eventId, Math.toIntExact(studentService.getCurrentStudent().getId()), numTickets, participatesId);
+//            eventService.applyForRSVP(eventId, Math.toIntExact(studentService.getCurrentStudent().getId()), numTickets, participatesId,1);
+            eventService.applyForRSVP(eventId, studentId, numTickets, participatesId,4);
+
             return ResponseEntity.ok(null); // 成功返回空响应
-        } catch (NotEnoughTicketsException e) {
+        } catch (OptimisticLockingFailureException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_CONFLICT,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_CONFLICT)
+                            .message("RSVP ticket Conflict.")
+                            .reason(e.getMessage())
+                            .build());
+        }catch (NotEnoughTicketsException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()
                             .status(HttpServletResponse.SC_BAD_REQUEST)
@@ -227,7 +245,7 @@ public class EventController extends HttpServlet {
         Event event = null;
         try {
             event = eventService.getEventById(eventId);
-            Integer currentCapacity = eventService.getCurrentCapacity(event);
+            Integer currentCapacity = event.getCapacity();
             event.setCurrentCapacity(currentCapacity);
             return ResponseEntity.ok(event);
         }catch (NumberFormatException e) {

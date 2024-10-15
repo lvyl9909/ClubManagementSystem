@@ -10,5 +10,4 @@ public class NotFoundException extends RuntimeException {
         super(String.format("%s with ID %s not found", type, id), cause);
     }
 
-
 }

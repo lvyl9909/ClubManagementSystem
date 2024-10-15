@@ -2,6 +2,7 @@ package org.teamy.backend.DataMapper;
 
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.Club;
+import org.teamy.backend.model.FacultyAdministrator;
 import org.teamy.backend.model.Person;
 import org.teamy.backend.model.Student;
 
@@ -36,7 +37,7 @@ public class StudentDataMapper {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                return new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
+                return new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"),"USER");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -70,7 +71,8 @@ public class StudentDataMapper {
                         rs.getString("email"),
                         rs.getLong("phone_number"),
                         rs.getString("pwd"),
-                        rs.getBoolean("isactive"));
+                        rs.getBoolean("isactive"),
+                        "USER");
                 students.add(student);
             }
         } catch (SQLException e) {
@@ -92,9 +94,12 @@ public class StudentDataMapper {
             System.out.println("Finish search");
             if (rs.next()) {
                 if (Objects.equals(rs.getString("role"), "student")){
-                    user = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
-                }else {
-
+                    user = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"),"USER");
+                }else if (Objects.equals(rs.getString("role"), "admin")){
+                    user = new FacultyAdministrator(rs.getLong("id"),rs.getString("username"),
+                            rs.getString("name"), rs.getString("email"),
+                            rs.getLong("phone_number"),rs.getString("pwd"),
+                            rs.getBoolean("isactive"),"ADMIN");
                 }
                 return user;
             }
@@ -115,7 +120,7 @@ public class StudentDataMapper {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"));
+                Student student = new Student(rs.getLong("id"),rs.getString("username"), rs.getString("name"), rs.getString("email"),rs.getLong("phone_number"),rs.getString("pwd"),rs.getBoolean("isactive"),"USER");
                 students.add(student);
             }
             return students;

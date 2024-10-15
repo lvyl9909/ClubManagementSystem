@@ -1,18 +1,28 @@
-import React,{ useState }  from 'react'
-import { Form, Input, Button, message } from 'antd';
+import React,{ useState, useEffect }  from 'react'
+import { Form, Input, Button } from 'antd';
 import "./login.css"
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {useAuth} from '../../router/auth';
 
 
 const Login = () => {
     const path = process.env.REACT_APP_API_BASE_URL
-    const { login, authenticating, authenticationError } = useAuth();
+    const { login, authenticating, authenticationError, user  } = useAuth();
     // const [username, setUsername] = useState('');
     // const [password, setPassword] = useState('');
     // const [role, setRole] = useState("user");
     const [error, setError] = useState('');
     const navigate = useNavigate()
+
+    useEffect(() => {
+        if (user) {
+            if (user.authorities?.includes('ROLE_ADMIN')) {
+                navigate('/view_funding');
+            } else if (user.authorities?.includes('ROLE_USER')) {
+                navigate('/home');
+            }
+        }
+    }, [user, navigate]);
 
     const handleLogin = async (values) => {
         const { username, password } = values;
@@ -23,7 +33,6 @@ const Login = () => {
             if(authenticationError){
                 return;
             }
-            navigate('/Home');
         } catch (error) {
             setError('Invalid Username or Password! Please try again.');
         }

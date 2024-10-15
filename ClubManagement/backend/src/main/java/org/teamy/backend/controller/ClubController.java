@@ -19,9 +19,7 @@ import org.teamy.backend.model.request.ResponseEntity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import com.google.gson.Gson;
 
@@ -57,6 +55,9 @@ public class ClubController extends HttpServlet {
                     return listClubs();
                 } else {
                     try {
+                        HashMap<Integer,Integer> map = new HashMap<>();
+                        int[] nums = new int[0];
+                        map.getOrDefault(nums[0],0);
                         Integer clubId = Integer.valueOf(idParam); // 将id参数转换为整数
 
                         // 检查用户是否拥有访问该 clubId 的权限
