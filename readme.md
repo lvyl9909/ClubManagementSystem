@@ -68,17 +68,18 @@ This system is designed to manage student clubs, events, and funding application
 ### User Credentials
 To test the system, you can use the following pre-defined usernames and passwords. These users have already been created in the sample data:
 
-| Username   | Password   |
-|------------|------------|
-| username1  | password1  |
-| username2  | password2  |
-| username3  | password3  |
-| username4  | password4  |
-| username5  | password5  |
-| username6  | password6  |
-| username7  | password7  |
-| username8  | password8  |
-| username9  | password9  |
+| Username   | Password   | Note         |
+|------------|------------|--------------|
+| username1  | password1  | Club admin   |
+| username2  | password2  | Club admin   |
+| username3  | password3  | Club admin   |
+| username4  | password4  | Club admin   |
+| username5  | password5  | Club admin   |
+| username6  | password6  | Club admin   |
+| username7  | password7  | Club admin   |
+| username8  | password8  | Club admin   |
+| username9  | password9  | Club admin   |
+| username10 | password10 | Faculty admin|
 
 Simply log in using any of these credentials through the `/login` page or API to access the system's features.
 
