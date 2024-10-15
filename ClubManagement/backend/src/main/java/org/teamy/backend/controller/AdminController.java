@@ -13,6 +13,7 @@ import org.teamy.backend.config.ContextListener;
 import org.teamy.backend.model.FacultyAdministrator;
 import org.teamy.backend.model.FundingApplication;
 import org.teamy.backend.model.exception.Error;
+import org.teamy.backend.model.exception.OptimisticLockingFailureException;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.model.request.ResponseEntity;
@@ -74,7 +75,15 @@ public class AdminController extends HttpServlet {
             System.out.println("approve:"+idParam);
             fundingApplicationService.reviewFundingApplication(Integer.valueOf(idParam),Math.toIntExact(facultyAdministrator.getId()),"Approved");
             return ResponseEntity.ok(null);
-        } catch (IllegalArgumentException e) {
+        } catch (OptimisticLockingFailureException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_CONFLICT,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_CONFLICT)
+                            .message("conflict.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        }catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()
                             .status(HttpServletResponse.SC_BAD_REQUEST)

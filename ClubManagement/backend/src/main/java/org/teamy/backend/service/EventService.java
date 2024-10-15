@@ -140,10 +140,16 @@ public class EventService {
             boolean isSuccess =  eventRepository.updateEvent(event,connection);
             connection.commit();
             return isSuccess;
-        }catch (Exception e) {
+        }catch (OptimisticLockingFailureException e){
             try {
                 connection.rollback();  // 事务回滚
                 throw new OptimisticLockingFailureException("Failed to update event capacity due to version mismatch: "+e.getMessage());
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+        }catch(Exception e) {
+            try {
+                connection.rollback();  // 事务回滚
             } catch (SQLException rollbackEx) {
                 rollbackEx.printStackTrace();
             }
@@ -159,6 +165,7 @@ public class EventService {
                 e.printStackTrace();
             }
         }
+        return false;
     }
     public void applyForRSVP(int eventId, int studentId, int numTickets,List<Integer> participates_id,int retryCount) throws Exception {
 
@@ -175,7 +182,7 @@ public class EventService {
                     Event event = eventRepository.findEventById(eventId,connection);
                     System.out.println(event.getVersion());
                     if(event.getCapacity() - numTickets<0){
-                        throw new IllegalArgumentException("no more tickets");
+                        throw new NotEnoughTicketsException("no more tickets");
                     }
                     event.setCapacity(event.getCapacity() - numTickets);
 
@@ -198,7 +205,23 @@ public class EventService {
 
                     // 提交事务
                     connection.commit();
-                } catch (Exception e) {
+                } catch (NotEnoughTicketsException e) {
+                    try {
+                        connection.rollback();  // 事务回滚
+                        System.out.println("rollback");
+                        throw new NotEnoughTicketsException("version conflict: " + e.getMessage());
+                    } catch (SQLException rollbackEx) {
+                        rollbackEx.printStackTrace();
+                    }
+                }catch (OptimisticLockingFailureException e) {
+                    try {
+                        connection.rollback();  // 事务回滚
+                        System.out.println("rollback");
+                        throw new OptimisticLockingFailureException("version conflict: " + e.getMessage());
+                    } catch (SQLException rollbackEx) {
+                        rollbackEx.printStackTrace();
+                    }
+                }catch (Exception e) {
                     try {
                         connection.rollback();  // 事务回滚
                         System.out.println("rollback");
@@ -220,7 +243,7 @@ public class EventService {
                 return;  // 成功时直接返回
             } catch (OptimisticLockingFailureException e) {
                 if (retryCount == 0) {
-                    throw e;  // 重试次数用尽，抛出异常
+                    throw new OptimisticLockingFailureException("version conflict: " + e.getMessage());
                 }
                 // 等待一段时间后重试
                 Thread.sleep(200);

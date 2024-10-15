@@ -129,6 +129,16 @@ public class FundingApplicationService {
 
             // 提交事务
             connection.commit();
+        }catch (OptimisticLockingFailureException e) {
+            // 出现异常时回滚事务
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw new OptimisticLockingFailureException("conflict: " + e.getMessage());
         } catch (SQLException e) {
             // 出现异常时回滚事务
             if (connection != null) {
@@ -200,9 +210,16 @@ public class FundingApplicationService {
             }
             throw new RuntimeException("Error updating funding application: " + e.getMessage(), e);
         }catch (OptimisticLockingFailureException e){
-            System.out.println(e.getMessage());
-        }
-            finally {
+            // 在出现异常时回滚事务
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw new OptimisticLockingFailureException("Error updating funding application: " + e.getMessage());
+        } finally {
             // 确保在任何情况下都关闭数据库连接
             if (connection != null) {
                 try {
@@ -213,6 +230,5 @@ public class FundingApplicationService {
                 }
             }
         }
-        return false;
     }
 }

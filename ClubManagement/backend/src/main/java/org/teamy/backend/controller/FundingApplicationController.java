@@ -12,6 +12,7 @@ import org.teamy.backend.model.Club;
 import org.teamy.backend.model.Event;
 import org.teamy.backend.model.FundingApplication;
 import org.teamy.backend.model.exception.Error;
+import org.teamy.backend.model.exception.OptimisticLockingFailureException;
 import org.teamy.backend.model.request.MarshallingRequestHandler;
 import org.teamy.backend.model.request.RequestHandler;
 import org.teamy.backend.model.request.ResponseEntity;
@@ -128,7 +129,15 @@ public class FundingApplicationController extends HttpServlet {
                                 .build()
                 );
             }
-        } catch (IllegalArgumentException e) {
+        } catch (OptimisticLockingFailureException e) {
+            return ResponseEntity.of(HttpServletResponse.SC_CONFLICT,
+                    Error.builder()
+                            .status(HttpServletResponse.SC_CONFLICT)
+                            .message("conflict.")
+                            .reason(e.getMessage())
+                            .build()
+            );
+        }catch (IllegalArgumentException e) {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()
                             .status(HttpServletResponse.SC_BAD_REQUEST)
