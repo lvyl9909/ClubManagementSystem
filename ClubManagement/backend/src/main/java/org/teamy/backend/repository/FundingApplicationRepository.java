@@ -58,4 +58,8 @@ public class FundingApplicationRepository {
     public int existsByClubIdAndSemester(Integer clubId, Integer semester, Connection connection) throws SQLException {
         return fundingApplicationMapper.existsByClubIdAndSemester(clubId,semester,connection);
     }
+
+    public boolean cancelApplication(FundingApplication fundingApplication, Connection connection) throws Exception {
+        return fundingApplicationMapper.cancelApplication(fundingApplication,connection);
+    }
 }

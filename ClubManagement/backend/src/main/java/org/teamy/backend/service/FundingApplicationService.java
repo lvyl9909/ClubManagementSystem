@@ -169,7 +169,6 @@ public class FundingApplicationService {
 
             // 禁止自动提交，开启事务
             connection.setAutoCommit(false);
-            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
             // 获取当前 fundingApplication 的最新版本，确保使用正确的版本号
             FundingApplication fundingApplicationFromDb = fundingApplicationRepository.findFundingApplicationsByIdBeforeReview(fundingApplication.getId(), connection);
@@ -219,6 +218,72 @@ public class FundingApplicationService {
                 }
             }
             throw new OptimisticLockingFailureException("Error updating funding application: " + e.getMessage());
+        } finally {
+            // 确保在任何情况下都关闭数据库连接
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);  // 恢复自动提交模式
+                    connection.close();  // 关闭连接
+                } catch (SQLException closeEx) {
+                    closeEx.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public boolean cancelFundingApplication(FundingApplication fundingApplication) {
+        Connection connection = null;
+        try {
+            // 获取数据库连接
+            connection = databaseConnectionManager.nextConnection();
+
+            // 禁止自动提交，开启事务
+            connection.setAutoCommit(false);
+
+            // 获取当前 fundingApplication 的最新版本，确保使用正确的版本号
+            FundingApplication fundingApplicationFromDb = fundingApplicationRepository.findFundingApplicationsByIdBeforeReview(fundingApplication.getId(), connection);
+
+            // 将数据库中的版本号赋值给传入的对象，以便后续的乐观锁检查
+            fundingApplication.setVersion(fundingApplicationFromDb.getVersion());
+
+            // 第一个判断：资金申请的状态必须没被审批，才能进行更新
+            if (fundingApplication.getStatus() != fundingApplicationStatus.Submitted) {
+                throw new IllegalStateException("Funding application is not in 'Submitted' status.");
+            }
+
+            // 更新资金申请，使用乐观锁机制
+            boolean isSuccess = fundingApplicationRepository.cancelApplication(fundingApplication, connection);
+
+            if (!isSuccess) {
+                throw new RuntimeException("Failed to update the funding application.");
+            }
+
+            // 提交事务
+            connection.commit();
+
+            return true;
+        } catch (SQLException e) {
+            // 在出现异常时回滚事务
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Error updating funding application: " + e.getMessage(), e);
+        }catch (OptimisticLockingFailureException e){
+            // 在出现异常时回滚事务
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            throw new OptimisticLockingFailureException("Error updating funding application: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             // 确保在任何情况下都关闭数据库连接
             if (connection != null) {

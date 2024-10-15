@@ -3,6 +3,7 @@ package org.teamy.backend.DataMapper;
 import org.teamy.backend.config.DatabaseConnectionManager;
 import org.teamy.backend.model.*;
 import org.teamy.backend.model.exception.OptimisticLockingFailureException;
+import org.teamy.backend.service.FundingApplicationService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -310,10 +311,11 @@ public class FundingApplicationMapper {
     }
 
     public int existsByClubIdAndSemester(Integer clubId, Integer semester, Connection connection )throws SQLException {
-        String query = "SELECT COUNT(*) FROM fundingapplications WHERE club = ? AND semester = ?";
+        String query = "SELECT COUNT(*) FROM fundingapplications WHERE club = ? AND semester = ? AND status != ?::funding_application_status";
         PreparedStatement stmt = connection.prepareStatement(query);
         stmt.setInt(1, clubId);
         stmt.setInt(2, semester);
+        stmt.setString(3,fundingApplicationStatus.Cancelled.name());
         ResultSet rs = stmt.executeQuery();
 
         if (rs.next()) {
@@ -321,5 +323,33 @@ public class FundingApplicationMapper {
         }
 
         return 0;  // 没有记录则返回 false
+    }
+
+    public boolean cancelApplication(FundingApplication fundingApplication, Connection connection) throws Exception {
+        // SQL 查询增加了对版本号的检查，确保乐观锁的机制生效
+        String query ="UPDATE fundingapplications SET status = ?::funding_application_status, version = version + 1 " +
+                "WHERE application_id = ? AND version = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            // 设置参数
+            stmt.setString(1, fundingApplicationStatus.Cancelled.name());
+            stmt.setInt(2, fundingApplication.getId());
+            stmt.setInt(3, fundingApplication.getVersion());  // 设置版本号参数
+
+            // 执行更新操作
+            int rowsAffected = stmt.executeUpdate();
+
+            // 判断是否成功更新行，若版本号不匹配则没有更新行
+            if (rowsAffected == 0) {
+                throw new OptimisticLockingFailureException("Funding application has been modified by another transaction (optimistic locking failed).");
+            }
+
+            // 更新成功，手动递增 FundingApplication 对象中的版本号
+            fundingApplication.setVersion(fundingApplication.getVersion() + 1);
+
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new Exception("Error updating FundingApplication: " + e.getMessage());
+        }
     }
 }
