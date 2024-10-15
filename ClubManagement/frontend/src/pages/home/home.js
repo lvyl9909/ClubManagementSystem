@@ -45,7 +45,6 @@ const Home = () => {
     }
 
     const getRoleText = (roles) => {
-        console.log("Role value:", roles);
         const roleNames = roles.map(role => role.authority);
         if (roleNames.includes('ROLE_USER')) return 'Student';
         if (roleNames.includes('ROLE_ADMIN')) return 'Faculty Admin';

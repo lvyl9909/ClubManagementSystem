@@ -124,8 +124,8 @@ public class FundingApplicationController extends HttpServlet {
                 return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                         Error.builder()
                                 .status(HttpServletResponse.SC_BAD_REQUEST)
-                                .message("Failed to save the event.")
-                                .reason("Failed to save the event.")
+                                .message("Failed to save the application.")
+                                .reason("Failed to save the application.")
                                 .build()
                 );
             }
@@ -141,7 +141,7 @@ public class FundingApplicationController extends HttpServlet {
             return ResponseEntity.of(HttpServletResponse.SC_BAD_REQUEST,
                     Error.builder()
                             .status(HttpServletResponse.SC_BAD_REQUEST)
-                            .message("Failed to save the event.")
+                            .message("Failed to save the application.")
                             .reason(e.getMessage())
                             .build()
             );
@@ -150,7 +150,7 @@ public class FundingApplicationController extends HttpServlet {
             return ResponseEntity.of(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     Error.builder()
                             .status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                            .message("An error occurred while saving the event.")
+                            .message("An error occurred while saving the application.")
                             .reason(e.getMessage())
                             .build()
             );
