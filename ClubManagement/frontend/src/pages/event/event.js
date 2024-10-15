@@ -272,6 +272,11 @@ function Event() {
     };
     // Submit the RSVP request with participant details
     const handleRsvpSubmit = async (values) => {
+        const selectedEventDetails = allEvents.find(event => event.id === selectedEvent);
+        if (values.numTickets > selectedEventDetails.currentCapacity) {
+            message.error(`You cannot request more tickets than available. Only ${selectedEventDetails.currentCapacity} tickets left.`);
+            return;
+        }
         if (values.numTickets !== participantsIds.length) {
             message.error('Number of tickets must match the number of participants.');
             return;
