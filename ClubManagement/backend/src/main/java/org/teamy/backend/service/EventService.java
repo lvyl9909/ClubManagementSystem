@@ -229,16 +229,6 @@ public class EventService {
                     } catch (SQLException rollbackEx) {
                         rollbackEx.printStackTrace();
                     }
-                } finally {
-                    try {
-                        // 恢复自动提交模式并关闭连接
-                        if (!connection.getAutoCommit()) {
-                            connection.setAutoCommit(true);  // 恢复自动提交模式
-                        }
-                        databaseConnectionManager.releaseConnection(connection);  // 释放数据库连接
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
                 }
                 return;  // 成功时直接返回
             } catch (OptimisticLockingFailureException e) {
@@ -247,6 +237,12 @@ public class EventService {
                 }
                 // 等待一段时间后重试
                 Thread.sleep(200);
+            } finally {
+                // 恢复自动提交模式
+                if (!connection.getAutoCommit()) {
+                    connection.setAutoCommit(true);
+                }
+                databaseConnectionManager.releaseConnection(connection);
             }
         }
     }

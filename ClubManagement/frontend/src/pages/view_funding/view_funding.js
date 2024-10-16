@@ -13,28 +13,27 @@ const ViewFunding = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [currentApplication, setCurrentApplication] = useState(null); // 存储当前查看的申请详情
 
-    useEffect(() => {
-        console.log(user);
 
-        const fetchFundingApplications = async () => {
-            setLoading(true);
-            try {
-                const response = await doCall(`${path}/admin/fundingapplication`, 'GET');
-                if (response.ok) {
-                    const data = await response.json(); // 解析 JSON 数据
-                    console.log(data);
-                    setFundingApplications(data); // 将解析后的数据设置为状态
-                } else {
-                    setError('Failed to load funding applications');
-                }
-            } catch (err) {
-                setError('Failed to fetch funding applications');
-                message.error('Failed to load funding applications');
-            } finally {
-                setLoading(false);
+    const fetchFundingApplications = async () => {
+        setLoading(true);
+        try {
+            const response = await doCall(`${path}/admin/fundingapplication`, 'GET');
+            if (response.ok) {
+                const data = await response.json(); // 解析 JSON 数据
+                console.log(data);
+                setFundingApplications(data); // 将解析后的数据设置为状态
+            } else {
+                setError('Failed to load funding applications');
             }
-        };
+        } catch (err) {
+            setError('Failed to fetch funding applications');
+            message.error('Failed to load funding applications');
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchFundingApplications();
 
     }, [path]);
@@ -65,6 +64,8 @@ const ViewFunding = () => {
         } catch (error) {
             message.error('Failed to approve funding application');
         }
+        handleModalClose();
+        fetchFundingApplications();
     };
 
     // Reject Funding Application
@@ -81,6 +82,8 @@ const ViewFunding = () => {
         } catch (error) {
             message.error('Failed to reject funding application');
         }
+        handleModalClose();
+        fetchFundingApplications();
     };
 
     const getStatusTag = (status) => {

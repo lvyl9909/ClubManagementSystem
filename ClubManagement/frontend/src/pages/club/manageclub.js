@@ -414,14 +414,20 @@ function ManageClub() {
             const res = await doCall(`${path}/student/fundingappliction/save`, 'POST', newFunding);
             if (res.ok) {
                 message.success('Funding application submitted successfully');
-                setCreateFundingModalVisible(false);  // Close the modal
-                fetchFundingApplications();  // Refresh the funding list
             } else {
                 message.error('Failed to submit funding application');
             }
         } catch (error) {
+            const errorData = await error.response?.json?.();
             console.error('Error submitting funding application:', error);
-            message.error('An error occurred while submitting the funding application');
+            if (errorData && errorData.message) {
+                message.error(errorData.message);
+            } else {
+                message.error('An error occurred while submitting the funding application');
+            }
+        }finally {
+            setCreateFundingModalVisible(false);
+            await fetchFundingApplications();
         }
     };
 
@@ -457,14 +463,20 @@ function ManageClub() {
             const res = await doCall(`${path}/student/fundingappliction/update`, 'POST', updatedFunding);
             if (res.ok) {
                 message.success('Funding application modified successfully');
-                setModifyFundingModalVisible(false); // Close modal
-                fetchFundingApplications(); // Refresh funding applications
             } else {
                 message.error('Failed to modify funding application');
             }
         } catch (error) {
+            const errorData = await error.response?.json?.();
             console.error('Error modifying funding application:', error);
-            message.error('An error occurred while modifying the funding application');
+            if (errorData && errorData.message) {
+                message.error(errorData.message);
+            } else {
+                message.error('An error occurred while modifying the funding application');
+            }
+        } finally {
+            setModifyFundingModalVisible(false);  // Close modal even on error
+            await fetchFundingApplications();  // Always refresh funding list, regardless of success or failure
         }
     };
 
@@ -484,13 +496,14 @@ function ManageClub() {
                     const res = await doCall(`${path}/student/fundingappliction/cancel`, 'POST', cancelData);
                     if (res.ok) {
                         message.success('Funding application canceled successfully');
-                        fetchFundingApplications();  // Refresh the funding applications list
                     } else {
                         message.error('Failed to cancel funding application');
                     }
                 } catch (error) {
                     console.error('Error canceling funding application:', error);
                     message.error('An error occurred while canceling the funding application');
+                }finally {
+                    await fetchFundingApplications();  // Always refresh funding list, regardless of success or failure
                 }
             }
         });
@@ -742,9 +755,9 @@ function ManageClub() {
                                                     Modify
                                                 </Button>
                                                 <Button danger
-                                                    style={record.status === 'Submitted' ? { color: 'red', cursor: 'pointer' } : { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' }}
-                                                    onClick={() => handleCancelApplication(record)}
-                                                    disabled={record.status !== 'Submitted'}
+                                                        style={record.status === 'Submitted' ? { color: 'red', cursor: 'pointer' } : { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' }}
+                                                        onClick={() => handleCancelApplication(record)}
+                                                        disabled={record.status !== 'Submitted'}
                                                 >
                                                     Cancel
                                                 </Button>

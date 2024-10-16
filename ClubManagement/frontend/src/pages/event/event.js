@@ -53,19 +53,19 @@ function Event() {
         try {
             const res = await doCall(`${path}/student/events/?id=-1`,'GET', );
 
-                // const response = await fetch(`${path}/student/events/?id=-1`, {
-                //     method: 'GET',
-                //     headers: {
-                //         'Content-Type': 'application/json', // 设置内容类型
-                //         'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
-                //     }
-                // });
+            // const response = await fetch(`${path}/student/events/?id=-1`, {
+            //     method: 'GET',
+            //     headers: {
+            //         'Content-Type': 'application/json', // 设置内容类型
+            //         'Authorization': `${type} ${token}`, // 使用 Bearer token 进行身份验证
+            //     }
+            // });
             if (res.ok ) {
                 const data = await res.json();
                 setAllEvents(data);
                 const uniqueClubIds = [...new Set(data.map(event => event.clubId))];
-                    // fetchClubNames(uniqueClubIds);
-                    // console.log(data, 'data------');
+                // fetchClubNames(uniqueClubIds);
+                // console.log(data, 'data------');
             } else {
                 setError('Failed to load club information');
             }
@@ -78,7 +78,7 @@ function Event() {
     };
 
     useEffect(() => {fetchAllEvent();
-        }, []);
+    }, []);
 
     // const fetchClubNames = async (clubIds) => {
     //     try {
@@ -313,6 +313,11 @@ function Event() {
             }
         } catch (error) {
             console.error('Error applying for RSVP:', error);
+            message.error("Error applying for RSVP")
+            await fetchAllEvent();
+            await fetchRsvpedEvents();
+        }finally {
+            setSubmitting(false);
         }
     };
 
@@ -448,9 +453,9 @@ function Event() {
 
                             return (
                                 <Button type="primary" ghost
-                                    disabled={isRSVPed || isEventFull || isCancelledByClub}
-                                    style={isRSVPed ? { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' } : {}}
-                                    onClick={() => handleOpenModal(record.id)}
+                                        disabled={isRSVPed || isEventFull || isCancelledByClub}
+                                        style={isRSVPed ? { backgroundColor: '#d9d9d9', color: '#8c8c8c', cursor: 'not-allowed' } : {}}
+                                        onClick={() => handleOpenModal(record.id)}
                                 >
                                     {isRSVPed ? 'Already Joined' :isEventFull?'Full': isCancelledByClub? 'Cancelled by Club': 'Get Ticket'}
                                 </Button>
