@@ -126,6 +126,7 @@ public class EventService {
             if (existingEvent == null) {
                 throw new Exception("Event not found with ID: " + event.getId());
             }
+            event.setVersion(existingEvent.getVersion());
             Venue venue = venueRepository.getVenueById(event.getVenueId(),connection);
             Club club = clubRepository.findClubById(event.getClubId(),connection);
 
