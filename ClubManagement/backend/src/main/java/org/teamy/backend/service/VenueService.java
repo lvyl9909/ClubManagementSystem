@@ -40,6 +40,16 @@ public class VenueService {
     }
 
 
+//    public List<Venue> getAllVenue() throws Exception {
+//        Connection connection = databaseConnectionManager.nextConnection();
+//        List<Venue> venues = null;
+//        try {
+//            venues = new ArrayList<>(venueRepository.getAllVenue(connection).values());  // 转换 Collection<Venue> 为 List<Venue>
+//            return venues;
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
     public List<Venue> getAllVenue() throws Exception {
         Connection connection = databaseConnectionManager.nextConnection();
         List<Venue> venues = null;
@@ -48,6 +58,8 @@ public class VenueService {
             return venues;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }finally {
+            databaseConnectionManager.releaseConnection(connection);
         }
     }
 }

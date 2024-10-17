@@ -50,37 +50,76 @@ public class TicketService {
         }
         return ticket;
     }
+//    public Map<Ticket, Event> getTicketInfo(Student student) throws Exception {
+//        Connection connection = databaseConnectionManager.nextConnection();
+//        // 为当前请求创建一个 IdentityMapManager 实例
+//        TicketInfoIdentityMap identityMapManager = new TicketInfoIdentityMap();
+//        Map<Ticket, Event> result = new HashMap<>();
+//
+//        // 首先检查缓存或从数据库懒加载 Ticket
+//        student = studentRepository.lazyLoadTicket(student);
+//        List<Ticket> tickets = student.getTickets();
+//        System.out.println("从缓存拿到ticket"+tickets);
+//
+//        // 查询 Event
+//        for (Ticket ticket : tickets) {
+//            System.out.println("ticket:" + ticket);
+//
+//            // 先从 IdentityMap 中获取 event，避免重复查询
+//            Event event = identityMapManager.getEvent(ticket.getEventId());
+//            System.out.println(event);
+//
+//            // 如果 IdentityMap 中没有，则从数据库查询并更新 IdentityMap
+//            if (event == null) {
+//                event = eventDataMapper.findEventById(ticket.getEventId(),connection);  // 查询数据库
+//                identityMapManager.addEvent(event); // 将 event 加入 IdentityMap
+//            }
+//
+//            // 将 Ticket 和对应的 Event 放入结果 Map
+//            result.put(ticket, event);
+//        }
+//
+//        // 将 Ticket 和 Event 信息打包返回
+//        return result;
+//    }
+
     public Map<Ticket, Event> getTicketInfo(Student student) throws Exception {
         Connection connection = databaseConnectionManager.nextConnection();
         // 为当前请求创建一个 IdentityMapManager 实例
-        TicketInfoIdentityMap identityMapManager = new TicketInfoIdentityMap();
-        Map<Ticket, Event> result = new HashMap<>();
+        try {
+            TicketInfoIdentityMap identityMapManager = new TicketInfoIdentityMap();
+            Map<Ticket, Event> result = new HashMap<>();
 
-        // 首先检查缓存或从数据库懒加载 Ticket
-        student = studentRepository.lazyLoadTicket(student);
-        List<Ticket> tickets = student.getTickets();
-        System.out.println("从缓存拿到ticket"+tickets);
+            // 首先检查缓存或从数据库懒加载 Ticket
+            student = studentRepository.lazyLoadTicket(student);
+            List<Ticket> tickets = student.getTickets();
+            System.out.println("从缓存拿到ticket"+tickets);
 
-        // 查询 Event
-        for (Ticket ticket : tickets) {
-            System.out.println("ticket:" + ticket);
+            // 查询 Event
+            for (Ticket ticket : tickets) {
+                System.out.println("ticket:" + ticket);
 
-            // 先从 IdentityMap 中获取 event，避免重复查询
-            Event event = identityMapManager.getEvent(ticket.getEventId());
-            System.out.println(event);
+                // 先从 IdentityMap 中获取 event，避免重复查询
+                Event event = identityMapManager.getEvent(ticket.getEventId());
+                System.out.println(event);
 
-            // 如果 IdentityMap 中没有，则从数据库查询并更新 IdentityMap
-            if (event == null) {
-                event = eventDataMapper.findEventById(ticket.getEventId(),connection);  // 查询数据库
-                identityMapManager.addEvent(event); // 将 event 加入 IdentityMap
+                // 如果 IdentityMap 中没有，则从数据库查询并更新 IdentityMap
+                if (event == null) {
+                    event = eventDataMapper.findEventById(ticket.getEventId(),connection);  // 查询数据库
+                    identityMapManager.addEvent(event); // 将 event 加入 IdentityMap
+                }
+
+                // 将 Ticket 和对应的 Event 放入结果 Map
+                result.put(ticket, event);
             }
 
-            // 将 Ticket 和对应的 Event 放入结果 Map
-            result.put(ticket, event);
+            // 将 Ticket 和 Event 信息打包返回
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
         }
-
-        // 将 Ticket 和 Event 信息打包返回
-        return result;
     }
     public synchronized void deleteTicket(Integer id){
         try {

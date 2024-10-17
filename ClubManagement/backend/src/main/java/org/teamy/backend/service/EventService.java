@@ -51,18 +51,39 @@ public class EventService {
         this.venueRepository = venueRepository;
         this.databaseConnectionManager = databaseConnectionManager;
     }
+//    public Event getEventById(Integer id) throws Exception {
+//        Connection connection =  databaseConnectionManager.nextConnection();
+//        if (id <= 0) {
+//            throw new IllegalArgumentException("Club ID must be positive");
+//        }
+//
+//        Event event = eventRepository.findEventById(id,connection);
+//        if (event == null) {
+//            throw new RuntimeException("event with id '" + id + "' not found");
+//        }
+//        return event;
+//    }
     public Event getEventById(Integer id) throws Exception {
+        Event event = null;
         Connection connection =  databaseConnectionManager.nextConnection();
-        if (id <= 0) {
-            throw new IllegalArgumentException("Club ID must be positive");
-        }
+        try {
 
-        Event event = eventRepository.findEventById(id,connection);
-        if (event == null) {
-            throw new RuntimeException("event with id '" + id + "' not found");
+            if (id <= 0) {
+                throw new IllegalArgumentException("Club ID must be positive");
+            }
+
+            event = eventRepository.findEventById(id,connection);
+            if (event == null) {
+                throw new RuntimeException("event with id '" + id + "' not found");
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        } finally {
+            databaseConnectionManager.releaseConnection(connection);
         }
         return event;
     }
+
     public List<Event> getEventByTitle(String title) throws Exception {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be null or empty.");
@@ -98,6 +119,7 @@ public class EventService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
+            databaseConnectionManager.releaseConnection(connection);
         }
     }
 

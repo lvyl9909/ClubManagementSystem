@@ -288,14 +288,7 @@ public class FundingApplicationService {
             throw new RuntimeException(e);
         } finally {
             // 确保在任何情况下都关闭数据库连接
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);  // 恢复自动提交模式
-                    connection.close();  // 关闭连接
-                } catch (SQLException closeEx) {
-                    closeEx.printStackTrace();
-                }
-            }
+            databaseConnectionManager.releaseConnection(connection);
         }
     }
 }

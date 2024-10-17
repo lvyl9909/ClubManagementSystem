@@ -330,14 +330,15 @@ function ManageClub() {
             const res = await doCall(`${path}/student/events/update`, 'POST', updatedEvent);
             if (res.ok) {
                 message.success('Event updated successfully');
-                setEditModalVisible(false); // Close the modal
-                fetchClubEvents(); // Refresh the events
             } else {
                 message.error('Failed to update event');
             }
         } catch (error) {
             console.error('Error updating event:', error);
             message.error('An error occurred while updating the event');
+        }finally {
+            setEditModalVisible(false); // Close the modal
+            fetchClubEvents(); // Refresh the events
         }
     };
 
@@ -368,8 +369,6 @@ function ManageClub() {
             const res = await doCall(`${path}/student/events/save`, 'POST', newEvent);
             if (res.ok) {
                 message.success('Event created successfully');
-                setCreateModalVisible(false); // Close the modal
-                fetchClubEvents(); // Refresh the events list
             } else {
                 throw new Error('Failed to create event');
             }
@@ -380,6 +379,9 @@ function ManageClub() {
             } else {
                 message.error(errorData.message || 'An error occurred while creating the event');
             }
+        }finally {
+            setCreateModalVisible(false); // Close the modal
+            fetchClubEvents(); // Refresh the events list
         }
     };
 
