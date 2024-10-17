@@ -224,7 +224,8 @@ public class FundingApplicationService {
             if (connection != null) {
                 try {
                     connection.setAutoCommit(true);  // 恢复自动提交模式
-                    connection.close();  // 关闭连接
+//                    connection.close();  // 关闭连接
+                    databaseConnectionManager.releaseConnection(connection);
                 } catch (SQLException closeEx) {
                     closeEx.printStackTrace();
                 }
