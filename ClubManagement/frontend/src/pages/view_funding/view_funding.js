@@ -159,9 +159,15 @@ const ViewFunding = () => {
 //         </div>
 //     );
 // };
-    const approvedApplications = fundingApplications.filter(app => app.status === 'Approved');
-    const rejectedApplications = fundingApplications.filter(app => app.status === 'Rejected');
-    const activeApplications = fundingApplications.filter(app => app.status !== 'Approved' && app.status !== 'Rejected');
+    const approvedApplications = fundingApplications
+        .filter(app => app.status === 'Approved' && app.status !== 'Cancelled');
+
+    const rejectedApplications = fundingApplications
+        .filter(app => app.status === 'Rejected' && app.status !== 'Cancelled');
+
+    const activeApplications = fundingApplications
+        .filter(app => app.status !== 'Approved' && app.status !== 'Rejected' && app.status !== 'Cancelled');
+
 
     return (
         <div style={{ margin: '20px' }}>
