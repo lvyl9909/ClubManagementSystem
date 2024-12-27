@@ -1,4 +1,4 @@
-** repository structure:**
+* repository structure: *
 
 ```
 ├── docs
